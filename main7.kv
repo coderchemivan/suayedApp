@@ -1,0 +1,347 @@
+## VERSIÓN 5
+
+WindowManager:
+    id: screen_manager
+    LoginPage:
+        id:login_screen
+        name: 'login_page'
+    FirstWindow:
+        name: 'firstwindow'
+    SecondWindow:
+        id:sw
+        name: 'secondwindow'
+    ThirdWindow:
+        id:tw
+        name: 'thirdwindow'
+    FourthWindow:
+        id:fw
+        name: 'thirdwindow'
+
+
+
+<ListItemWithCheckbox>:
+    on_press: root.screen_two.press_actividad(root,self)
+    RightCheckbox:
+        on_press: root.screen_two.activity_check(root)
+
+
+<ListItemWithoutCheckbox>:
+    on_press: root.screen_two.press_actividad(self)
+
+
+
+
+
+<ContentNavigationDrawer>:
+
+    ScrollView:
+
+        MDList:
+
+            OneLineListItem:
+                text: "Principios y técnicas de la investigación"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    app.root.current = "secondwindow"
+
+            OneLineListItem:
+                text: "Dirección"
+                on_press:
+                    root.nav_drawer.set_state("close")
+                    app.root.current = "secondwindow"
+
+
+
+<LoginPage>:
+    username: User
+    password: Pass
+    login_cb: login_cb2
+    MDTextField:
+        id: User
+        hint_text: "Username"
+        size_hint: 0.5, 0.09
+        pos_hint: {"center_x": 0.5, "center_y": 0.7}
+        icon_right: "account"
+
+    MDTextField:
+        id: Pass
+        hint_text: "Password"
+        size_hint: 0.5, 0.09
+        pos_hint: {"center_x": 0.5, "center_y": 0.6}
+        icon_right: "key"
+        password: True
+        cursor_color: 0,0,0,1
+    MDLabel:
+        text: "Remember me"
+        size_hint: 0.5,0.06
+        pos_hint:{"x":0.35,"y":0.47}
+
+    RightCheckbox:
+        id: login_cb2
+        #active: True
+        size_hint:0.055, 0.055
+        pos_hint: {"x": 0.68, "center_y": 0.5}
+        on_press:
+            root.remember_me()
+
+
+    MDFillRoundFlatButton:
+        id:login_button
+        text: "Login"
+        size_hint: 0.5, 0.06
+        pos_hint: {"center_x": 0.5, "center_y": 0.35}
+        on_release:
+            root.login()
+
+
+
+
+<FirstWindow>:
+    RelativeLayout:
+
+        MDToolbar:
+            title: 'HOME'
+            elevation: 10
+            left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+            pos_hint:{'x':0,'top':1}
+            size_hint_y: 0.1
+            size_hint_x:1
+
+
+        MDNavigationDrawer:
+            id: nav_drawer
+            ContentNavigationDrawer:
+                #screen_manager: screen_manager
+                nav_drawer: nav_drawer
+                size_hint_y: 1
+                size_hint_x:0.3
+                pos_hint:{"x":0,"top":1}
+
+
+
+        MDFloatingActionButton:
+            elevation: 8
+            icon: 'plus'
+            pos_hint: {'center_x': .5}
+            on_press:
+                app.root.current = 'secondwindow'
+                root.manager.transition.direction = 'left'
+
+
+<SecondWindow>:
+    BoxLayout:
+        spacing: 5
+        orientation: "vertical"
+        BoxLayout:
+            size_hint_y : 0.1
+            orientation: 'horizontal'
+            MDToolbar:
+                id: nombre_materia
+                title: 'ACTIVIDADES'
+                right_action_items: [["menu", lambda x: root.abrir_menu(x)]]
+                elevation:10
+
+
+
+        FloatLayout:
+            orientation : "horizontal"
+            size_hint_x : 1
+            size_hint_y : 0.20
+
+
+            MDFloatingActionButton:
+                id: Por_entregar
+                icon: "bookmark-check-outline"
+                opposite_colors: True
+                elevation: 8
+                md_bg_color: 0, 0.1, 0, .5
+                pos_hint: {"x":0.10,"y":0.40}
+                on_press: root.por_entregar()
+
+            MDTextButton:
+                id:por_entregar_text
+                text: "8"
+                pos_hint:{"x":0.17,"y":0.12}
+                font_size:18
+
+
+            MDFloatingActionButton:
+                id: Entregas_a_tiempo
+                icon: "bookmark-check-outline"
+                opposite_colors: True
+                elevation: 8
+                md_bg_color: 0, 1, 0, .5
+                pos_hint: {"x":0.32,"y":0.40}
+                on_press: root.entregas_a_tiempo()
+
+            MDTextButton:
+                id:Entregas_a_tiempo_text
+                text: "5"
+                pos_hint:{"x":0.39,"y":0.12}
+                font_size:18
+
+
+            MDFloatingActionButton:
+                id: Entregas_con_retraso
+                icon: "bookmark-check-outline"
+                opposite_colors: True
+                elevation: 8
+                md_bg_color: 0, 0, 1, 1
+                pos_hint: {"x":0.54,"y":0.40}
+                on_press: root.entregas_con_atraso()
+
+            MDTextButton:
+                id:Entregas_con_retraso_text
+                text: "5"
+                pos_hint:{"x":0.60,"y":0.12}
+                font_size:18
+
+
+            MDFloatingActionButton:
+                icon: "backspace-reverse"
+                opposite_colors: True
+                elevation: 8
+                md_bg_color: 1, 0, 0, .5
+                pos_hint: {"x":0.76,"y":0.40}
+                on_press: root.atrasadas()
+
+            MDTextButton:
+                id:Atrasada_text
+                text: "5"
+                pos_hint:{"x":0.82,"y":0.12}
+                font_size:18
+
+
+        BoxLayout:
+            orientation : "horizontal"
+            size_hint_x : 1
+            size_hint_y : 0.7
+
+
+            ScrollView:
+                MDList:
+                    id: list_one
+
+
+        BoxLayout:
+            orientation : "horizontal"
+            size_hint_x : 1
+            size_hint_y : 0.1
+
+
+            MDBottomNavigation:
+                panel_color: get_color_from_hex("#eeeaea")
+                selected_color_background: get_color_from_hex("#97ecf8")
+                text_color_active: 0, 0, 0, 1
+
+                MDBottomNavigationItem:
+                    name: 'progreso'
+                    text: 'Progreso'
+                    icon: 'mail'
+                    badge_icon: "numeric-10"
+
+
+                MDBottomNavigationItem:
+                    name: 'calificaciones'
+                    text: 'Consultar calificaciones'
+                    icon: 'cloud-search-outline'
+                    badge_icon: "numeric-5"
+                    on_tab_press: root.consultar_calificaciones()
+
+#                MDFloatingActionButton:
+#                    text: "goto screen 4"
+#                    on_release: app.root.current = 'fourthwindow'
+
+<ThirdWindow>:
+    FloatLayout:
+        spacing:5
+        MDToolbar:
+            id: nombre_actividad
+            title : ""
+            size_hint: 1,0.1
+            pos_hint:{"top":1}
+            elevation: 10
+            left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]
+
+
+        MDRoundFlatIconButton:
+            id: estatus_entrega
+            text: "Estatus de la entrega"
+            font_size: 14
+            size_hint: 0.98,0.06
+            pos_hint:{"x":0.01,"y":0.83}
+            icon: 'pencil'
+
+        MDRoundFlatIconButton:
+            id: enviado_el
+            text: "Enviado el: "
+            size_hint: 0.98,0.06
+            font_size: 14
+            pos_hint:{"x":0.01,"y":0.75}
+            icon: 'calendar'
+            on_press:
+                root.show_date_picker()
+
+        MDRoundFlatIconButton:
+            id: calificacion
+            text: "Calificación :"
+            size_hint: 0.98,0.06
+            pos_hint:{"x":0.01,"y":0.67}
+            icon: 'school'
+
+        MDRoundFlatIconButton:
+            id: ponderacion
+            text: "Valor :"
+            size_hint: 0.98,0.06
+            pos_hint:{"x":0.01,"y":0.59}
+            icon: 'menu'
+
+
+        MDRoundFlatIconButton:
+            id: calificado_el
+            text: "Calificado el:"
+            font_size: 13
+            size_hint: 0.98,0.06
+            pos_hint:{"x":0.01,"y":0.51}
+            icon: 'calendar'
+
+        MDLabel:
+            id: comentarios_etiqueta
+            text: "Comentarios:"
+            size_hint: 0.98,0.06
+            pos_hint:{"x":0.01,"y":0.43}
+
+        BoxLayout
+            size_hint: 0.9,0.44
+            pos_hint:{"x":0.05,"y":0}
+            GridLayout:
+                cols:1
+                size_hint_x: 0.5
+                #width:"600dp"
+                #size_hint_x:None
+                #size_hint:0.8,1
+                #pos_hint: {"x":0.1,"y":0.5}
+                ScrolllabelLabel:
+                    id:scroll_lable
+
+<ScrolllabelLabel>:
+    MDLabel:
+        comentarios:comentarios
+        id: comentarios
+        text: ""
+
+        font_size: 20
+        text_size: self.width, None
+        size_hint_y: None
+        height: self.texture_size[1]
+
+
+
+<FourthWindow>:
+    GridLayout:
+        cols:1
+        #size_hint_x:None
+        size_hint:0.8,1
+        pos_hint: {"x":0.1,"y":0.5}
+        ScrolllabelLabel:
+
