@@ -16,6 +16,9 @@ from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.list import IconRightWidget
 from kivymd.uix.toolbar import MDToolbar
 from kivy.properties import ObjectProperty
+
+import picker_modificado
+from picker_modificado import MDDatePicker
 from kivymd.uix.picker import MDDatePicker
 from kivymd.uix.button import MDRoundFlatIconButton
 from kivymd.uix.button import MDFillRoundFlatIconButton
@@ -294,7 +297,7 @@ class ThirdWindow(Screen):
 
     def show_date_picker(self):
         # date_dialog = MDDatePicker(year=2000, month=2, day=14)
-        date_dialog = MDDatePicker()
+        date_dialog = picker_modificado.MDDatePicker()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
 
