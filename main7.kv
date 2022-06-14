@@ -59,14 +59,14 @@ WindowManager:
     MDTextField:
         id: User
         hint_text: "Username"
-        size_hint: 0.5, 0.09
+        size_hint: 0.5, 0.1
         pos_hint: {"center_x": 0.5, "center_y": 0.7}
         icon_right: "account"
 
     MDTextField:
         id: Pass
         hint_text: "Password"
-        size_hint: 0.5, 0.09
+        size_hint: 0.5, 0.1
         pos_hint: {"center_x": 0.5, "center_y": 0.6}
         icon_right: "key"
         password: True
@@ -94,7 +94,12 @@ WindowManager:
             root.login()
 
 
-
+    Button:
+        text: "show calendar"
+        size_hint: 0.5, 0.06
+        pos_hint: {"center_x": 0.5, "center_y": 0.20}
+        on_press:
+            root.show_date_picker()
 
 <FirstWindow>:
     RelativeLayout:

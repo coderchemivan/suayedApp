@@ -18,8 +18,9 @@ from kivymd.uix.toolbar import MDToolbar
 from kivy.properties import ObjectProperty
 
 import picker_modificado
-from picker_modificado import MDDatePicker
-from kivymd.uix.picker import MDDatePicker
+#from picker_modificado import MDDatePicker
+from kivymd.uix.pickers import MDDatePicker
+
 from kivymd.uix.button import MDRoundFlatIconButton
 from kivymd.uix.button import MDFillRoundFlatIconButton
 from kivymd.uix.list import IRightBodyTouch, TwoLineAvatarIconListItem
@@ -59,7 +60,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
 from plataformaSuayed_CSV_DB import Feedback
-import mysql.connector
+
 import datetime
 from datetime import date
 
@@ -113,6 +114,23 @@ class LoginPage(Screen):
                 self.password.text = ""
             else:
                 print("Not here!")
+
+    def on_save(self, instance, value, date_range):
+        print(instance, value, date_range)
+        # self.root.ids.date_label.text = str(value)
+        self.ids.enviado_el.text = str(value)
+
+    #
+    # Click Cancel
+    def on_cancel(self, instance, value):
+        pass
+
+    def show_date_picker(self):
+        # date_dialog = MDDatePicker(year=2000, month=2, day=14)
+        date_dialog = picker_modificado.MDDatePicker()
+        date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
+        date_dialog.open()
+
 
 
 class FirstWindow(Screen):pass
@@ -297,10 +315,9 @@ class ThirdWindow(Screen):
 
     def show_date_picker(self):
         # date_dialog = MDDatePicker(year=2000, month=2, day=14)
-        date_dialog = picker_modificado.MDDatePicker()
+        date_dialog = MDDatePicker()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
-
 
 
 class FourthWindow(Screen): pass
