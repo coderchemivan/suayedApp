@@ -11,6 +11,37 @@ class obtener_materias():
     def __init__(self,archivo_materias):
         self.archivo_materias = archivo_materias
 
+    def dias_con_pendientes(self,modo,month = None):
+        with open(self.archivo_materias, 'r') as file:
+            reader = csv.reader(file)
+            myList = list(reader)
+
+        if modo == 1:
+            lista_dias = list()
+            for x,line in enumerate(myList):
+                if x>0:
+                    fecha_entrega = myList[x][3]
+                    fecha_split = fecha_entrega.split('/')
+                    mes_ = fecha_split[1]
+                    if month == mes_:
+                        lista_dias.append(fecha_split[0])
+
+            return lista_dias
+        elif modo==2:
+            mes_trabajado = myList[1][15]
+            return mes_trabajado
+        elif modo == 3:
+            myList[1][15] = month
+            my_new_list = open(self.archivo_materias, 'w', newline='')
+            csv_writer = csv.writer(my_new_list)
+            csv_writer.writerows(myList)
+
+
+
+
+
+
+
 
     def remember_status(self):
         with open(self.archivo_materias, 'r') as file:
@@ -316,8 +347,8 @@ class vaciar_feedback():
 
 
 
-
-#archivo = r'C:\Python310\PycharmProjects\kivyGUI\virt\KivyMDNavDrawerAndScreenManager\assests\BD\materias.csv'
+archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
+#print(obtener_materias(archivo).dias_con_pendientes('05'))
 #obtener_materias(archivo).actualizar_estados()
 #obtener_materias(r'C:\Python310\PycharmProjects\kivyGUI\virt\KivyMDNavDrawerAndScreenManager\assests\BD\materias.csv').definir_lista('TwoLineRightIconListItem')
 #obtener_materias(r'C:\Python310\PycharmProjects\kivyGUI\virt\KivyMDNavDrawerAndScreenManager\assests\BD\materias.csv').total_actividades('PRINCIPIOS Y TECNICAS DE LA INVESTIGACION')
