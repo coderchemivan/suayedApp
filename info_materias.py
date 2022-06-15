@@ -11,7 +11,7 @@ class obtener_materias():
     def __init__(self,archivo_materias):
         self.archivo_materias = archivo_materias
 
-    def dias_con_pendientes(self,modo,month = None,año=None):
+    def dias_con_pendientes(self,modo,month = None,año=None,fecha = None):
         with open(self.archivo_materias, 'r') as file:
             reader = csv.reader(file)
             myList = list(reader)
@@ -37,9 +37,14 @@ class obtener_materias():
             csv_writer = csv.writer(my_new_list)
             csv_writer.writerows(myList)
 
-
-
-
+        elif modo == 4:
+            lista_dias = list()
+            for x,line in enumerate(myList):
+                if x>0:
+                    fecha_entrega = myList[x][3]
+                    if fecha_entrega == fecha:
+                        lista_dias.append(fecha_entrega)
+            return lista_dias
 
 
 
