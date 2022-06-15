@@ -126,10 +126,15 @@ class LoginPage(Screen):
         pass
 
     def show_date_picker(self):
+        archivo = r'assests\BD\materias.csv'
+
+        obtener_materias(archivo).dias_con_pendientes(modo=3, month='06',año='2022')
         # date_dialog = MDDatePicker(year=2000, month=2, day=14)
         date_dialog = picker_modificado.MDDatePicker()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
+        hoy = date.today().month
+        print(hoy)
 
 
 
