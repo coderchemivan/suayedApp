@@ -39,15 +39,17 @@ WindowManager:
         MDList:
 
             OneLineListItem:
-                text: "Principios y técnicas de la investigación"
+                text: "Semestre 22-2"
                 on_press:
                     root.nav_drawer.set_state("close")
+                    root.sm2.transition.direction = 'right'
                     app.root.current = "secondwindow"
 
             OneLineListItem:
-                text: "Dirección"
+                text: "Semestre 23-1"
                 on_press:
                     root.nav_drawer.set_state("close")
+                    root.sm2.transition.direction = 'right'
                     app.root.current = "secondwindow"
 
 
@@ -102,15 +104,30 @@ WindowManager:
             root.show_date_picker()
 
 <FirstWindow>:
-    RelativeLayout:
+    MDScreen:
 
-        MDToolbar:
-            title: 'HOME'
-            elevation: 10
-            left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
-            pos_hint:{'x':0,'top':1}
-            size_hint_y: 0.1
-            size_hint_x:1
+        RelativeLayout:
+
+            MDToolbar:
+                title: 'HOME'
+                elevation: 10
+                left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+                pos_hint:{'x':0,'top':1}
+                size_hint_y: 0.1
+                size_hint_x:1
+
+            MDFloatingActionButton:
+                elevation: 8
+                icon: 'plus'
+                pos_hint: {'center_x': .5}
+                on_press:
+                    app.root.current = 'secondwindow'
+                    root.manager.transition.direction = 'left'
+
+            Button:
+                text: "que pedo"
+                pos_hint: {'center_x':0.5,'center_y':0.5}
+                size_hint: 0.7,0.2
 
 
         MDNavigationDrawer:
@@ -124,15 +141,6 @@ WindowManager:
 
 
 
-        MDFloatingActionButton:
-            elevation: 8
-            icon: 'plus'
-            pos_hint: {'center_x': .5}
-            on_press:
-                app.root.current = 'secondwindow'
-                root.manager.transition.direction = 'left'
-
-
 <SecondWindow>:
     BoxLayout:
         spacing: 5
@@ -144,6 +152,7 @@ WindowManager:
                 id: nombre_materia
                 title: 'ACTIVIDADES'
                 right_action_items: [["menu", lambda x: root.abrir_menu(x)]]
+                left_action_items: [["keyboard-backspace", lambda x: app.go_back(1)]]
                 elevation:10
 
 
@@ -168,6 +177,7 @@ WindowManager:
                 text: "8"
                 pos_hint:{"x":0.17,"y":0.12}
                 font_size:18
+                size_hint: 0.2,0.1
 
 
             MDFloatingActionButton:
@@ -177,13 +187,15 @@ WindowManager:
                 elevation: 8
                 md_bg_color: 0, 1, 0, .5
                 pos_hint: {"x":0.32,"y":0.40}
+
                 on_press: root.entregas_a_tiempo()
 
             MDTextButton:
                 id:Entregas_a_tiempo_text
-                text: "5"
-                pos_hint:{"x":0.39,"y":0.12}
+                text: "hola"
+                pos_hint:{"x":0.38,"y":0.12}
                 font_size:18
+                size_hint: 0.2,0.1
 
 
             MDFloatingActionButton:
@@ -200,7 +212,7 @@ WindowManager:
                 text: "5"
                 pos_hint:{"x":0.60,"y":0.12}
                 font_size:18
-
+                size_hint: 0.2,0.1
 
             MDFloatingActionButton:
                 icon: "backspace-reverse"
@@ -215,7 +227,7 @@ WindowManager:
                 text: "5"
                 pos_hint:{"x":0.82,"y":0.12}
                 font_size:18
-
+                size_hint: 0.2,0.1
 
         BoxLayout:
             orientation : "horizontal"
@@ -266,7 +278,7 @@ WindowManager:
             size_hint: 1,0.1
             pos_hint:{"top":1}
             elevation: 10
-            left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]
+            left_action_items: [["keyboard-backspace", lambda x: app.go_back(2)]]
 
 
         MDRoundFlatIconButton:
