@@ -14,7 +14,7 @@ from kivymd.uix.list import OneLineIconListItem, MDList
 from kivymd.uix.list import OneLineListItem
 from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.list import IconRightWidget
-from kivymd.uix.toolbar import MDToolbar
+
 from kivy.properties import ObjectProperty
 
 import picker_modificado
@@ -143,7 +143,9 @@ class FirstWindow(Screen):pass
 
 activity_name = ""
 class SecondWindow(Screen):
-    def on_pre_enter(self, *args):
+    def on_pre_enter(self, *args): self.update_screen()
+
+    def update_screen(self):
         # Limpiando las materias de la pantalla
         self.ids.list_one.clear_widgets()
 
@@ -196,6 +198,7 @@ class SecondWindow(Screen):
         obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
 
 
+
     def press_actividad(self):  # Abre la ventana donde se muestran los detalles de la actividad
         activity_name = obtener_materias('assests\BD\materias.csv').define_activity(self.text)
         sm.current = 'thirdwindow'
@@ -217,9 +220,6 @@ class SecondWindow(Screen):
         self.menu.dismiss()
         archivo = 'assests\BD\materias.csv'
         obtener_materias(archivo).define_subject(text_item)
-
-        sm.current = "firstwindow"
-        sm.current = "secondwindow"
         subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
         estados = ['por entregar', 'entregadas con atraso', 'atrasadas', 'entregadas a tiempo']
         num_act_estado = dict()
@@ -227,12 +227,10 @@ class SecondWindow(Screen):
             obtener_materias(archivo).estado_actividad(estado, 'TwoLineRightIconListItem')
             num_actividades = len(obtener_materias(archivo).total_actividades(subject_name))
             num_act_estado[estado] = num_actividades
-
-        self.ids.por_entregar_text.text = str(num_act_estado['por entregar'])
-        self.ids.Entregas_con_retraso_text.text = str(num_act_estado['entregadas con atraso'])
-        self.ids.Atrasada_text.text = str(num_act_estado['atrasadas'])
-        self.ids.Entregas_a_tiempo_text.text = str(num_act_estado['entregadas a tiempo'])
         obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
+        self.update_screen()
+
+
 
     def consultar_calificaciones(self):  # Extrae el feedback de internet
         archivo = 'assests\BD\materias.csv'
@@ -255,9 +253,8 @@ class SecondWindow(Screen):
 
         subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
         actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
+        self.update_screen()
 
-        sm.current = "firstwindow"
-        sm.current = "secondwindow"
 
     def entregas_con_atraso(self, *args):
         archivo = 'assests\BD\materias.csv'
@@ -265,27 +262,23 @@ class SecondWindow(Screen):
 
         subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
         actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
-        sm.current = "firstwindow"
-        sm.current = "secondwindow"
+        self.update_screen()
 
 
     def atrasadas(self, *args):
         archivo = 'assests\BD\materias.csv'
         obtener_materias(archivo).estado_actividad('atrasadas', 'TwoLineRightIconListItem')
-
         subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
         actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
+        self.update_screen()
 
-        sm.current = "firstwindow"
-        sm.current = "secondwindow"
 
     def por_entregar(self, *args):
         archivo = 'assests\BD\materias.csv'
         obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
         subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
         actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
-        sm.current = "firstwindow"
-        sm.current = "secondwindow"
+        self.update_screen()
 
 
 class ThirdWindow(Screen):
@@ -303,9 +296,6 @@ class ThirdWindow(Screen):
         self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[5]) * 100)}'
 
 
-    def go_back(self):
-        sm.current = "secondwindow"
-        sm.transition.direction = 'right'
 
     #Click OK
     def on_save(self, instance, value, date_range):
@@ -334,7 +324,7 @@ class WindowManager(ScreenManager):
 
 class ContentNavigationDrawer(MDBoxLayout):
     nav_drawer = ObjectProperty()
-
+    sm2 = ScreenManager()
 
 class ListItemWithCheckbox(TwoLineRightIconListItem):
     '''Custom list item.'''
@@ -362,6 +352,7 @@ class TestNavigationDrawer(MDApp):
     def build(self):
         Window.size = (350, 600)
         self.title = "Gestor de tareas"
+        sm2 = ScreenManager()
         Builder.load_file('main7.kv')
         sm.add_widget(LoginPage(name='login_page'))
         sm.add_widget(FirstWindow(name='firstwindow'))
@@ -369,4 +360,12 @@ class TestNavigationDrawer(MDApp):
         sm.add_widget(ThirdWindow(name='thirdwindow'))
         sm.add_widget(FourthWindow(name='fourthwindow'))
         return sm
+
+    def go_back(self,pantalla):
+        if pantalla == 1:
+            sm.transition.direction = 'right'
+            sm.current = "firstwindow"
+        else:
+            sm.transition.direction = 'right'
+            sm.current = "secondwindow"
 TestNavigationDrawer().run()
