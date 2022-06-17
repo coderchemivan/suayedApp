@@ -127,7 +127,7 @@ class obtener_materias():
                         elif  'Entregada' in row[5]:
                             activity_date[row[2]] = f'Delivered {diff_fechaEntregada_Hoy} days ago'
                         elif diff<0 and  row[4]== "":
-                            activity_date[row[2]] = f'{diff_fechaEntrega_Hoy} delayed'
+                            activity_date[row[2]] = f'{diff_fechaEntrega_Hoy} days delayed'
 
                     elif estado == 'por entregar' and diff>=0 and row[1]==materia and row[5] =='Por entregar' :
                         actividades.append(row[2])
@@ -144,7 +144,7 @@ class obtener_materias():
                             activity_date[row[2]] = f'Delivered {diff_fechaEntregada_Hoy}'
                     elif estado =='atrasadas' and row[1] == materia and diff<0 and row[4]=="":
                         actividades.append(row[2])
-                        activity_date[row[2]] = f'{diff_fechaEntrega_Hoy} delayed'
+                        activity_date[row[2]] = f'{diff_fechaEntrega_Hoy} days delayed'
                 c+=1
         
         return activity_date

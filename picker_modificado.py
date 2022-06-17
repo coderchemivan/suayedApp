@@ -826,6 +826,7 @@ class BaseDialogPicker(
     BaseDialog,
     FakeRectangularElevationBehavior,
     SpecificBackgroundColorBehavior,
+
 ):
     """
     Base class for :attr:`~kivymd.uix.picker.MDDatePicker` and
@@ -2045,7 +2046,6 @@ class MDDatePicker(BaseDialogPicker):
 
     def generate_list_widgets_days(self):
         calendar_list = []
-
         for day in self.calendar.iterweekdays():
             weekday_label = DatePickerWeekdayLabel(
                 text=calendar.day_name[day][0].upper(),

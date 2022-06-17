@@ -76,7 +76,6 @@ class LoginPage(Screen):
         Clock.schedule_once(self.remember_)
 
     def remember_(self,*args):
-
         archivo = r'assests\BD\usuarioData.csv'
         with open(archivo, 'r') as file:
             reader = csv.reader(file)
@@ -143,6 +142,9 @@ class FirstWindow(Screen):pass
 
 activity_name = ""
 class SecondWindow(Screen):
+    def __init_(self,**kwargs):
+        super(SecondWindow,self).__init__(**kwargs)
+
     def on_pre_enter(self, *args): self.update_screen()
 
     def update_screen(self):
@@ -204,13 +206,14 @@ class SecondWindow(Screen):
         sm.current = 'thirdwindow'
 
 
-    def activity_check(self):  # Se indica que se entregó una actividad
+    def activity_check(self,*args):  # Se indica que se entregó una actividad
         archivo = 'assests\BD\materias.csv'
         activity_name = self.text
         materia = obtener_materias(archivo).obtener_materia_name()
         obtener_materias(archivo).actualizar_DB(materia, activity_name)
-        sm.current = "firstwindow"
+        sm.current ="firstwindow"
         sm.current = "secondwindow"
+
 
     def abrir_menu(self, button):  # Abre el menú con las materias
         self.menu.caller = button
@@ -229,7 +232,6 @@ class SecondWindow(Screen):
             num_act_estado[estado] = num_actividades
         obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
         self.update_screen()
-
 
 
     def consultar_calificaciones(self):  # Extrae el feedback de internet
@@ -294,7 +296,6 @@ class ThirdWindow(Screen):
         self.ids.calificado_el.text = f' Calificada el : {activity_status[3]}'
         self.ids.scroll_lable.ids.comentarios.text = f' {activity_status[4]}'
         self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[5]) * 100)}'
-
 
 
     #Click OK
