@@ -140,12 +140,21 @@ class LoginPage(Screen):
 class FirstWindow(Screen):pass
 
 
+
 activity_name = ""
 class SecondWindow(Screen):
     def __init_(self,**kwargs):
         super(SecondWindow,self).__init__(**kwargs)
 
-    def on_pre_enter(self, *args): self.update_screen()
+    def on_pre_enter(self, *args):
+        self.update_screen()
+
+    def definir_semestre(self):
+        archivo_aux = "assests\BD\semestres_materias.csv"
+        archivo = "assests\BD\materias.csv"
+        semestre = self.text
+        obtener_materias(archivo).define_semester(semestre,archivo_aux)
+
 
     def update_screen(self):
         # Limpiando las materias de la pantalla
@@ -326,6 +335,7 @@ class WindowManager(ScreenManager):
 class ContentNavigationDrawer(MDBoxLayout):
     nav_drawer = ObjectProperty()
     sm2 = ScreenManager()
+    screen_two = SecondWindow
 
 class ListItemWithCheckbox(TwoLineRightIconListItem):
     '''Custom list item.'''
@@ -369,4 +379,5 @@ class TestNavigationDrawer(MDApp):
         else:
             sm.transition.direction = 'right'
             sm.current = "secondwindow"
+
 TestNavigationDrawer().run()

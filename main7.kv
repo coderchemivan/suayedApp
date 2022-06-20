@@ -41,13 +41,16 @@ WindowManager:
             OneLineListItem:
                 text: "Semestre 22-2"
                 on_press:
+                    root.screen_two.definir_semestre(self)
                     root.nav_drawer.set_state("close")
                     root.sm2.transition.direction = 'right'
                     app.root.current = "secondwindow"
 
+
             OneLineListItem:
                 text: "Semestre 23-1"
                 on_press:
+                    root.screen_two.definir_semestre(self)
                     root.nav_drawer.set_state("close")
                     root.sm2.transition.direction = 'right'
                     app.root.current = "secondwindow"
