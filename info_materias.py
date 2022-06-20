@@ -11,6 +11,24 @@ class obtener_materias():
     def __init__(self,archivo_materias):
         self.archivo_materias = archivo_materias
 
+    def define_semester(self,semestre,archivo_aux):
+        with open(archivo_aux, 'r') as file:
+            reader = csv.reader(file)
+            myList = list(reader)
+            semester_list = list()
+            myList[1][12] = "PRINCIPIOS Y TECNICAS DE LA INVESTIGACION"
+            myList[1][16]= "TwoLineRightIconListItem"
+            for x,row in enumerate(myList):
+                if x == 0:
+                    semester_list.append(row[2:])
+                else:
+                    if myList[x][1] == semestre:
+                        semester_list.append(row[2:])
+            my_new_list = open(self.archivo_materias, 'w', newline='')
+            csv_writer = csv.writer(my_new_list)
+            csv_writer.writerows(semester_list)
+            #print(semester_list)
+
     def dias_con_pendientes(self,modo,month = None,año=None,fecha = None):
         with open(self.archivo_materias, 'r') as file:
             reader = csv.reader(file)
@@ -354,6 +372,9 @@ class vaciar_feedback():
 
 
 archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
+#obtener_materias(archivo).define_semester('Semestre 22-2',
+#r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD/semestres_materias.csv")
+
 #print(obtener_materias(archivo).dias_con_pendientes('05'))
 #obtener_materias(archivo).actualizar_estados()
 #obtener_materias(r'C:\Python310\PycharmProjects\kivyGUI\virt\KivyMDNavDrawerAndScreenManager\assests\BD\materias.csv').definir_lista('TwoLineRightIconListItem')
