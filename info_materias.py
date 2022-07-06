@@ -49,7 +49,7 @@ class obtener_materias():
         elif modo==2:
             mes_trabajado = myList[1][15]
             return mes_trabajado
-        elif modo == 3:
+        elif modo == 3: # Se pone el mes actual en la BD
             myList[1][15] = month
             my_new_list = open(self.archivo_materias, 'w', newline='')
             csv_writer = csv.writer(my_new_list)
