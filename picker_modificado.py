@@ -483,7 +483,7 @@ Builder.load_string(
         DatePickerIconTooltipButton:
             id: triangle
             owner: root
-            icon: "menu-down"
+            icon: "pencil"
             ripple_scale: .5
             theme_text_color: "Custom"
             hint_text: "Choose year"

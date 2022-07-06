@@ -41,13 +41,16 @@ WindowManager:
             OneLineListItem:
                 text: "Semestre 22-2"
                 on_press:
+                    root.screen_two.definir_semestre(self)
                     root.nav_drawer.set_state("close")
                     root.sm2.transition.direction = 'right'
                     app.root.current = "secondwindow"
 
+
             OneLineListItem:
                 text: "Semestre 23-1"
                 on_press:
+                    root.screen_two.definir_semestre(self)
                     root.nav_drawer.set_state("close")
                     root.sm2.transition.direction = 'right'
                     app.root.current = "secondwindow"
@@ -367,3 +370,18 @@ WindowManager:
         pos_hint: {"x":0.1,"y":0.5}
         ScrolllabelLabel:
 
+<DisplayTasks>:
+    FloatLayout:
+        MDLabel:
+            text: "hola"
+            pos_hint:{"x":0.5,"y":0.5}
+            font_size: 20
+            size_hint: 0.5,0.5
+            halign: "center"
+            valign: "middle"
+            color: 0, 0, 0, 1
+            markup: True
+            text_size: self.width, None
+            size_hint_y: None
+            height: self.texture_size[1]
+            
