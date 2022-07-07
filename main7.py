@@ -17,9 +17,8 @@ from kivymd.uix.list import IconRightWidget
 
 from kivy.properties import ObjectProperty
 
-import picker_modificado
-#from picker_modificado import MDDatePicker
-from kivymd.uix.pickers import MDDatePicker
+from picker_modificado import MDDatePicker 
+#from kivymd.uix.pickers import MDDatePicker
 
 from kivymd.uix.button import MDRoundFlatIconButton
 from kivymd.uix.button import MDFillRoundFlatIconButton
@@ -42,6 +41,7 @@ from kivymd.uix.list import IRightBodyTouch, ILeftBody
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.uix.button import MDFlatButton
+from kivy.uix.popup import Popup
 from kivy.metrics import dp
 
 # Base de datos
@@ -126,17 +126,12 @@ class LoginPage(Screen):
 
     def show_date_picker(self):
         archivo = r'assests\BD\materias.csv'
-
-       
-        # date_dialog = MDDatePicker(year=2000, month=2, day=14)
-        date_dialog = picker_modificado.MDDatePicker()
+        date_dialog = MDDatePicker()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
         current_month = date.today().month
         obtener_materias(archivo).dias_con_pendientes(modo=3, month=current_month,año='2022')
         
-
-
 
 class FirstWindow(Screen):pass
 
@@ -357,6 +352,17 @@ class ScrolllabelLabel(ScrollView):
     text = StringProperty('')
     comentarios = ObjectProperty()
 
+
+
+class MyPopup_tasks(Popup):
+    pass
+
+
+class PopupWindow_tasks(BoxLayout):
+    def open_popup(self):
+        popup = MyPopup_tasks()
+        popup.open()
+    
 
 
 sm = ScreenManager()
