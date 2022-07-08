@@ -292,7 +292,7 @@ from kivymd.uix.relativelayout import MDRelativeLayout
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.tooltip import MDTooltip
 from info_materias import obtener_materias
-from pendientes import PopContent
+from pendientes import pendientes_list
 
 with open(
     r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\l.kv'
@@ -706,6 +706,7 @@ class DatePickerDaySelectableItem(
     """A class that implements a list for choosing a day."""
 
     def on_press(self):
+        pendientes_fecha = list()
         if (
                 self.owner.mode == "range"
                 and self.owner._end_range_date
@@ -755,9 +756,11 @@ class DatePickerDaySelectableItem(
                 fecha = f'{str(self.text).zfill(2)}/{mes_trabajado}/{str(self.current_year)}'
                 pendientes_fecha = obtener_materias(archivo).dias_con_pendientes(modo=4,fecha=fecha)
                 print(pendientes_fecha)
-
-        pop_screen = PopContent()
-        pop_screen.open()
+        if self.is_selected == True:
+            c = pendientes_list()
+            c.show_dialog(pendientes_fecha)
+            # pop_screen = PopContent()
+            # pop_screen.open()
 
     text = StringProperty()
     owner = ObjectProperty()
@@ -775,10 +778,6 @@ class DatePickerDaySelectableItem(
                 return False
 
     def on_release(self):pass
-
-
-
-
 
 class DatePickerYearSelectableItem(RecycleDataViewBehavior, MDLabel):
     """Implements an item for a pick list of the year."""
