@@ -39,6 +39,7 @@ class ItemConfirm(OneLineAvatarIconListItem):
         for check in check_list:
             if check != instance_check:
                 check.active = False
+        print("este es una prueba")
 
 
 class pendientes_list():
