@@ -55,28 +55,14 @@ class obtener_materias():
             csv_writer = csv.writer(my_new_list)
             csv_writer.writerows(myList)
 
-        elif modo == 4: #Regresa una lista con las actividades del día seleccionado
+        elif modo == 4:
             lista_dias = list()
-            lista_materia_actividad = list()
-            lista_materias = list()
-            lista_actividades = list()
-
             for x,line in enumerate(myList):
                 if x>0:
-                    materia = myList[x][1]
-                    actividad = myList[x][2]
                     fecha_entrega = myList[x][3]
-                    materia_actividad = list()
-
                     if fecha_entrega == fecha:
                         lista_dias.append(fecha_entrega)
-                        lista_materias.append(materia)
-                        lista_actividades.append(actividad)
-                lista_materia_actividad.append(lista_actividades)
-                lista_materia_actividad.append(lista_materias)
             return lista_dias
-
-
 
 
 
