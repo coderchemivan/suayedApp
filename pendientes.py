@@ -7,6 +7,7 @@ from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.list import OneLineAvatarIconListItem
 
 from kivymd.uix.list import OneLineAvatarIconListItem
+from kivymd.uix.list import TwoLineAvatarIconListItem
 from kivymd.uix.list import OneLineListItem
 
 
@@ -19,18 +20,11 @@ KV = '''
         id: check
         group: "check"
 
-
-MDFloatLayout:
-
-    MDFlatButton:
-        text: "ALERT DIALOG"
-        pos_hint: {'center_x': .5, 'center_y': .5}
-        on_release: app.show_confirmation_dialog()
 '''
 
 
 
-class ItemConfirm(OneLineAvatarIconListItem):
+class ItemConfirm(TwoLineAvatarIconListItem):
     divider = None
 
     def set_icon(self, instance_check):
@@ -54,7 +48,7 @@ class pendientes_list():
             self.dialog = MDDialog(
                 title="Phone ringtone",
                 type="confirmation",
-                items=[ItemConfirm(text=str(materia)) for materia in materias_act[0]
+                items=[ItemConfirm(text=str(materia),secondary_text = materias_act[1][i]) for i,materia in enumerate(materias_act[0])
                 ],
                 buttons=[
                     MDFlatButton(

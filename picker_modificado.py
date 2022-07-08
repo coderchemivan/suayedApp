@@ -759,7 +759,7 @@ class DatePickerDaySelectableItem(
         if self.is_selected == True:
             print(pendientes_fecha)
             c = pendientes_list()
-            c.build()
+            #c.build()
             c.show_dialog(pendientes_fecha)
 
 
