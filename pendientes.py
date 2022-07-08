@@ -168,19 +168,28 @@ from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
+<<<<<<< HEAD
 from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.list import OneLineAvatarIconListItem
 
+=======
+>>>>>>> parent of 1cdf1f4 ("Work on calendar")
 from kivymd.uix.list import OneLineAvatarIconListItem
 from kivymd.uix.list import OneLineListItem
-
 
 KV = '''
 <ItemConfirm>
     on_release: root.set_icon(check)
 
 <<<<<<< HEAD
+KV = '''
+<ItemConfirm>
+    on_release: root.set_icon(check)
+
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> parent of 1cdf1f4 ("Work on calendar")
     CheckboxLeftWidget:
         id: check
         group: "check"
@@ -195,7 +204,10 @@ MDFloatLayout:
 '''
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> parent of 1cdf1f4 ("Work on calendar")
 class ItemConfirm(OneLineAvatarIconListItem):
     divider = None
 
