@@ -4,11 +4,18 @@ from kivymd.app import MDApp
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
 from kivymd.uix.list import TwoLineListItem
-from kivymd.uix.list import OneLineListItem
+from kivymd.uix.list import OneLineAvatarIconListItem
 
 
-class ItemConfirm(TwoLineListItem):
-    pass
+class ItemConfirm(OneLineAvatarIconListItem):
+    divider = None
+
+    def set_icon(self, instance_check):
+        instance_check.active = True
+        check_list = instance_check.get_widgets(instance_check.group)
+        for check in check_list:
+            if check != instance_check:
+                check.active = False
 
 
 class pendientes_list():
@@ -20,7 +27,7 @@ class pendientes_list():
             self.dialog = MDDialog(
                 title="Phone ringtone",
                 type="confirmation",
-                items=[ItemConfirm(text=str(fecha)) for fecha in fechas
+                items=[ItemConfirm(text=str(i)) for i in range(20)
                 ],
                 buttons=[
                     MDFlatButton(
