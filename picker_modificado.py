@@ -744,7 +744,7 @@ class DatePickerDaySelectableItem(
             self.owner.set_selected_widget_modificado(self)
             archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
             mes_trabajado = obtener_materias(archivo).dias_con_pendientes(modo=2)
-            mes_trabajado = str(mes_trabajado)
+            mes_trabajado = str(mes_trabajado).zfill(2)
             lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=mes_trabajado, año=str(self.current_year))
             lista_days = list()
             for day in lista:
@@ -755,12 +755,12 @@ class DatePickerDaySelectableItem(
             if self.text in lista_days:
                 fecha = f'{str(self.text).zfill(2)}/{mes_trabajado}/{str(self.current_year)}'
                 pendientes_fecha = obtener_materias(archivo).dias_con_pendientes(modo=4,fecha=fecha)
-                print(pendientes_fecha)
+
         if self.is_selected == True:
+            print(pendientes_fecha)
             c = pendientes_list()
             c.show_dialog(pendientes_fecha)
-            # pop_screen = PopContent()
-            # pop_screen.open()
+
 
     text = StringProperty()
     owner = ObjectProperty()

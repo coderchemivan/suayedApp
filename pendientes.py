@@ -14,8 +14,7 @@ KV = '''
 <ItemConfirm>
     on_release: root.set_icon(check)
 
-<<<<<<< HEAD
-=======
+
     CheckboxLeftWidget:
         id: check
         group: "check"
@@ -48,12 +47,13 @@ class pendientes_list():
     def build(self):
         return Builder.load_string(KV)
 
-    def show_dialog(self,fechas):
+    def show_dialog(self,materias_act):
+
         if not self.dialog:
             self.dialog = MDDialog(
                 title="Phone ringtone",
                 type="confirmation",
-                items=[ItemConfirm(text=str(i)) for i in range(20)
+                items=[ItemConfirm(text=str(materia)) for materia in materias_act[0]
                 ],
                 buttons=[
                     MDFlatButton(
