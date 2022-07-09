@@ -11,6 +11,24 @@ class obtener_materias():
     def __init__(self,archivo_materias):
         self.archivo_materias = archivo_materias
 
+    def define_semester(self,semestre,archivo_aux):
+        with open(archivo_aux, 'r') as file:
+            reader = csv.reader(file)
+            myList = list(reader)
+            semester_list = list()
+            myList[1][12] = "PRINCIPIOS Y TECNICAS DE LA INVESTIGACION"
+            myList[1][16]= "TwoLineRightIconListItem"
+            for x,row in enumerate(myList):
+                if x == 0:
+                    semester_list.append(row[2:])
+                else:
+                    if myList[x][1] == semestre:
+                        semester_list.append(row[2:])
+            my_new_list = open(self.archivo_materias, 'w', newline='')
+            csv_writer = csv.writer(my_new_list)
+            csv_writer.writerows(semester_list)
+            #print(semester_list)
+
     def dias_con_pendientes(self,modo,month = None,año=None,fecha = None):
         with open(self.archivo_materias, 'r') as file:
             reader = csv.reader(file)
@@ -31,7 +49,7 @@ class obtener_materias():
         elif modo==2:
             mes_trabajado = myList[1][15]
             return mes_trabajado
-        elif modo == 3:
+        elif modo == 3: # Se pone el mes actual en la BD
             myList[1][15] = month
             my_new_list = open(self.archivo_materias, 'w', newline='')
             csv_writer = csv.writer(my_new_list)
@@ -39,12 +57,26 @@ class obtener_materias():
 
         elif modo == 4:
             lista_dias = list()
+            materias = list()
+            actividades = list()
+            estados = list()
+            materia_actividad = list()
             for x,line in enumerate(myList):
                 if x>0:
+                    materia = myList[x][1]
+                    actividad =myList[x][2]
                     fecha_entrega = myList[x][3]
+                    estado = myList[x][5]
+                    materia_act = dict()
                     if fecha_entrega == fecha:
                         lista_dias.append(fecha_entrega)
-            return lista_dias
+                        materias.append(materia)
+                        actividades.append(actividad)
+                        estados.append(estado)
+            materia_actividad.append(materias)
+            materia_actividad.append(actividades)
+            materia_actividad.append(estados)
+            return materia_actividad
 
 
 
@@ -354,6 +386,9 @@ class vaciar_feedback():
 
 
 archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
+#obtener_materias(archivo).define_semester('Semestre 22-2',
+#r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD/semestres_materias.csv")
+
 #print(obtener_materias(archivo).dias_con_pendientes('05'))
 #obtener_materias(archivo).actualizar_estados()
 #obtener_materias(r'C:\Python310\PycharmProjects\kivyGUI\virt\KivyMDNavDrawerAndScreenManager\assests\BD\materias.csv').definir_lista('TwoLineRightIconListItem')

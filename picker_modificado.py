@@ -271,6 +271,7 @@ from kivy.uix.behaviors import ButtonBehavior, FocusBehavior
 from kivy.uix.recyclegridlayout import RecycleGridLayout
 from kivy.uix.recycleview.layout import LayoutSelectionBehavior
 from kivy.uix.recycleview.views import RecycleDataViewBehavior
+from kivymd.uix.dialog import MDDialog
 from kivy.utils import get_color_from_hex
 from kivy.vector import Vector
 
@@ -291,7 +292,9 @@ from kivymd.uix.relativelayout import MDRelativeLayout
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.tooltip import MDTooltip
 from info_materias import obtener_materias
+from pendientes import pendientes_list
 
+<<<<<<< HEAD
 Builder.load_string(
     """
 #:import os os
@@ -820,6 +823,12 @@ Builder.load_string(
         else root.owner.input_field_background_color
 """
 )
+=======
+with open(
+    r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\l.kv'
+) as kv_file:
+    Builder.load_string(kv_file.read())
+>>>>>>> Add_semester_to_DB
 
 
 class BaseDialogPicker(
@@ -1227,22 +1236,8 @@ class DatePickerDaySelectableItem(
 ):
     """A class that implements a list for choosing a day."""
 
-    text = StringProperty()
-    owner = ObjectProperty()
-    is_today = BooleanProperty(False)
-    is_selected = BooleanProperty(False)
-    current_month = NumericProperty()
-    current_year = NumericProperty()
-    index = NumericProperty(0)
-
-    def check_date(self, year, month, day):
-        try:
-            return date(year, month, day) in self.owner._date_range
-        except ValueError as error:
-            if str(error) == "day is out of range for month":
-                return False
-
-    def on_release(self):
+    def on_press(self):
+        pendientes_fecha = list()
         if (
                 self.owner.mode == "range"
                 and self.owner._end_range_date
@@ -1280,7 +1275,7 @@ class DatePickerDaySelectableItem(
             self.owner.set_selected_widget_modificado(self)
             archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
             mes_trabajado = obtener_materias(archivo).dias_con_pendientes(modo=2)
-            mes_trabajado = str(mes_trabajado)
+            mes_trabajado = str(mes_trabajado).zfill(2)
             lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=mes_trabajado, año=str(self.current_year))
             lista_days = list()
             for day in lista:
@@ -1291,8 +1286,29 @@ class DatePickerDaySelectableItem(
             if self.text in lista_days:
                 fecha = f'{str(self.text).zfill(2)}/{mes_trabajado}/{str(self.current_year)}'
                 pendientes_fecha = obtener_materias(archivo).dias_con_pendientes(modo=4,fecha=fecha)
-                print(pendientes_fecha)
 
+        if self.is_selected == True:
+            print(pendientes_fecha)
+            c = pendientes_list()
+            c.show_dialog(pendientes_fecha,fecha)
+
+
+    text = StringProperty()
+    owner = ObjectProperty()
+    is_today = BooleanProperty(False)
+    is_selected = BooleanProperty(False)
+    current_month = NumericProperty()
+    current_year = NumericProperty()
+    index = NumericProperty(0)
+
+    def check_date(self, year, month, day):
+        try:
+            return date(year, month, day) in self.owner._date_range
+        except ValueError as error:
+            if str(error) == "day is out of range for month":
+                return False
+
+    def on_release(self):pass
 
 class DatePickerYearSelectableItem(RecycleDataViewBehavior, MDLabel):
     """Implements an item for a pick list of the year."""
@@ -1551,6 +1567,7 @@ class MDDatePicker(BaseDialogPicker):
         self.set_position_to_current_year()
 
     def transformation_to_dialog_input_date(self):
+        
         def set_date_to_input_field():
             if not self._enter_data_field_two:
                 # Date of current day.
@@ -1743,13 +1760,13 @@ class MDDatePicker(BaseDialogPicker):
         else:
             self.year = year
             self.month = month
-
-
             archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
             mes_trabajado = obtener_materias(archivo).dias_con_pendientes(modo=2)
-            mes_trabajado = str(mes_trabajado)
+            mes_trabajado = str(mes_trabajado).zfill(2)
             lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=mes_trabajado,año=str(self.year))
+
             lista_days = list()
+
             for day in lista:
                 day = str(day)
                 if day[0] == '0':
@@ -1790,7 +1807,8 @@ class MDDatePicker(BaseDialogPicker):
 
                     try:
                         lista_days.remove(self._calendar_list[idx].text)
-                    except:pass
+                    except:
+                        pass
                     self._calendar_list[idx].is_selected = True
                 else:
                     self._calendar_list[idx].is_selected = False
