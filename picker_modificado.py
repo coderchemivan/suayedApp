@@ -294,7 +294,7 @@ from kivymd.uix.tooltip import MDTooltip
 from info_materias import obtener_materias
 from pendientes import pendientes_list
 
-<<<<<<< HEAD
+
 Builder.load_string(
     """
 #:import os os
@@ -823,12 +823,12 @@ Builder.load_string(
         else root.owner.input_field_background_color
 """
 )
-=======
+
 with open(
     r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\l.kv'
 ) as kv_file:
     Builder.load_string(kv_file.read())
->>>>>>> Add_semester_to_DB
+
 
 
 class BaseDialogPicker(
@@ -1277,6 +1277,7 @@ class DatePickerDaySelectableItem(
             mes_trabajado = obtener_materias(archivo).dias_con_pendientes(modo=2)
             mes_trabajado = str(mes_trabajado).zfill(2)
             lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=mes_trabajado, año=str(self.current_year))
+            print(lista)
             lista_days = list()
             for day in lista:
                 day = str(day)
@@ -1764,8 +1765,9 @@ class MDDatePicker(BaseDialogPicker):
             mes_trabajado = obtener_materias(archivo).dias_con_pendientes(modo=2)
             mes_trabajado = str(mes_trabajado).zfill(2)
             lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=mes_trabajado,año=str(self.year))
-
             lista_days = list()
+
+
 
             for day in lista:
                 day = str(day)
