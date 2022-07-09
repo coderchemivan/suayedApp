@@ -49,7 +49,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 # from plataformaSuayed import Feedback
 from plataformaSuayed_CSV_DB import Feedback
-import mysql.connector
+#import mysql.connector
 import datetime
 from datetime import date
 

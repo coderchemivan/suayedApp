@@ -1238,6 +1238,7 @@ class DatePickerDaySelectableItem(
 
     def on_press(self):
         pendientes_fecha = list()
+        fecha = None
         if (
                 self.owner.mode == "range"
                 and self.owner._end_range_date
