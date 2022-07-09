@@ -21,7 +21,7 @@ WindowManager:
 
 
 <ListItemWithCheckbox>:
-    on_press: root.screen_two.press_actividad(root,self)
+    on_press: root.screen_two.press_actividad(self)
     RightCheckbox:
         on_press: root.screen_two.activity_check(root)
 
@@ -44,17 +44,16 @@ WindowManager:
                 on_press:
                     root.screen_two.definir_semestre(self)
                     root.nav_drawer.set_state("close")
-                    root.sm2.transition.direction = 'right'
                     app.root.current = "secondwindow"
-
+                    root.sm2.transition.direction = 'left'
 
             OneLineListItem:
                 text: "Semestre 23-1"
                 on_press:
                     root.screen_two.definir_semestre(self)
                     root.nav_drawer.set_state("close")
-                    root.sm2.transition.direction = 'right'
                     app.root.current = "secondwindow"
+                    root.sm2.transition.direction = 'left'
 
 <MyPopup_tasks>:
     Button:
@@ -105,13 +104,6 @@ WindowManager:
             root.login()
 
 
-    Button:
-        text: "show calendar"
-        size_hint: 0.5, 0.06
-        pos_hint: {"center_x": 0.5, "center_y": 0.20}
-        on_press:
-            root.show_date_picker()
-
 <FirstWindow>:
     MDScreen:
 
@@ -134,9 +126,11 @@ WindowManager:
                     root.manager.transition.direction = 'left'
 
             Button:
-                text: "que pedo"
-                pos_hint: {'center_x':0.5,'center_y':0.5}
-                size_hint: 0.7,0.2
+                text: "show calendar"
+                size_hint: 0.5, 0.06
+                pos_hint: {"center_x": 0.5, "center_y": 0.20}
+                on_press:
+                    root.show_date_picker()
 
 
         MDNavigationDrawer:

@@ -114,6 +114,12 @@ class LoginPage(Screen):
             else:
                 print("Not here!")
 
+
+
+
+
+class FirstWindow(Screen):
+
     def on_save(self, instance, value, date_range):
         print(instance, value, date_range)
         # self.root.ids.date_label.text = str(value)
@@ -124,6 +130,7 @@ class LoginPage(Screen):
     def on_cancel(self, instance, value):
         pass
 
+
     def show_date_picker(self):
         archivo = r'assests\BD\materias.csv'
         current_month = date.today().month
@@ -131,11 +138,6 @@ class LoginPage(Screen):
         date_dialog = MDDatePicker()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
-
-        
-
-class FirstWindow(Screen):pass
-
 
 
 activity_name = ""
@@ -210,6 +212,7 @@ class SecondWindow(Screen):
     def press_actividad(self):  # Abre la ventana donde se muestran los detalles de la actividad
         activity_name = obtener_materias('assests\BD\materias.csv').define_activity(self.text)
         sm.current = 'thirdwindow'
+        sm.transition.direction = "left"
 
 
     def activity_check(self,*args):  # Se indica que se entregó una actividad
@@ -227,6 +230,8 @@ class SecondWindow(Screen):
 
     def on_select_item_menu(self, text_item):  # Carga la ventana con la materia seleccionada
         self.menu.dismiss()
+        sm.current = "secondwindow"
+        sm.transition.direction = 'right'
         archivo = 'assests\BD\materias.csv'
         obtener_materias(archivo).define_subject(text_item)
         subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
@@ -335,6 +340,9 @@ class ContentNavigationDrawer(MDBoxLayout):
     sm2 = ScreenManager()
     screen_two = SecondWindow
 
+class SemestresContent():pass
+
+
 class ListItemWithCheckbox(TwoLineRightIconListItem):
     '''Custom list item.'''
     icon = StringProperty("")
@@ -383,10 +391,12 @@ class TestNavigationDrawer(MDApp):
 
     def go_back(self,pantalla):
         if pantalla == 1:
-            sm.transition.direction = 'right'
+
             sm.current = "firstwindow"
-        else:
             sm.transition.direction = 'right'
+        else:
+
             sm.current = "secondwindow"
+            sm.transition.direction = 'right'
 
 TestNavigationDrawer().run()
