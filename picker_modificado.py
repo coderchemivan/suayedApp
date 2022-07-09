@@ -1277,7 +1277,7 @@ class DatePickerDaySelectableItem(
             mes_trabajado = obtener_materias(archivo).dias_con_pendientes(modo=2)
             mes_trabajado = str(mes_trabajado).zfill(2)
             lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=mes_trabajado, año=str(self.current_year))
-            print(lista)
+
             lista_days = list()
             for day in lista:
                 day = str(day)
@@ -1289,7 +1289,7 @@ class DatePickerDaySelectableItem(
                 pendientes_fecha = obtener_materias(archivo).dias_con_pendientes(modo=4,fecha=fecha)
 
         if self.is_selected == True:
-            print(pendientes_fecha)
+
             c = pendientes_list()
             c.show_dialog(pendientes_fecha,fecha)
 
