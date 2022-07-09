@@ -3,52 +3,43 @@ from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.list import TwoLineListItem
+from kivymd.uix.list import ThreeLineListItem
 from kivymd.uix.list import OneLineAvatarIconListItem
 
 from kivymd.uix.list import OneLineAvatarIconListItem
-from kivymd.uix.list import TwoLineAvatarIconListItem
+from kivymd.uix.list import ThreeLineAvatarListItem
 from kivymd.uix.list import OneLineListItem
 
 
-KV = '''
-<ItemConfirm>
-    on_release: root.set_icon(check)
 
-
-    CheckboxLeftWidget:
-        id: check
-        group: "check"
-
-'''
-
-
-
-class ItemConfirm(TwoLineAvatarIconListItem):
+class ItemConfirm(ThreeLineAvatarListItem):
     divider = None
 
-    def set_icon(self, instance_check):
-        instance_check.active = True
-        check_list = instance_check.get_widgets(instance_check.group)
-        for check in check_list:
-            if check != instance_check:
-                check.active = False
-        print("este es una prueba")
 
 
 class pendientes_list():
+    def __init_(self,**kwargs):
+        super(pendientes_list,self).__init__(**kwargs)
+
+    def hola(self):
+        print("haz chonguitos")
+
     dialog = None
 
-    def build(self):
-        return Builder.load_string(KV)
+    #def build(self):
+    #    return Builder.load_string(KV)
 
-    def show_dialog(self,materias_act):
+    def show_dialog(self,materias_act,fecha):
 
         if not self.dialog:
             self.dialog = MDDialog(
-                title="Phone ringtone",
+                title=f"Actividades para el {fecha}",
                 type="confirmation",
-                items=[ItemConfirm(text=str(materia),secondary_text = materias_act[1][i]) for i,materia in enumerate(materias_act[0])
+                items=[ItemConfirm(text=str(materia),
+                                   secondary_text = materias_act[1][i],
+                                   tertiary_text = materias_act[2][i],
+                                   on_release=lambda x=3: self.hola()
+                                   ) for i,materia in enumerate(materias_act[0])
                 ],
                 buttons=[
                     MDFlatButton(

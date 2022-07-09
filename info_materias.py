@@ -59,19 +59,23 @@ class obtener_materias():
             lista_dias = list()
             materias = list()
             actividades = list()
+            estados = list()
             materia_actividad = list()
             for x,line in enumerate(myList):
                 if x>0:
                     materia = myList[x][1]
                     actividad =myList[x][2]
                     fecha_entrega = myList[x][3]
+                    estado = myList[x][5]
                     materia_act = dict()
                     if fecha_entrega == fecha:
                         lista_dias.append(fecha_entrega)
                         materias.append(materia)
                         actividades.append(actividad)
+                        estados.append(estado)
             materia_actividad.append(materias)
             materia_actividad.append(actividades)
+            materia_actividad.append(estados)
             return materia_actividad
 
 
