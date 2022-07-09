@@ -244,6 +244,7 @@ class SecondWindow(Screen):
         archivo = 'assests\BD\materias.csv'
         subject_name = obtener_materias(archivo).obtener_materia_name()
         subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
+        obtener_materias(archivo).estado_actividad("todas", 'TwoLineRightIconListItem')
         actividades = obtener_materias(archivo).total_actividades(subject_name)
         opts = Options()
         opts.add_argument(
@@ -251,9 +252,9 @@ class SecondWindow(Screen):
 
         driver = webdriver.Chrome('C:\Program Files (x86)\chromedriver_win32\chromedriver.exe', options=opts)
         activity_feedback = Feedback([subject_clave], actividades, driver).extraccion_feedback()
-        vaciar_feedback(archivo, subject_name, activity_feedback)
-        register_feedback = vaciar_feedback('assests\BD\materias.csv', subject_name,
-                                            activity_feedback).vaciar_resultados()
+        vaciar_feedback('assests\BD\semestres_materias.csv', subject_name, activity_feedback).vaciar_resultados()
+        #register_feedback = vaciar_feedback('assests\BD\semestres_materias.csv', subject_name,
+        #                                    activity_feedback)
 
     def entregas_a_tiempo(self, *args):
         archivo = 'assests\BD\materias.csv'

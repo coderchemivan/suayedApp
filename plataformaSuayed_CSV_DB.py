@@ -59,7 +59,10 @@ class Feedback():
 
             actividad_feedback = dict()
 
-            for i in range(len(self.actividades)):
+
+            for activity,value in self.actividades.items():
+
+            #for i in range(len(self.actividades)):
 
 
                 subject_content = WebDriverWait(self.driver, 10).until(
@@ -71,7 +74,7 @@ class Feedback():
                 # Abriendo la actividad
                 try:
                     actividad = self.driver.find_element(By.XPATH,
-                                                         './/span[contains(text(),"' + self.actividades[i] + '")]').click()
+                                                         './/span[contains(text(),"' + activity + '")]').click()
                 except:
                     continue
 
@@ -107,7 +110,7 @@ class Feedback():
 
 
 
-                actividad_feedback[self.actividades[i]]= [calificacion,calificado_en,feedback]
+                actividad_feedback[activity]= [calificacion,calificado_en,feedback]
 
 
                 self.driver.back()

@@ -2,7 +2,7 @@ import csv
 
 import datetime
 from datetime import date
-
+import chardet
 
 
 
@@ -16,18 +16,31 @@ class obtener_materias():
             reader = csv.reader(file)
             myList = list(reader)
             semester_list = list()
-            myList[1][12] = "PRINCIPIOS Y TECNICAS DE LA INVESTIGACION"
+
             myList[1][16]= "TwoLineRightIconListItem"
+            first_subject_semester = False
+
             for x,row in enumerate(myList):
                 if x == 0:
                     semester_list.append(row[2:])
-                else:
+
+                elif x > 0:
+                    if first_subject_semester is False and row[1] == semestre:
+                        myList[1][12] = row[3]
+                        materia = row[3]
+                        first_subject_semester = True
                     if myList[x][1] == semestre:
-                        semester_list.append(row[2:])
+                        if len(semester_list) == 1:
+                            row = row[2:]
+                            row[10] = materia
+                            semester_list.append(row)
+                        else:
+                            semester_list.append(row[2:])
+
             my_new_list = open(self.archivo_materias, 'w', newline='')
             csv_writer = csv.writer(my_new_list)
             csv_writer.writerows(semester_list)
-            #print(semester_list)
+            first_subject_semester = False
 
     def dias_con_pendientes(self,modo,month = None,año=None,fecha = None):
         with open(self.archivo_materias, 'r') as file:
@@ -178,7 +191,7 @@ class obtener_materias():
                         actividades.append(row[2])
                         activity_date[row[2]] = f'{diff_fechaEntrega_Hoy} days delayed'
                 c+=1
-        
+
         return activity_date
 
 
@@ -373,14 +386,17 @@ class vaciar_feedback():
             for k,v in self.actividades_feedback.items():
                 c = 0
                 for row in myList:
-                    if row[1] == self.materia and row[2] == k:
-                        myList[c][6] = v[0] #calificacion
-                        myList[c][7] = v[1] #calificada el
-                        myList[c][8] = v[2] #comentarios
+                    if row[3] == self.materia and row[4] == k:
+                        myList[c][8] = v[0] #calificacion
+                        myList[c][9] = v[1] #calificada el
+                        print(v[2])#comentarios
+                        myList[c][10] = v[2] #comentarios
                     c+=1
 
                 my_new_list = open(self.archivo_materias, 'w', newline='')
                 csv_writer = csv.writer(my_new_list)
+
+
                 csv_writer.writerows(myList)
 
 
