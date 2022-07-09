@@ -379,6 +379,7 @@ class vaciar_feedback():
 
     def vaciar_resultados(self):
         with open(self.archivo_materias, 'r') as file:
+
             reader = csv.reader(file)
             myList = list(reader)
             for line in reader:
@@ -389,15 +390,24 @@ class vaciar_feedback():
                     if row[3] == self.materia and row[4] == k:
                         myList[c][8] = v[0] #calificacion
                         myList[c][9] = v[1] #calificada el
-                        print(v[2])#comentarios
                         myList[c][10] = v[2] #comentarios
                     c+=1
 
                 my_new_list = open(self.archivo_materias, 'w', newline='')
                 csv_writer = csv.writer(my_new_list)
+                for line in myList:
+                    try:
+                        csv_writer.writerow(line)
+                    except:
+                        line[10] =  line[10].encode('utf8').decode('ascii','ignore')
+                        csv_writer.writerow(line)
 
 
-                csv_writer.writerows(myList)
+
+
+
+
+
 
 
 
