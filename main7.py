@@ -70,7 +70,7 @@ class LoginPage(Screen):
     username = ObjectProperty()
     password = ObjectProperty()
     login_cb = ObjectProperty()
-    #hola
+
 
     def on_pre_enter(self, *args):
         Clock.schedule_once(self.remember_)
