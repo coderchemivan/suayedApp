@@ -135,6 +135,14 @@ class FirstWindow(Screen):
             except:
                 pass   
 
+    def definir_semestre(self):
+        print("hiiiiiiiiiiiiiiiiiiiiiii")
+        archivo_aux = "assests\BD\semestres_materias.csv"
+        archivo = "assests\BD\materias.csv"
+        semestre = self.text
+        obtener_materias(archivo).define_semester(semestre,archivo_aux)
+
+
     def on_save(self, instance, value, date_range):
         print(instance, value, date_range)
         # self.root.ids.date_label.text = str(value)
@@ -365,8 +373,6 @@ class DrawerList(ThemableBehavior, MDList):
                 item.text_color = self.theme_cls.text_color
                 break
         instance_item.text_color = self.theme_cls.primary_color
-    def on_touch_down(self, touch):
-        sm.current = 'secondwindow'
 
 class ListaSesmtres(MDList,Screen):
     def __init_(self,**kwargs):
