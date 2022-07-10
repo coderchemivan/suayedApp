@@ -119,16 +119,32 @@ class LoginPage(Screen):
 
 
 class FirstWindow(Screen):
+    def on_enter(self):
+        Clock.schedule_once(self.lista_semestres)   
+
+    def lista_semestres(self, dt): # Llena el MDlist del NavigationDrawer
+        archivo_aux = r'assests\BD\semestres_materias.csv'
+        semestres = obtener_materias(archivo_aux).lista_semester()
+        #Limpiando los semestres anteriores
+        self.ids.nav_drawer_content.ids.md_list.clear_widgets()
+
+        for semestre in semestres:
+            try:
+                self.ids.nav_drawer_content.ids.md_list.add_widget(
+                OneLineIconListItem(text = semestre))
+            except:
+                pass   
 
     def on_save(self, instance, value, date_range):
         print(instance, value, date_range)
         # self.root.ids.date_label.text = str(value)
         self.ids.enviado_el.text = str(value)
 
-    #
     # Click Cancel
     def on_cancel(self, instance, value):
         pass
+
+
 
 
     def show_date_picker(self):
@@ -247,6 +263,7 @@ class SecondWindow(Screen):
 
     def consultar_calificaciones(self):  # Extrae el feedback de internet
         archivo = 'assests\BD\materias.csv'
+        archivo_aux = 'assests\BD\semestres_materias.csv'
         subject_name = obtener_materias(archivo).obtener_materia_name()
         subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
         obtener_materias(archivo).estado_actividad("todas", 'TwoLineRightIconListItem')
@@ -257,10 +274,8 @@ class SecondWindow(Screen):
 
         driver = webdriver.Chrome('C:\Program Files (x86)\chromedriver_win32\chromedriver.exe', options=opts)
         activity_feedback = Feedback([subject_clave], actividades, driver).extraccion_feedback()
-        vaciar_feedback('assests\BD\semestres_materias.csv', subject_name, activity_feedback).vaciar_resultados()
-        #register_feedback = vaciar_feedback('assests\BD\semestres_materias.csv', subject_name,
-        #                                    activity_feedback)
-
+        vaciar_feedback(archivo_aux, subject_name, activity_feedback).vaciar_resultados()
+        
     def entregas_a_tiempo(self, *args):
         archivo = 'assests\BD\materias.csv'
         obtener_materias(archivo).estado_actividad('entregadas a tiempo', 'TwoLineListItem')
@@ -340,21 +355,26 @@ class ContentNavigationDrawer(MDBoxLayout):
     sm2 = ScreenManager()
     screen_two = SecondWindow
 
-class ListaSesmtres(MDList):
+class DrawerList(ThemableBehavior, MDList):
+    def set_color_item(self, instance_item):
+        '''Called when tap on a menu item.'''
+
+        # Set the color of the icon and text for the menu item.
+        for item in self.children:
+            if item.text_color == self.theme_cls.primary_color:
+                item.text_color = self.theme_cls.text_color
+                break
+        instance_item.text_color = self.theme_cls.primary_color
+    def on_touch_down(self, touch):
+        sm.current = 'secondwindow'
+
+class ListaSesmtres(MDList,Screen):
     def __init_(self,**kwargs):
         super(ListaSesmtres,self).__init__(**kwargs)
+        Clock.schedule_once(self.hola)
 
     lista_semester = ObjectProperty()
-
-
-    def on_enter(self, *args):
-       self.ids.lista_semester.add_widget(OneLineListItem(text=f'Semestre {i+1}'))    
-
     
-   
- 
-
-
 class ListItemWithCheckbox(TwoLineRightIconListItem):
     '''Custom list item.'''
     icon = StringProperty("")
@@ -374,17 +394,6 @@ class ScrolllabelLabel(ScrollView):
     text = StringProperty('')
     comentarios = ObjectProperty()
 
-
-
-class MyPopup_tasks(Popup):
-    pass
-
-
-class PopupWindow_tasks(BoxLayout):
-    def open_popup(self):
-        popup = MyPopup_tasks()
-        popup.open()
-    
 
 
 sm = ScreenManager()

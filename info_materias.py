@@ -3,6 +3,7 @@ import csv
 import datetime
 from datetime import date
 import chardet
+import pandas as pd
 
 
 
@@ -10,6 +11,16 @@ class obtener_materias():
 
     def __init__(self,archivo_materias):
         self.archivo_materias = archivo_materias
+
+
+    def lista_semester(self): # Devuelve una lista con los semestres disponibles
+        with open(self.archivo_materias, 'rb') as rawdata:
+            result = chardet.detect(rawdata.read(100000))
+        df = pd.read_csv(self.archivo_materias, encoding=result['encoding'])
+        semestres = df['Semestre'].unique()
+        return semestres
+       
+
 
     def define_semester(self,semestre,archivo_aux):
         with open(archivo_aux, 'r') as file:
@@ -411,7 +422,8 @@ class vaciar_feedback():
 
 
 
-archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
+archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\semestres_materias.csv'
+#obtener_materias(archivo).lista_semester()
 #obtener_materias(archivo).define_semester('Semestre 22-2',
 #r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD/semestres_materias.csv")
 

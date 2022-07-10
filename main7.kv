@@ -31,30 +31,38 @@ WindowManager:
 
 
 
-<ListaSesmtres>:
-    
-
-
-
-
 
 
 <ContentNavigationDrawer>:
+    orientation: "vertical"
+    padding: "8dp"
+    spacing: "8dp"
+
+    AnchorLayout:
+        anchor_x: "left"
+        size_hint_y: None
+        height: avatar.height
+
+        Image:
+            id: avatar
+            size_hint: None, None
+            size: "56dp", "56dp"
+            source: "kivymd_logo.png"
+
+    MDLabel:
+        text: "Semestres"
+        font_style: "Button"
+        size_hint_y: None
+        height: self.texture_size[1]
+
+
 
     ScrollView:
-
-        MDList:
-            id: lista_semester
-
-            ListaSesmtres:
-                lista_semester: lista_semester
-            
+        id: scroll
+        DrawerList:
+            id: md_list
 
 
-<MyPopup_tasks>:
-    Button:
-        text: "Aceptar"
-        
 
 
 
@@ -132,7 +140,7 @@ WindowManager:
         MDNavigationDrawer:
             id: nav_drawer
             ContentNavigationDrawer:
-                #screen_manager: screen_manager
+                id: nav_drawer_content
                 nav_drawer: nav_drawer
                 size_hint_y: 1
                 size_hint_x:0.3
