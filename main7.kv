@@ -1,6 +1,3 @@
-
-## VERSIÓN 5
-
 WindowManager:
     id: screen_manager
     LoginPage:
@@ -14,58 +11,6 @@ WindowManager:
     ThirdWindow:
         id:tw
         name: 'thirdwindow'
-    FourthWindow:
-        id:fw
-        name: 'thirdwindow'
-
-
-
-<ListItemWithCheckbox>:
-    on_press: root.screen_two.press_actividad(self)
-    RightCheckbox:
-        on_press: root.screen_two.activity_check(root)
-
-
-<ListItemWithoutCheckbox>:
-    on_press: root.screen_two.press_actividad(self)
-
-
-
-
-
-<ContentNavigationDrawer>:
-    orientation: "vertical"
-    padding: "8dp"
-    spacing: "8dp"
-
-    AnchorLayout:
-        anchor_x: "left"
-        size_hint_y: None
-        height: avatar.height
-
-        Image:
-            id: avatar
-            size_hint: None, None
-            size: "56dp", "56dp"
-            source: "kivymd_logo.png"
-
-    MDLabel:
-        text: "Semestres"
-        font_style: "Button"
-        size_hint_y: None
-        height: self.texture_size[1]
-
-
-
-    ScrollView:
-        id: scroll
-        DrawerList:
-            id: md_list
-
-
-<ListItem>:
-    on_pres:
-
 
 
 <LoginPage>:
@@ -109,7 +54,7 @@ WindowManager:
         on_release:
             root.login()
 
-
+#'''Contenido de la primera principal'''
 <FirstWindow>:
     MDScreen:
 
@@ -150,6 +95,47 @@ WindowManager:
 
 
 
+
+<ContentNavigationDrawer>:
+    orientation: "vertical"
+    padding: "8dp"
+    spacing: "8dp"
+
+    AnchorLayout:
+        anchor_x: "left"
+        size_hint_y: None
+        height: avatar.height
+
+        Image:
+            id: avatar
+            size_hint: None, None
+            size: "56dp", "56dp"
+            source: "kivymd_logo.png"
+
+    MDLabel:
+        text: "Semestres"
+        font_style: "Button"
+        size_hint_y: None
+        height: self.texture_size[1]
+
+
+
+    ScrollView:
+        id: scroll
+        DrawerList:
+            id: md_list
+
+
+
+
+<ItemList>:
+    on_press:
+        root.screen_one.definir_semestre(self)
+        app.root.current = "secondwindow"
+
+
+
+#'''Contenido de la pantalla donde se muestran las actividades por materia'''
 <SecondWindow>:
     BoxLayout:
         spacing: 5
@@ -277,12 +263,18 @@ WindowManager:
                     on_tab_press: root.consultar_calificaciones()
 
 
+<ListItemWithCheckbox>:
+    on_press: root.screen_two.press_actividad(self)
+    RightCheckbox:
+        on_press: root.screen_two.activity_check(root)
 
 
-#                MDFloatingActionButton:
-#                    text: "goto screen 4"
-#                    on_release: app.root.current = 'fourthwindow'
+<ListItemWithoutCheckbox>:
+    on_press:
+        root.screen_two.press_actividad(self)
 
+
+#'''Contenido de la pantalla donde se muestra el feddback de las tareas entregadas'''
 <ThirdWindow>:
     FloatLayout:
         spacing:5
@@ -368,26 +360,3 @@ WindowManager:
 
 
 
-<FourthWindow>:
-    GridLayout:
-        cols:1
-        #size_hint_x:None
-        size_hint:0.8,1
-        pos_hint: {"x":0.1,"y":0.5}
-        ScrolllabelLabel:
-
-<DisplayTasks>:
-    FloatLayout:
-        MDLabel:
-            text: "hola"
-            pos_hint:{"x":0.5,"y":0.5}
-            font_size: 20
-            size_hint: 0.5,0.5
-            halign: "center"
-            valign: "middle"
-            color: 0, 0, 0, 1
-            markup: True
-            text_size: self.width, None
-            size_hint_y: None
-            height: self.texture_size[1]
-            

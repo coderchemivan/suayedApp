@@ -65,6 +65,9 @@ import datetime
 from datetime import date
 
 
+class WindowManager(ScreenManager):
+    pass
+
 
 class LoginPage(Screen):
     username = ObjectProperty()
@@ -115,9 +118,6 @@ class LoginPage(Screen):
                 print("Not here!")
 
 
-
-
-
 class FirstWindow(Screen):
     def on_enter(self):
         Clock.schedule_once(self.lista_semestres)   
@@ -131,12 +131,11 @@ class FirstWindow(Screen):
         for semestre in semestres:
             try:
                 self.ids.nav_drawer_content.ids.md_list.add_widget(
-                OneLineIconListItem(text = semestre))
+                ItemList(text = semestre))
             except:
                 pass   
 
     def definir_semestre(self):
-        print("hiiiiiiiiiiiiiiiiiiiiiii")
         archivo_aux = "assests\BD\semestres_materias.csv"
         archivo = "assests\BD\materias.csv"
         semestre = self.text
@@ -151,8 +150,6 @@ class FirstWindow(Screen):
     # Click Cancel
     def on_cancel(self, instance, value):
         pass
-
-
 
 
     def show_date_picker(self):
@@ -171,13 +168,6 @@ class SecondWindow(Screen):
 
     def on_pre_enter(self, *args):
         self.update_screen()
-
-    def definir_semestre(self):
-        archivo_aux = "assests\BD\semestres_materias.csv"
-        archivo = "assests\BD\materias.csv"
-        semestre = self.text
-        obtener_materias(archivo).define_semester(semestre,archivo_aux)
-
 
     def update_screen(self):
         # Limpiando las materias de la pantalla
@@ -351,56 +341,32 @@ class ThirdWindow(Screen):
         date_dialog.open()
 
 
-class FourthWindow(Screen): pass
-
-
-class WindowManager(ScreenManager):
-    pass
-
-
-class ContentNavigationDrawer(MDBoxLayout):
+class ContentNavigationDrawer(MDBoxLayout): #Pertenece a la página principal
     nav_drawer = ObjectProperty()
     sm2 = ScreenManager()
     screen_two = SecondWindow
 
-class DrawerList(ThemableBehavior, MDList):
-    def set_color_item(self, instance_item):
-        '''Called when tap on a menu item.'''
+class ItemList(TwoLineListItem):  #Pertenece a la página principal
+    screen_one = FirstWindow
+    sm2 = ScreenManager()
 
-        # Set the color of the icon and text for the menu item.
-        for item in self.children:
-            if item.text_color == self.theme_cls.primary_color:
-                item.text_color = self.theme_cls.text_color
-                break
-        instance_item.text_color = self.theme_cls.primary_color
 
-class ListaSesmtres(MDList,Screen):
-    def __init_(self,**kwargs):
-        super(ListaSesmtres,self).__init__(**kwargs)
-        Clock.schedule_once(self.hola)
-
-    lista_semester = ObjectProperty()
-    
-class ListItemWithCheckbox(TwoLineRightIconListItem):
+class ListItemWithCheckbox(TwoLineRightIconListItem): #Pertenece a la pantalla donde se muestran las actividades por materia (se muestra para actividades por entregar o atrasadas)
     '''Custom list item.'''
     icon = StringProperty("")
     screen_two = SecondWindow
 
-
-class ListItemWithoutCheckbox(TwoLineListItem):
+class ListItemWithoutCheckbox(TwoLineListItem):  #Pertenece a la pantalla donde se muestran las actividades por materia (se muestra para actividades entregafas)
     '''Custom list item.'''
     screen_two = SecondWindow
 
-
-class RightCheckbox(IRightBodyTouch, MDCheckbox):
+class RightCheckbox(IRightBodyTouch, MDCheckbox): #Pertenece a la pantalla donde se muestran las actividades por materia es el checkbox que se muestra para las actividades por entregar o atrasadas
     '''Custom right container.'''
     screen_login = LoginPage
 
-class ScrolllabelLabel(ScrollView):
+class ScrolllabelLabel(ScrollView):   #Pertenece a la pantalla donde se muestra el feedback de las materias, y es es el scroll que permite hacer scroll a los comentarios del feedback
     text = StringProperty('')
     comentarios = ObjectProperty()
-
-
 
 sm = ScreenManager()
 class TestNavigationDrawer(MDApp):
