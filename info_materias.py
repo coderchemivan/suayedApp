@@ -403,8 +403,11 @@ class vaciar_feedback():
                         myList[c][9] = v[1] #calificada el
                         myList[c][10] = v[2] #comentarios
                     c+=1
+                    continue
 
-                my_new_list = open(self.archivo_materias, 'w', newline='')
+                with open(self.archivo_materias, 'rb') as rawdata:
+                    result = chardet.detect(rawdata.read(100000))
+                my_new_list = open(self.archivo_materias, 'w', newline='',encoding=result['encoding'])
                 csv_writer = csv.writer(my_new_list)
                 for line in myList:
                     try:
