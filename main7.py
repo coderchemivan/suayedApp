@@ -119,6 +119,8 @@ class LoginPage(Screen):
 
 
 class FirstWindow(Screen):
+    def __init_(self,**kwargs):
+        super(FirstWindow,self).__init__(**kwargs)   
     
     def on_enter(self):
         Clock.schedule_once(self.lista_semestres)   
@@ -136,10 +138,10 @@ class FirstWindow(Screen):
             except:
                 pass   
 
-    def definir_semestre(self):
+    def definir_semestre(instance):
         archivo_aux = "assests\BD\semestres_materias.csv"
         archivo = "assests\BD\materias.csv"
-        semestre = self.text
+        semestre = instance.text
         obtener_materias(archivo).define_semester(semestre,archivo_aux)
 
 
@@ -361,8 +363,8 @@ class DrawerList(ThemableBehavior, MDList): #Pertenece a la página principal
 
 class ItemList(TwoLineListItem):  #Pertenece a la página principal
     screen_one = FirstWindow
-    sm2 = ScreenManager()
-
+    
+    
 
 class ListItemWithCheckbox(TwoLineRightIconListItem): #Pertenece a la pantalla donde se muestran las actividades por materia (se muestra para actividades por entregar o atrasadas)
     '''Custom list item.'''
