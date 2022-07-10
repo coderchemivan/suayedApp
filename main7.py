@@ -119,6 +119,7 @@ class LoginPage(Screen):
 
 
 class FirstWindow(Screen):
+    
     def on_enter(self):
         Clock.schedule_once(self.lista_semestres)   
 
@@ -345,6 +346,18 @@ class ContentNavigationDrawer(MDBoxLayout): #Pertenece a la página principal
     nav_drawer = ObjectProperty()
     sm2 = ScreenManager()
     screen_two = SecondWindow
+    screen_one = FirstWindow
+
+class DrawerList(ThemableBehavior, MDList): #Pertenece a la página principal
+    def set_color_item(self, instance_item):
+        """Called when tap on a menu item."""
+
+        # Set the color of the icon and text for the menu item.
+        for item in self.children:
+            if item.text_color == self.theme_cls.primary_color:
+                item.text_color = self.theme_cls.text_color
+                break
+        instance_item.text_color = self.theme_cls.primary_color
 
 class ItemList(TwoLineListItem):  #Pertenece a la página principal
     screen_one = FirstWindow
@@ -379,7 +392,6 @@ class TestNavigationDrawer(MDApp):
         sm.add_widget(FirstWindow(name='firstwindow'))
         sm.add_widget(SecondWindow(name='secondwindow'))
         sm.add_widget(ThirdWindow(name='thirdwindow'))
-        sm.add_widget(FourthWindow(name='fourthwindow'))
         return sm
 
     def go_back(self,pantalla):

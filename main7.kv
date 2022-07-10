@@ -13,6 +13,7 @@ WindowManager:
         name: 'thirdwindow'
 
 
+## Contenido de la página de Login
 <LoginPage>:
     username: User
     password: Pass
@@ -110,7 +111,7 @@ WindowManager:
             id: avatar
             size_hint: None, None
             size: "56dp", "56dp"
-            source: "kivymd_logo.png"
+            source: r"assests\multimedia\school.png"
 
     MDLabel:
         text: "Semestres"
@@ -132,6 +133,8 @@ WindowManager:
     on_press:
         root.screen_one.definir_semestre(self)
         app.root.current = "secondwindow"
+        root.screen_one.manager.transition.direction = 'left'
+
 
 
 
