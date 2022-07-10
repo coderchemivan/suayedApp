@@ -340,7 +340,19 @@ class ContentNavigationDrawer(MDBoxLayout):
     sm2 = ScreenManager()
     screen_two = SecondWindow
 
-class SemestresContent():pass
+class ListaSesmtres(MDList):
+    def __init_(self,**kwargs):
+        super(ListaSesmtres,self).__init__(**kwargs)
+
+    lista_semester = ObjectProperty()
+
+
+    def on_enter(self, *args):
+       self.ids.lista_semester.add_widget(OneLineListItem(text=f'Semestre {i+1}'))    
+
+    
+   
+ 
 
 
 class ListItemWithCheckbox(TwoLineRightIconListItem):

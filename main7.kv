@@ -31,6 +31,12 @@ WindowManager:
 
 
 
+<ListaSesmtres>:
+    
+
+
+
+
 
 
 <ContentNavigationDrawer>:
@@ -38,22 +44,12 @@ WindowManager:
     ScrollView:
 
         MDList:
+            id: lista_semester
 
-            OneLineListItem:
-                text: "Semestre 22-2"
-                on_press:
-                    root.screen_two.definir_semestre(self)
-                    root.nav_drawer.set_state("close")
-                    app.root.current = "secondwindow"
-                    root.sm2.transition.direction = 'left'
+            ListaSesmtres:
+                lista_semester: lista_semester
+            
 
-            OneLineListItem:
-                text: "Semestre 23-1"
-                on_press:
-                    root.screen_two.definir_semestre(self)
-                    root.nav_drawer.set_state("close")
-                    app.root.current = "secondwindow"
-                    root.sm2.transition.direction = 'left'
 
 <MyPopup_tasks>:
     Button:
