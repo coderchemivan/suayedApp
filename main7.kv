@@ -61,7 +61,7 @@ WindowManager:
 
         RelativeLayout:
 
-            MDToolbar:
+            MDTopAppBar:
                 title: 'HOME'
                 elevation: 10
                 left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
@@ -124,7 +124,7 @@ WindowManager:
             id: avatar
             size_hint: None, None
             size: "56dp", "56dp"
-            source: r"assests\multimedia\school.png"
+            source: "assests\\multimedia\\school.png"
 
     MDLabel:
         text: "Semestres"
@@ -159,7 +159,7 @@ WindowManager:
         BoxLayout:
             size_hint_y : 0.1
             orientation: 'horizontal'
-            MDToolbar:
+            MDTopAppBar:
                 id: nombre_materia
                 title: 'ACTIVIDADES'
                 right_action_items: [["menu", lambda x: root.abrir_menu(x)]]
@@ -235,6 +235,7 @@ WindowManager:
 
             MDTextButton:
                 id:Atrasada_text
+                hint_text: "hola perros"
                 text: "5"
                 pos_hint:{"x":0.82,"y":0.12}
                 font_size:18
@@ -256,6 +257,24 @@ WindowManager:
             size_hint_x : 1
             size_hint_y : 0.1
 
+#            MDFloatingActionButtonSpeedDial:
+#                data: root.data
+#                root_button_anim: True
+#                hint_animation: True
+#                #Color stuff
+#                #label_text_color: 1,0,0,1 # Text color
+#                #bg_color_stack_button: 1,0,0,1 # bg of icon
+#                #bg_color_root_button: 1,0,0,1 # speed dial bg
+#                #color_icon_root_button: 1,0,0,1 # speed dial text color
+#                #color_icon_stack_button: 1,0,0,1 # icond text color
+#                #bg_hint_color: 1,0,0,1 icon bgcolor
+#
+#                #Pushing the buttons
+#                callback: root.callback
+#
+#                # Open or Close
+#                on_open: root.open()
+#                on_close: root.close()
 
             MDBottomNavigation:
                 panel_color: get_color_from_hex("#eeeaea")
@@ -263,26 +282,34 @@ WindowManager:
                 text_color_active: 0, 0, 0, 1
 
                 MDBottomNavigationItem:
-                    name: 'progreso'
-                    text: 'Progreso'
+                    name: 'plan_trabajo'
+                    hint_text: 'Abrir plan de trabajo'
+                    icon: 'text-box-multiple'
                     hint_text: "hola perros"
-                    icon: 'pencil'
-                    badge_icon: "numeric-10"
+                    #badge_icon: "numeric-5"
 
+                MDBottomNavigationItem:
+                    name: 'progreso'
+                    hint_text: 'Progreso'
+                    icon: 'progress-star'
+                    #badge_icon: "numeric-10"
 
                 MDBottomNavigationItem:
                     name: 'calificaciones'
-                    text: 'Consultar calificaciones'
-                    icon: 'cloud-search-outline'
+                    hint_text: 'Consultar calificaciones'
+                    icon: 'search-web'
                     hint_text: "hola perros"
-                    badge_icon: "numeric-5"
+                    #badge_icon: "numeric-5"
                     on_tab_press: root.consultar_calificaciones()
 
-
 <ListItemWithCheckbox>:
-    on_press: root.screen_two.press_actividad(self)
+    on_press:
+        root.screen_two.press_actividad(self)
+        root.screen_two.buttonss.close_stack()
     RightCheckbox:
-        on_press: root.screen_two.activity_check(root)
+        on_press:
+            root.screen_two.activity_check(root)
+            root.screen_two.buttonss.close_stack()
 
 
 <ListItemWithoutCheckbox>:
@@ -294,7 +321,7 @@ WindowManager:
 <ThirdWindow>:
     FloatLayout:
         spacing:5
-        MDToolbar:
+        MDTopAppBar:
             id: nombre_actividad
             title : ""
             size_hint: 1,0.1

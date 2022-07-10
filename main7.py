@@ -17,8 +17,8 @@ from kivymd.uix.list import IconRightWidget
 
 from kivy.properties import ObjectProperty
 
-from picker_modificado import MDDatePicker 
-#from kivymd.uix.pickers import MDDatePicker
+from picker_modificado import MDDatePicker
+# from kivymd.uix.pickers import MDDatePicker
 
 from kivymd.uix.button import MDRoundFlatIconButton
 from kivymd.uix.button import MDFillRoundFlatIconButton
@@ -74,11 +74,10 @@ class LoginPage(Screen):
     password = ObjectProperty()
     login_cb = ObjectProperty()
 
-
     def on_pre_enter(self, *args):
         Clock.schedule_once(self.remember_)
 
-    def remember_(self,*args):
+    def remember_(self, *args):
         archivo = r'assests\BD\usuarioData.csv'
         with open(archivo, 'r') as file:
             reader = csv.reader(file)
@@ -109,7 +108,6 @@ class LoginPage(Screen):
             self.ids.User.text = user
             self.ids.Pass.text = pass_
 
-
             if self.username.text == user and self.password.text == pass_:
                 sm.current = "firstwindow"
                 self.username.text = ""
@@ -119,31 +117,30 @@ class LoginPage(Screen):
 
 
 class FirstWindow(Screen):
-    def __init_(self,**kwargs):
-        super(FirstWindow,self).__init__(**kwargs)   
-    
-    def on_enter(self):
-        Clock.schedule_once(self.lista_semestres)   
+    def __init_(self, **kwargs):
+        super(FirstWindow, self).__init__(**kwargs)
 
-    def lista_semestres(self, dt): # Llena el MDlist del NavigationDrawer
+    def on_enter(self):
+        Clock.schedule_once(self.lista_semestres)
+
+    def lista_semestres(self, dt):  # Llena el MDlist del NavigationDrawer
         archivo_aux = r'assests\BD\semestres_materias.csv'
         semestres = obtener_materias(archivo_aux).lista_semester()
-        #Limpiando los semestres anteriores
+        # Limpiando los semestres anteriores
         self.ids.nav_drawer_content.ids.md_list.clear_widgets()
 
         for semestre in semestres:
             try:
                 self.ids.nav_drawer_content.ids.md_list.add_widget(
-                ItemList(text = semestre))
+                    ItemList(text=semestre))
             except:
-                pass   
+                pass
 
     def definir_semestre(instance):
         archivo_aux = "assests\BD\semestres_materias.csv"
         archivo = "assests\BD\materias.csv"
         semestre = instance.text
-        obtener_materias(archivo).define_semester(semestre,archivo_aux)
-
+        obtener_materias(archivo).define_semester(semestre, archivo_aux)
 
     def on_save(self, instance, value, date_range):
         print(instance, value, date_range)
@@ -154,23 +151,49 @@ class FirstWindow(Screen):
     def on_cancel(self, instance, value):
         pass
 
-
     def show_date_picker(self):
         archivo = r'assests\BD\materias.csv'
         current_month = date.today().month
-        obtener_materias(archivo).dias_con_pendientes(modo=3, month=current_month,año='2022')
+        obtener_materias(archivo).dias_con_pendientes(modo=3, month=current_month, año='2022')
         date_dialog = MDDatePicker()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
 
 
 activity_name = ""
-class SecondWindow(Screen):
-    def __init_(self,**kwargs):
-        super(SecondWindow,self).__init__(**kwargs)
 
+
+class SecondWindow(Screen):
+
+    def __init_(self, **kwargs):
+        super(SecondWindow, self).__init__(**kwargs)
+        second_window = SecondWindow
     def on_pre_enter(self, *args):
         self.update_screen()
+
+    data = {
+        "Abrir plan de estudio": "text-box-multiple",
+        "Consultar calificaciones": "search-web",
+        "Ver progreso": "progress-star"
+    }
+
+    def callback(self, instance):
+        lang = ""
+        print(instance.icon)
+        if instance.icon == 'language-python':
+            lang = "Python"
+        elif instance.icon == 'language-javascript':
+            lang = "JS"
+        elif instance.icon == 'language-ruby':
+            lang = "Ruby"
+
+    def open(self):
+        pass
+
+    def close(self):
+        pass
+
+    # self.root.ids.my_label.text = f'Close!!!'
 
     def update_screen(self):
         # Limpiando las materias de la pantalla
@@ -224,22 +247,18 @@ class SecondWindow(Screen):
         self.ids.Entregas_a_tiempo_text.text = str(num_act_estado['entregadas a tiempo'])
         obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
 
-
-
     def press_actividad(self):  # Abre la ventana donde se muestran los detalles de la actividad
         activity_name = obtener_materias('assests\BD\materias.csv').define_activity(self.text)
         sm.current = 'thirdwindow'
         sm.transition.direction = "left"
 
-
-    def activity_check(self,*args):  # Se indica que se entregó una actividad
+    def activity_check(self, *args):  # Se indica que se entregó una actividad
         archivo = 'assests\BD\materias.csv'
         activity_name = self.text
         materia = obtener_materias(archivo).obtener_materia_name()
         obtener_materias(archivo).actualizar_DB(materia, activity_name)
-        sm.current ="firstwindow"
+        sm.current = "firstwindow"
         sm.current = "secondwindow"
-
 
     def abrir_menu(self, button):  # Abre el menú con las materias
         self.menu.caller = button
@@ -261,7 +280,6 @@ class SecondWindow(Screen):
         obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
         self.update_screen()
 
-
     def consultar_calificaciones(self):  # Extrae el feedback de internet
         archivo = 'assests\BD\materias.csv'
         archivo_aux = 'assests\BD\semestres_materias.csv'
@@ -276,7 +294,7 @@ class SecondWindow(Screen):
         driver = webdriver.Chrome('C:\Program Files (x86)\chromedriver_win32\chromedriver.exe', options=opts)
         activity_feedback = Feedback([subject_clave], actividades, driver).extraccion_feedback()
         vaciar_feedback(archivo_aux, subject_name, activity_feedback).vaciar_resultados()
-        
+
     def entregas_a_tiempo(self, *args):
         archivo = 'assests\BD\materias.csv'
         obtener_materias(archivo).estado_actividad('entregadas a tiempo', 'TwoLineListItem')
@@ -284,7 +302,6 @@ class SecondWindow(Screen):
         subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
         actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
         self.update_screen()
-
 
     def entregas_con_atraso(self, *args):
         archivo = 'assests\BD\materias.csv'
@@ -294,14 +311,12 @@ class SecondWindow(Screen):
         actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
         self.update_screen()
 
-
     def atrasadas(self, *args):
         archivo = 'assests\BD\materias.csv'
         obtener_materias(archivo).estado_actividad('atrasadas', 'TwoLineRightIconListItem')
         subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
         actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
         self.update_screen()
-
 
     def por_entregar(self, *args):
         archivo = 'assests\BD\materias.csv'
@@ -325,8 +340,7 @@ class ThirdWindow(Screen):
         self.ids.scroll_lable.ids.comentarios.text = f' {activity_status[4]}'
         self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[5]) * 100)}'
 
-
-    #Click OK
+    # Click OK
     def on_save(self, instance, value, date_range):
         print(instance, value, date_range)
         # self.root.ids.date_label.text = str(value)
@@ -344,13 +358,14 @@ class ThirdWindow(Screen):
         date_dialog.open()
 
 
-class ContentNavigationDrawer(MDBoxLayout): #Pertenece a la página principal
+class ContentNavigationDrawer(MDBoxLayout):  # Pertenece a la página principal
     nav_drawer = ObjectProperty()
     sm2 = ScreenManager()
     screen_two = SecondWindow
     screen_one = FirstWindow
 
-class DrawerList(ThemableBehavior, MDList): #Pertenece a la página principal
+
+class DrawerList(ThemableBehavior, MDList):  # Pertenece a la página principal
     def set_color_item(self, instance_item):
         """Called when tap on a menu item."""
 
@@ -361,29 +376,39 @@ class DrawerList(ThemableBehavior, MDList): #Pertenece a la página principal
                 break
         instance_item.text_color = self.theme_cls.primary_color
 
-class ItemList(TwoLineListItem):  #Pertenece a la página principal
-    screen_one = FirstWindow
-    
-    
 
-class ListItemWithCheckbox(TwoLineRightIconListItem): #Pertenece a la pantalla donde se muestran las actividades por materia (se muestra para actividades por entregar o atrasadas)
+class ItemList(TwoLineListItem):  # Pertenece a la página principal
+    screen_one = FirstWindow
+
+
+class ListItemWithCheckbox(
+    TwoLineRightIconListItem):  # Pertenece a la pantalla donde se muestran las actividades por materia (se muestra para actividades por entregar o atrasadas)
     '''Custom list item.'''
     icon = StringProperty("")
     screen_two = SecondWindow
 
-class ListItemWithoutCheckbox(TwoLineListItem):  #Pertenece a la pantalla donde se muestran las actividades por materia (se muestra para actividades entregafas)
+
+class ListItemWithoutCheckbox(
+    TwoLineListItem):  # Pertenece a la pantalla donde se muestran las actividades por materia (se muestra para actividades entregafas)
     '''Custom list item.'''
     screen_two = SecondWindow
 
-class RightCheckbox(IRightBodyTouch, MDCheckbox): #Pertenece a la pantalla donde se muestran las actividades por materia es el checkbox que se muestra para las actividades por entregar o atrasadas
+
+class RightCheckbox(IRightBodyTouch,
+                    MDCheckbox):  # Pertenece a la pantalla donde se muestran las actividades por materia es el checkbox que se muestra para las actividades por entregar o atrasadas
     '''Custom right container.'''
     screen_login = LoginPage
 
-class ScrolllabelLabel(ScrollView):   #Pertenece a la pantalla donde se muestra el feedback de las materias, y es es el scroll que permite hacer scroll a los comentarios del feedback
+
+class ScrolllabelLabel(
+    ScrollView):  # Pertenece a la pantalla donde se muestra el feedback de las materias, y es es el scroll que permite hacer scroll a los comentarios del feedback
     text = StringProperty('')
     comentarios = ObjectProperty()
 
+
 sm = ScreenManager()
+
+
 class TestNavigationDrawer(MDApp):
     def build(self):
         Window.size = (350, 600)
@@ -396,7 +421,7 @@ class TestNavigationDrawer(MDApp):
         sm.add_widget(ThirdWindow(name='thirdwindow'))
         return sm
 
-    def go_back(self,pantalla):
+    def go_back(self, pantalla):
         if pantalla == 1:
 
             sm.current = "firstwindow"
@@ -405,5 +430,6 @@ class TestNavigationDrawer(MDApp):
 
             sm.current = "secondwindow"
             sm.transition.direction = 'right'
+
 
 TestNavigationDrawer().run()
