@@ -50,6 +50,7 @@ import subprocess
 from info_materias import obtener_materias
 from info_materias import vaciar_feedback
 from info_materias import estatus_feedback
+from info_materias import goal_file
 
 # Web scrapping
 from time import sleep
@@ -322,6 +323,15 @@ class SecondWindow(Screen):
         path = r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Documents\Administracion\Ivan\4.Semestre 22-2" + r'"\"' + carpeta
         path = path.replace('"',"")
         subprocess.Popen([path], shell=True)
+
+
+    def ver_progreso(self):
+        archivo = 'assests\BD\materias.csv'
+        subject_name = obtener_materias(archivo).obtener_materia_name()
+        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
+        archivo_grafica_progreso = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
+        goal_file(archivo_grafica_progreso,archivo,subject_clave,subject_name).change_cell()
+
 
 class ThirdWindow(Screen):
     def on_enter(self, *args):

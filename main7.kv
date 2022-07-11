@@ -274,16 +274,21 @@ WindowManager:
                     name: 'progreso'
                     hint_text: 'Progreso'
                     icon: 'progress-star'
+                    on_tab_press: root.ver_progreso()
                     #badge_icon: "numeric-10"
 
                 MDBottomNavigationItem:
                     name: 'calificaciones'
                     hint_text: 'Consultar calificaciones'
                     icon: 'search-web'
-                    hint_text: "hola perros"
                     #badge_icon: "numeric-5"
                     on_tab_press: root.consultar_calificaciones()
 
+                MDBottomNavigationItem:
+                    name: 'correo'
+                    hint_text: 'Consultar calificaciones'
+                    icon: 'email'
+                    #badge_icon: "numeric-5"
 
 
 <ListItemWithCheckbox>:

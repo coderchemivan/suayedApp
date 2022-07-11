@@ -4,6 +4,9 @@ import datetime
 from datetime import date
 import chardet
 import pandas as pd
+import xlwings as xw
+from openpyxl import load_workbook
+import re
 
 
 class obtener_materias():
@@ -229,6 +232,7 @@ class obtener_materias():
                     fechas.append(row[3])
         return fechas
 
+
     def define_activity(self, actividad):
         with open(self.archivo_materias, 'r') as file:
             reader = csv.reader(file)
@@ -386,6 +390,9 @@ class vaciar_feedback():
                 c = 0
                 for row in myList:
                     if row[3] == self.materia and row[4] == k:
+                        if v[0]!="" and v[0]!="Sin envío":
+                            v[0] = float(v[0].split("/")[0])
+                        else:pass
                         myList[c][8] = v[0]  # calificacion
                         myList[c][9] = v[1]  # calificada el
                         myList[c][10] = v[2]  # comentarios
@@ -404,7 +411,52 @@ class vaciar_feedback():
                         csv_writer.writerow(line)
 
 
-archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\semestres_materias.csv'
+class goal_file():
+    def __init__(self,archivo_excel,archivo,clave,subject_name):
+        self.archivo = archivo
+        self.archivo_excel = archivo_excel
+        self.clave = clave
+        self.subject_name = subject_name
+    def change_cell(self):
+        with open(self.archivo, 'rb') as rawdata:
+            result = chardet.detect(rawdata.read(100000))
+        df = pd.read_csv(self.archivo,encoding=result['encoding'])
+        try:
+            df['Clave'] = df['Clave'].astype(str).apply(lambda x:x[:4])
+        except:pass
+        df = df[df['Clave'] == self.clave]
+        #df_calificacion = df['Calificacion'].apply(lambda x: x.split("/")[0]).astype(float)
+        df_calificacion = df['Calificacion'].astype(float)
+        df_valor = df['Valor'].astype(float)
+        df_ponderacion = ((df_calificacion*df_valor)/10)
+
+        ## Se hace la suma de las calificaciones
+        resultados = dict()
+        acumulado = df_ponderacion.sum()*10
+        resultados['acumulado'] = round(acumulado,2)
+        #resultados['max_grade'] = round(max_grade,2)
+        print(resultados)
+
+        ## Enviando la suma de calificaciones al libro de excel
+        wb = load_workbook(filename=self.archivo_excel,read_only=False,keep_vba=True)
+        ws = wb['Hoja1']
+        ws['a2'] = self.subject_name
+        ws['b2'] = int(self.clave)
+        ws['d2'] = resultados['acumulado']
+        wb.save(self.archivo_excel)
+        app = xw.App(visible=False)
+        wb = xw.Book('assests/materia_dashboard_material/meta.xlsm')
+        macro1 = wb.macro('modulo.progress')
+        macro1()
+        wb.save()
+        wb.app.quit()
+        return resultados
+
+
+#archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\semestres_materias.csv'
+#archiv = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
+#goal_file(archiv,archivo,'1343','COMPORTAMIENTO EN LAS ORGANIZACIONES').change_cell()
+
 # obtener_materias(archivo).lista_semester()
 # obtener_materias(archivo).define_semester('Semestre 22-2',
 # r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD/semestres_materias.csv")
