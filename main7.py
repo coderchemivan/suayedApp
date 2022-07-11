@@ -46,6 +46,7 @@ from kivy.metrics import dp
 
 # Base de datos
 import csv
+import subprocess
 from info_materias import obtener_materias
 from info_materias import vaciar_feedback
 from info_materias import estatus_feedback
@@ -261,22 +262,6 @@ class SecondWindow(Screen):
         obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
         self.update_screen()
 
-
-    def consultar_calificaciones(self):  # Extrae el feedback de internet
-        archivo = 'assests\BD\materias.csv'
-        archivo_aux = 'assests\BD\semestres_materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name()
-        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
-        obtener_materias(archivo).estado_actividad("todas", 'TwoLineRightIconListItem')
-        actividades = obtener_materias(archivo).total_actividades(subject_name)
-        opts = Options()
-        opts.add_argument(
-            "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36")
-
-        driver = webdriver.Chrome('C:\Program Files (x86)\chromedriver_win32\chromedriver.exe', options=opts)
-        activity_feedback = Feedback([subject_clave], actividades, driver).extraccion_feedback()
-        vaciar_feedback(archivo_aux, subject_name, activity_feedback).vaciar_resultados()
-        
     def entregas_a_tiempo(self, *args):
         archivo = 'assests\BD\materias.csv'
         obtener_materias(archivo).estado_actividad('entregadas a tiempo', 'TwoLineListItem')
@@ -310,6 +295,33 @@ class SecondWindow(Screen):
         actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
         self.update_screen()
 
+    ##Los métodos del MDBottomNavigation
+    def consultar_calificaciones(self):  # Extrae el feedback de internet
+        archivo = 'assests\BD\materias.csv'
+        archivo_aux = 'assests\BD\semestres_materias.csv'
+        subject_name = obtener_materias(archivo).obtener_materia_name()
+        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
+        obtener_materias(archivo).estado_actividad("todas", 'TwoLineRightIconListItem')
+        actividades = obtener_materias(archivo).total_actividades(subject_name)
+        opts = Options()
+        opts.add_argument(
+            "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36")
+
+        driver = webdriver.Chrome('C:\Program Files (x86)\chromedriver_win32\chromedriver.exe', options=opts)
+        activity_feedback = Feedback([subject_clave], actividades, driver).extraccion_feedback()
+        vaciar_feedback(archivo_aux, subject_name, activity_feedback).vaciar_resultados()
+
+    def abrir_plan_trabajo(self):
+        archivo = 'assests\BD\materias.csv'
+        archivo_clave_grupo = 'assests\BD\materia_grupo.csv'
+        subject_name = obtener_materias(archivo).obtener_materia_name()
+        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
+        subject_grupo = obtener_materias(archivo_clave_grupo).obtener_materia_grupo(subject_clave)
+
+        carpeta = subject_name + r'\1. Materiales\plan_'+subject_clave +'_'+ subject_grupo+'_'+'ED.pdf'
+        path = r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Documents\Administracion\Ivan\4.Semestre 22-2" + r'"\"' + carpeta
+        path = path.replace('"',"")
+        subprocess.Popen([path], shell=True)
 
 class ThirdWindow(Screen):
     def on_enter(self, *args):
@@ -363,8 +375,7 @@ class DrawerList(ThemableBehavior, MDList): #Pertenece a la página principal
 
 class ItemList(TwoLineListItem):  #Pertenece a la página principal
     screen_one = FirstWindow
-    
-    
+
 
 class ListItemWithCheckbox(TwoLineRightIconListItem): #Pertenece a la pantalla donde se muestran las actividades por materia (se muestra para actividades por entregar o atrasadas)
     '''Custom list item.'''

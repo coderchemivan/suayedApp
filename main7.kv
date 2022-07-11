@@ -263,20 +263,27 @@ WindowManager:
                 text_color_active: 0, 0, 0, 1
 
                 MDBottomNavigationItem:
-                    name: 'progreso'
-                    text: 'Progreso'
+                    name: 'plan_trabajo'
+                    hint_text: 'Abrir plan de trabajo'
+                    icon: 'text-box-multiple'
                     hint_text: "hola perros"
-                    icon: 'pencil'
-                    badge_icon: "numeric-10"
+                    #badge_icon: "numeric-5"
+                    on_tab_press: root.abrir_plan_trabajo()
 
+                MDBottomNavigationItem:
+                    name: 'progreso'
+                    hint_text: 'Progreso'
+                    icon: 'progress-star'
+                    #badge_icon: "numeric-10"
 
                 MDBottomNavigationItem:
                     name: 'calificaciones'
-                    text: 'Consultar calificaciones'
-                    icon: 'cloud-search-outline'
+                    hint_text: 'Consultar calificaciones'
+                    icon: 'search-web'
                     hint_text: "hola perros"
-                    badge_icon: "numeric-5"
+                    #badge_icon: "numeric-5"
                     on_tab_press: root.consultar_calificaciones()
+
 
 
 <ListItemWithCheckbox>:
