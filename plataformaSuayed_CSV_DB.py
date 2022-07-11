@@ -98,16 +98,15 @@ class Feedback():
                     comentarios = self.driver.find_elements_by_xpath(
                         '//*[contains(@class,"box py-3 boxaligncenter full_assignfeedback_comments")]/p')
 
-
-                    for comentario in comentarios:
-                        feedback += ' ' + comentario.text
-                        # print(comentario.text)
-                    # print(feedback)
-
                 except:
-                    None
+                    comentarios = self.driver.find_elements_by_xpath(
+                        '//*[contains(@class,"assignfeedback_comments")]/p')
 
 
+                for comentario in comentarios:
+                    feedback += ' ' + comentario.text
+                    # print(comentario.text)
+                    # print(feedback)
 
 
                 actividad_feedback[activity]= [calificacion,calificado_en,feedback]
