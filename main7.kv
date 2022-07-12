@@ -124,7 +124,7 @@ WindowManager:
             id: avatar
             size_hint: None, None
             size: "56dp", "56dp"
-            source: r"assests\multimedia\school.png"
+            source: r"assests/multimedia/school.png"
 
     MDLabel:
         text: "Semestres"
@@ -153,12 +153,13 @@ WindowManager:
 
 #'''Contenido de la pantalla donde se muestran las actividades por materia'''
 <SecondWindow>:
-    BoxLayout:
+    FloatLayout:
         spacing: 5
         orientation: "vertical"
         BoxLayout:
             size_hint_y : 0.1
             orientation: 'horizontal'
+            pos_hint:{"x":0,"y":0.9}
             MDToolbar:
                 id: nombre_materia
                 title: 'ACTIVIDADES'
@@ -172,79 +173,147 @@ WindowManager:
             orientation : "horizontal"
             size_hint_x : 1
             size_hint_y : 0.20
+            pos_hint:{"x":0.10,"y":0.2}
 
-
-            MDFloatingActionButton:
-                id: Por_entregar
-                icon: "bookmark-check-outline"
-                opposite_colors: True
-                elevation: 8
-                md_bg_color: 0, 0.1, 0, .5
-                pos_hint: {"x":0.10,"y":0.40}
-                on_press: root.por_entregar()
-
-            MDTextButton:
-                id:por_entregar_text
-                text: "8"
-                pos_hint:{"x":0.17,"y":0.12}
-                font_size:18
-                size_hint: 0.2,0.1
-
-
-            MDFloatingActionButton:
-                id: Entregas_a_tiempo
-                icon: "bookmark-check-outline"
-                opposite_colors: True
-                elevation: 8
-                md_bg_color: 0, 1, 0, .5
-                pos_hint: {"x":0.32,"y":0.40}
-
-                on_press: root.entregas_a_tiempo()
-
-            MDTextButton:
-                id:Entregas_a_tiempo_text
-                text: "hola"
-                pos_hint:{"x":0.38,"y":0.12}
-                font_size:18
-                size_hint: 0.2,0.1
-
-
-            MDFloatingActionButton:
-                id: Entregas_con_retraso
-                icon: "bookmark-check-outline"
-                opposite_colors: True
-                elevation: 8
-                md_bg_color: 0, 0, 1, 1
-                pos_hint: {"x":0.54,"y":0.40}
-                on_press: root.entregas_con_atraso()
-
-            MDTextButton:
-                id:Entregas_con_retraso_text
-                text: "5"
-                pos_hint:{"x":0.60,"y":0.12}
-                font_size:18
-                size_hint: 0.2,0.1
-
-            MDFloatingActionButton:
-                icon: "backspace-reverse"
-                opposite_colors: True
-                elevation: 8
-                md_bg_color: 1, 0, 0, .5
-                pos_hint: {"x":0.76,"y":0.40}
-                on_press: root.atrasadas()
-
-            MDTextButton:
-                id:Atrasada_text
-                text: "5"
-                pos_hint:{"x":0.82,"y":0.12}
-                font_size:18
-                size_hint: 0.2,0.1
+#            MDFloatingActionButton:
+#                id: Por_entregar
+#                icon: "bookmark-check-outline"
+#                opposite_colors: True
+#                elevation: 8
+#                md_bg_color: 0, 0.1, 0, .5
+#                pos_hint: {"x":0.10,"y":0.40}
+#                on_press: root.por_entregar()
+#
+#            MDTextButton:
+#                id:por_entregar_text
+#                text: "8"
+#                pos_hint:{"x":0.17,"y":0.12}
+#                font_size:18
+#                size_hint: 0.2,0.1
+#
+#
+#            MDFloatingActionButton:
+#                id: Entregas_a_tiempo
+#                icon: "bookmark-check-outline"
+#                opposite_colors: True
+#                elevation: 8
+#                md_bg_color: 0, 1, 0, .5
+#                pos_hint: {"x":0.32,"y":0.40}
+#
+#                on_press: root.entregas_a_tiempo()
+#
+#            MDTextButton:
+#                id:Entregas_a_tiempo_text
+#                text: "hola"
+#                pos_hint:{"x":0.38,"y":0.12}
+#                font_size:18
+#                size_hint: 0.2,0.1
+#
+#
+#            MDFloatingActionButton:
+#                id: Entregas_con_retraso
+#                icon: "bookmark-check-outline"
+#                opposite_colors: True
+#                elevation: 8
+#                md_bg_color: 0, 0, 1, 1
+#                pos_hint: {"x":0.54,"y":0.40}
+#                on_press: root.entregas_con_atraso()
+#
+#            MDTextButton:
+#                id:Entregas_con_retraso_text
+#                text: "5"
+#                pos_hint:{"x":0.60,"y":0.12}
+#                font_size:18
+#                size_hint: 0.2,0.1
+#
+#            MDFloatingActionButton:
+#                icon: "backspace-reverse"
+#                opposite_colors: True
+#                elevation: 8
+#                md_bg_color: 1, 0, 0, .5
+#                pos_hint: {"x":0.76,"y":0.40}
+#                on_press: root.atrasadas()
+#
+#            MDTextButton:
+#                id:Atrasada_text
+#                text: "5"
+#                pos_hint:{"x":0.82,"y":0.12}
+#                font_size:18
+#                size_hint: 0.2,0.1
 
         BoxLayout:
             orientation : "horizontal"
             size_hint_x : 1
-            size_hint_y : 0.7
+            size_hint_y : 0.3
+            pos_hint:{"x":0,"y":0.6}
+            Button:
+                size_hint:0.55,1
+                text: "prueba"
 
+            FloatLayout:
+                size_hint:0.45,1
+                MDRectangleFlatIconButton:
+                    icon: "bookmark-check-outline"
+                    text: "Por entregar"
+                    id: Por_entregar
+                    theme_text_color: "Custom"
+                    text_color: 0, 0, 1, 1
+                    line_color: 0, 0, 1, 1
+                    theme_icon_color: "Custom"
+                    icon_color: 0, 0, 1, 1
+                    pos_hint: {"x":0,"y":0.8}
+                    size_hint: 1,0.2
+                    on_press: root.por_entregar()
+
+
+                MDRectangleFlatIconButton:
+                    id: Entregas_a_tiempo
+                    text: "Entregas a tiempo"
+                    icon: "bookmark-check-outline"
+                    theme_text_color: "Custom"
+                    text_color: 0, 0, 1, 1
+                    line_color: 0, 0, 1, 1
+                    theme_icon_color: "Custom"
+                    icon_color: 0, 0, 1, 1
+                    pos_hint: {"x":0,"y":0.6}
+                    size_hint: 1,0.2
+                    on_press: root.entregas_a_tiempo()
+
+
+                MDRectangleFlatIconButton:
+                    id: Entregas_con_retraso
+                    text: "Entregas retrasadas"
+                    icon: "bookmark-check-outline"
+                    theme_text_color: "Custom"
+                    text_color: 0, 0, 1, 1
+                    line_color: 0, 0, 1, 1
+                    theme_icon_color: "Custom"
+                    icon_color: 0, 0, 1, 1
+                    pos_hint: {"x":0.0,"y":0.4}
+                    size_hint: 1,0.2
+                    on_press: root.entregas_con_atraso()
+
+
+
+                MDRectangleFlatIconButton:
+                    icon: "backspace-reverse"
+                    text: "Atrasadas"
+                    theme_text_color: "Custom"
+                    text_color: 0, 0, 1, 1
+                    line_color: 0, 0, 1, 1
+                    theme_icon_color: "Custom"
+                    icon_color: 0, 0, 1, 1
+                    pos_hint: {"x":0.0,"y":0.2}
+                    size_hint: 1,0.2
+                    on_press: root.atrasadas()
+
+
+
+        BoxLayout:
+            orientation : "horizontal"
+            size_hint_x : 1
+            size_hint_y : 0.5
+            pos_hint:{"x":0,"y":0.1}
 
             ScrollView:
                 MDList:

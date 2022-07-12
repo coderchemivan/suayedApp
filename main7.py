@@ -220,10 +220,10 @@ class SecondWindow(Screen):
             num_actividades = len(obtener_materias(archivo).total_actividades(subject_name))
             num_act_estado[estado] = num_actividades
 
-        self.ids.por_entregar_text.text = str(num_act_estado['por entregar'])
-        self.ids.Entregas_con_retraso_text.text = str(num_act_estado['entregadas con atraso'])
-        self.ids.Atrasada_text.text = str(num_act_estado['atrasadas'])
-        self.ids.Entregas_a_tiempo_text.text = str(num_act_estado['entregadas a tiempo'])
+        #self.ids.por_entregar_text.text = str(num_act_estado['por entregar'])
+        #self.ids.Entregas_con_retraso_text.text = str(num_act_estado['entregadas con atraso'])
+        #self.ids.Atrasada_text.text = str(num_act_estado['atrasadas'])
+        #self.ids.Entregas_a_tiempo_text.text = str(num_act_estado['entregadas a tiempo'])
         obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
 
 
