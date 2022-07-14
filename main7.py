@@ -16,6 +16,7 @@ from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.list import IconRightWidget
 
 from kivy.properties import ObjectProperty
+from pyparsing import FollowedBy
 
 from picker_modificado import MDDatePicker 
 #from kivymd.uix.pickers import MDDatePicker
@@ -331,7 +332,9 @@ class SecondWindow(Screen):
         subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
         archivo_grafica_progreso = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
         goal_file(archivo_grafica_progreso,archivo,subject_clave,subject_name).change_cell()
-
+        sm.current = "fourthwindow"
+        sm.transition.direction = 'left'
+        
 
 class ThirdWindow(Screen):
     def on_enter(self, *args):
@@ -364,6 +367,11 @@ class ThirdWindow(Screen):
         date_dialog = MDDatePicker()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
+
+
+class FourthWindow(Screen):
+    def go_back(self):
+        sm.current = "secondwindow"
 
 
 class ContentNavigationDrawer(MDBoxLayout): #Pertenece a la página principal
@@ -415,6 +423,7 @@ class TestNavigationDrawer(MDApp):
         sm.add_widget(FirstWindow(name='firstwindow'))
         sm.add_widget(SecondWindow(name='secondwindow'))
         sm.add_widget(ThirdWindow(name='thirdwindow'))
+        sm.add_widget(FourthWindow(name='fourthwindow'))
         return sm
 
     def go_back(self,pantalla):
