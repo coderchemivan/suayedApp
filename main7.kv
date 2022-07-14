@@ -11,7 +11,9 @@ WindowManager:
     ThirdWindow:
         id:tw
         name: 'thirdwindow'
-
+    FourthWindow:
+        id:fw
+        name: 'fourthwindow'
 
 ## Contenido de la página de Login
 <LoginPage>:
@@ -387,4 +389,21 @@ WindowManager:
         height: self.texture_size[1]
 
 
-
+<FourthWindow>:
+    FloatLayout:
+        BoxLayout:
+            orientation: "horizontal" 
+            MDToolbar:
+                title : ""
+                size_hint: 1,0.1
+                pos_hint:{"top":1}
+                elevation: 10
+                left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]      
+        BoxLayout:
+            orientation: "horizontal"
+            size_hint:1,0.5
+            pos_hint:{"y":0.10}
+            Image:
+                source: "assests/materia_dashboard_material/progreso.gif"
+                size_hint: 0.2,1
+                pos_hint:{"top":1}
