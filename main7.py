@@ -173,7 +173,10 @@ class SecondWindow(Screen):
         super(SecondWindow,self).__init__(**kwargs)
 
     def on_pre_enter(self, *args):
+        self.por_entregar()
         self.update_screen()
+
+
 
     def update_screen(self):
         # Limpiando las materias de la pantalla
