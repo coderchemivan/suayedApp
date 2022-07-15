@@ -1,3 +1,4 @@
+#:kivy 2.1.0
 WindowManager:
     id: screen_manager
     LoginPage:
@@ -398,12 +399,89 @@ WindowManager:
                 size_hint: 1,0.1
                 pos_hint:{"top":1}
                 elevation: 10
-                left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]      
+                left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]  
+
         BoxLayout:
             orientation: "horizontal"
-            size_hint:1,0.5
-            pos_hint:{"y":0.10}
+            spacing:5
+            padding:5
+            size_hint:1,0.3
+            pos_hint:{"x":0,"y":0.6}
+
+
+            BoxLayout:
+                orientation:"vertical"  
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 0, 0.4
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size        
+
+            BoxLayout:
+                orientation:"vertical"  
+                canvas.before:
+                    Color:
+                        rgba: 1, 0, 1, 0.4
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size       
+
+            BoxLayout:
+                orientation:"vertical"  
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.7
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size  
+
+
+
+
+
+        FloatLayout:
+            orientation: "horizontal"
+            spacing:5
+            size_hint:1,0.6
+            pos_hint:{"x":0,"y":0}
+            canvas.before:
+                Color:
+                    rgba: 0, 1, 0, 0.4
+                Rectangle:
+                    pos: self.pos
+                    size: self.size  
             Image:
                 id: materia_progreso
-                size_hint: 0.2,1
-                pos_hint:{"top":1}
+                size_hint: 0.8,1
+                pos_hint:{"x":0.1,"top":1}
+
+
+
+
+    # FloatLayout:
+
+    #     spacing:5
+
+
+    #     BoxLayout:
+    #         size_hint:1,0.3
+    #         pos_hint:{"x":0, "y":0.6}
+    #         orientation: "horizontal"
+
+    #         canvas.before:
+    #             Color:
+    #                 rgba: [1,0,0,0]
+    #             Rectangle:
+    #                 size: self.size
+    #                 pos: self.pos
+                 
+
+    #     BoxLayout:
+    #         orientation: "horizontal"
+    #         size_hint:1,0.5
+    #         pos_hint:{"y":0.10}
+    #         Image:
+    #             id: materia_progreso
+    #             size_hint: 0.2,1
+    #             pos_hint:{"top":1}
