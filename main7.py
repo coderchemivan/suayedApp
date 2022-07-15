@@ -373,6 +373,18 @@ class ThirdWindow(Screen):
 
 
 class FourthWindow(Screen):
+    def __init_(self,**kwargs):
+        super(FirstWindow,self).__init__(**kwargs)  
+
+    def on_pre_enter(self, *args):
+        Clock.schedule_once(self.imagen)
+
+    def imagen(self, *args):
+        archivo = 'assests\BD\materias.csv'
+        subject_name = obtener_materias(archivo).obtener_materia_name()
+        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
+        self.ids.materia_progreso.clear_widgets()
+        self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave}.gif'
     def go_back(self):
         sm.current = "secondwindow"
 
