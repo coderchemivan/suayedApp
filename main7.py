@@ -223,6 +223,9 @@ class SecondWindow(Screen):
             obtener_materias(archivo).estado_actividad(estado, 'TwoLineRightIconListItem')
             num_actividades = len(obtener_materias(archivo).total_actividades(subject_name))
             num_act_estado[estado] = num_actividades
+            if estado == 'por entregar':
+                if num_actividades == 0:
+                    self.ids.contenido.clear_widgets()
 
         self.ids.por_entregar_text.text = str(num_act_estado['por entregar'])
         self.ids.Entregas_con_retraso_text.text = str(num_act_estado['entregadas con atraso'])
@@ -330,11 +333,6 @@ class SecondWindow(Screen):
 
 
     def ver_progreso(self):
-        archivo = 'assests\BD\materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name()
-        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
-        archivo_grafica_progreso = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
-        goal_file(archivo_grafica_progreso,archivo,subject_clave,subject_name).change_cell()
         sm.current = "fourthwindow"
         sm.transition.direction = 'left'
         
@@ -374,11 +372,18 @@ class ThirdWindow(Screen):
 
 class FourthWindow(Screen):
     def __init_(self,**kwargs):
-        super(FirstWindow,self).__init__(**kwargs)  
+        super(FourthWindow,self).__init__(**kwargs)
 
     def on_pre_enter(self, *args):
-       Clock.schedule_once(self.imagen)
-
+        Clock.schedule_once(self.imagen)
+        archivo = 'assests\BD\materias.csv'
+        subject_name = obtener_materias(archivo).obtener_materia_name()
+        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
+        archivo_grafica_progreso = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
+        archivo_meta = 'assests\BD\materia_grupo.csv'
+        resultados = goal_file(archivo_grafica_progreso,archivo,archivo_meta,subject_clave,subject_name).change_cell()
+        self.ids.acumulado.text = "Acumulado \n" + str(resultados['acumulado'])
+        self.ids.meta.text = "Mi meta: \n" + str(resultados['meta'])
     def imagen(self, *args):
        archivo = 'assests\BD\materias.csv'
        subject_name = obtener_materias(archivo).obtener_materia_name()
@@ -443,11 +448,9 @@ class TestNavigationDrawer(MDApp):
 
     def go_back(self,pantalla):
         if pantalla == 1:
-
             sm.current = "firstwindow"
             sm.transition.direction = 'right'
         else:
-
             sm.current = "secondwindow"
             sm.transition.direction = 'right'
 

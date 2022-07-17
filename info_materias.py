@@ -412,9 +412,10 @@ class vaciar_feedback():
 
 
 class goal_file():
-    def __init__(self,archivo_excel,archivo,clave,subject_name):
+    def __init__(self,archivo_excel,archivo,archivo_meta,clave,subject_name):
         self.archivo = archivo
         self.archivo_excel = archivo_excel
+        self.archivo_meta = archivo_meta
         self.clave = clave
         self.subject_name = subject_name
     def change_cell(self):
@@ -434,8 +435,19 @@ class goal_file():
         resultados = dict()
         acumulado = df_ponderacion.sum()*10
         resultados['acumulado'] = round(acumulado,2)
-        #resultados['max_grade'] = round(max_grade,2)
-        print(resultados)
+
+
+        ## Obteniendo la meta de la materia
+        with open(self.archivo_meta, 'rb') as rawdata:
+            result = chardet.detect(rawdata.read(100000))
+        df = pd.read_csv(self.archivo_meta,encoding=result['encoding'])
+        try:
+            df['Clave'] = df['Clave'].astype(str).apply(lambda x:x[:4])
+        except:pass
+
+        df = df[df['Clave'] == self.clave]
+        meta = df.iat[0,2]
+        resultados['meta'] = float(meta)
 
         ## Enviando la suma de calificaciones al libro de excel
         wb = load_workbook(filename=self.archivo_excel,read_only=False,keep_vba=True)
@@ -450,6 +462,7 @@ class goal_file():
         macro1()
         wb.save()
         wb.app.quit()
+        print(resultados)
         return resultados
 
 

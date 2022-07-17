@@ -244,6 +244,7 @@ WindowManager:
                 size_hint: 0.2,0.1
 
         BoxLayout:
+            id: cotenido
             orientation : "horizontal"
             size_hint_x : 1
             size_hint_y : 0.7
@@ -392,6 +393,12 @@ WindowManager:
 
 <FourthWindow>:
     FloatLayout:
+        canvas.before:
+            Color:
+                rgba: 0.6, 0.63, 0.65, 0
+            Rectangle:
+                pos: self.pos
+                size: self.size
         BoxLayout:
             orientation: "horizontal" 
             MDToolbar:
@@ -405,56 +412,85 @@ WindowManager:
             orientation: "horizontal"
             spacing:5
             padding:5
-            size_hint:1,0.3
-            pos_hint:{"x":0,"y":0.6}
-
-
-            BoxLayout:
+            size_hint:1,0.2
+            pos_hint:{"x":0,"y":0.7}
+            FloatLayout:
+                spacing:5
+                padding:5
                 orientation:"vertical"  
                 canvas.before:
                     Color:
-                        rgba: 1, 1, 0, 0.4
+                        rgba: 1, 1, 1, 0.4
                     Rectangle:
                         pos: self.pos
                         size: self.size        
-
-            BoxLayout:
-                orientation:"vertical"  
+                MDRectangleFlatButton:
+                    id:meta
+                    text: "Mi meta\n"
+                    text_size: root.width, root.height
+                    valign: "top"
+                    halign: "center"
+                    multiline: True
+                    size_hint: 0.9,0.8
+                    pos_hint: {"x":0.05,"y":0.1}
+            FloatLayout:
+                spacing:5
+                padding:5
+                orientation:"vertical"
                 canvas.before:
                     Color:
-                        rgba: 1, 0, 1, 0.4
+                        rgba: 1, 1, 1, 0.4
                     Rectangle:
                         pos: self.pos
-                        size: self.size       
-
-            BoxLayout:
-                orientation:"vertical"  
+                        size: self.size
+                MDRectangleFlatButton:
+                    id:acumulado
+                    #text: "Acumulado\n"
+                    text_size: root.width, root.height
+                    valign: "top"
+                    halign: "center"
+                    multiline: True
+                    size_hint: 0.9,0.8
+                    pos_hint: {"x":0.05,"y":0.1}
+            FloatLayout:
+                spacing:5
+                padding:5
+                orientation:"vertical"
                 canvas.before:
                     Color:
-                        rgba: 1, 1, 1, 0.7
+                        rgba: 1, 1, 1, 0.4
                     Rectangle:
                         pos: self.pos
-                        size: self.size  
-
-
-
+                        size: self.size
+                MDRectangleFlatButton:
+                    id:"max_cal"
+                    text: "Calificación\n máxima"
+                    text_size: root.width, root.height
+                    valign: "top"
+                    halign: "center"
+                    multiline: True
+                    size_hint: 0.9,0.8
+                    pos_hint: {"x":0.05,"y":0.1}
 
 
         FloatLayout:
             orientation: "horizontal"
             spacing:5
-            size_hint:1,0.6
+            size_hint:1,0.7
             pos_hint:{"x":0,"y":0}
             canvas.before:
                 Color:
-                    rgba: 0, 1, 0, 0.4
+                    rgba: 1, 1, 1, 0.4
                 Rectangle:
                     pos: self.pos
                     size: self.size  
             Image:
                 id: materia_progreso
-                size_hint: 0.8,1
+                size_hint: 0.8,0.9
                 pos_hint:{"x":0.1,"top":1}
+                allow_stretch: True
+                keep_ratio: False
+
 
 
 
