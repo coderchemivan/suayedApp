@@ -223,9 +223,9 @@ class SecondWindow(Screen):
             obtener_materias(archivo).estado_actividad(estado, 'TwoLineRightIconListItem')
             num_actividades = len(obtener_materias(archivo).total_actividades(subject_name))
             num_act_estado[estado] = num_actividades
-            if estado == 'por entregar':
-                if num_actividades == 0:
-                    self.ids.contenido.clear_widgets()
+            #if estado == 'por entregar':
+            #    if num_actividades == 0:
+            #        self.ids.contenido.clear_widgets()
 
         self.ids.por_entregar_text.text = str(num_act_estado['por entregar'])
         self.ids.Entregas_con_retraso_text.text = str(num_act_estado['entregadas con atraso'])
@@ -311,6 +311,7 @@ class SecondWindow(Screen):
         subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
         obtener_materias(archivo).estado_actividad("todas", 'TwoLineRightIconListItem')
         actividades = obtener_materias(archivo).total_actividades(subject_name)
+        print(actividades)
         opts = Options()
         opts.add_argument(
             "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36")
