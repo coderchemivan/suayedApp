@@ -62,10 +62,11 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
-from plataformaSuayed_CSV_DB import Feedback
+from plataformaSuayed import Feedback
 
 import datetime
 from datetime import date
+import mysql.connector
 
 
 class WindowManager(ScreenManager):
@@ -169,18 +170,23 @@ class SecondWindow(Screen):
     def __init_(self,**kwargs):
         super(SecondWindow,self).__init__(**kwargs)
 
+
     def on_pre_enter(self, *args):
+        self.conn = mysql.connector.connect(user="root", password="123456",
+                                            host="localhost",
+                                            database="fca_materias",
+                                            port='3306'
+                                            )
+        self.cur = self.conn.cursor()
         self.por_entregar()
         self.update_screen()
-
-
 
     def update_screen(self):
         # Limpiando las materias de la pantalla
         self.ids.list_one.clear_widgets()
 
         ## Rellenando las materias del menú
-        materias = obtener_materias("assests\BD\materias.csv").extracción_materias()
+        materias = obtener_materias("assests\BD\materias.csv").extracción_materias()  ##listo  **
         menu_items = [
             {
                 "viewclass": "OneLineListItem",
@@ -193,14 +199,19 @@ class SecondWindow(Screen):
             items=menu_items,
             width_mult=4,
         )
-
         archivo = 'assests\BD\materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name()
-        actividades = obtener_materias(archivo).total_actividades(subject_name)
 
-        self.ids.nombre_materia.title = subject_name
+        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## listo
+        status = obtener_materias(archivo).status(modo=3) ## listo
+        clave = obtener_materias(archivo).obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo
+        actividades = obtener_materias(archivo).status(modo=2,materia = clave[0],status_=status) ## listo **
 
-        lista = obtener_materias(archivo).list_type()
+        #actividades = obtener_materias(archivo).total_actividades(subject_name)
+
+        self.ids.nombre_materia.title = subject_name[0]
+
+        lista = obtener_materias(archivo).list_type()  ## listo
+
 
         if lista == 'TwoLineRightIconListItem':
             for k, v in actividades.items():
@@ -213,27 +224,20 @@ class SecondWindow(Screen):
                     ListItemWithoutCheckbox(text=k, secondary_text=v)
                 )
 
-        subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
-        estados = ['por entregar', 'entregadas con atraso', 'atrasadas', 'entregadas a tiempo']
+        estados = ['Por entregar', 'Entregada con atraso', 'Atrasada', 'Entregada a tiempo']
         num_act_estado = dict()
         for estado in estados:
-            obtener_materias(archivo).estado_actividad(estado, 'TwoLineRightIconListItem')
-            num_actividades = len(obtener_materias(archivo).total_actividades(subject_name))
+            num_actividades = len(obtener_materias(archivo).status(modo=2, materia=clave[0], status_=estado)) ##listo
             num_act_estado[estado] = num_actividades
-            #if estado == 'por entregar':
-            #    if num_actividades == 0:
-            #        self.ids.contenido.clear_widgets()
-
-        self.ids.por_entregar_text.text = str(num_act_estado['por entregar'])
-        self.ids.Entregas_con_retraso_text.text = str(num_act_estado['entregadas con atraso'])
-        self.ids.Atrasada_text.text = str(num_act_estado['atrasadas'])
-        self.ids.Entregas_a_tiempo_text.text = str(num_act_estado['entregadas a tiempo'])
-        obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
 
 
+        self.ids.por_entregar_text.text = str(num_act_estado['Por entregar'])
+        self.ids.Entregas_con_retraso_text.text = str(num_act_estado['Entregada con atraso'])
+        self.ids.Atrasada_text.text = str(num_act_estado['Atrasada'])
+        self.ids.Entregas_a_tiempo_text.text = str(num_act_estado['Entregada a tiempo'])
 
     def press_actividad(self):  # Abre la ventana donde se muestran los detalles de la actividad
-        activity_name = obtener_materias('assests\BD\materias.csv').define_activity(self.text)
+        activity_name = obtener_materias('assests\BD\materias.csv').define_activity(self.text) ##listo
         sm.current = 'thirdwindow'
         sm.transition.direction = "left"
 
@@ -241,8 +245,10 @@ class SecondWindow(Screen):
     def activity_check(self,*args):  # Se indica que se entregó una actividad
         archivo = 'assests\BD\materias.csv'
         activity_name = self.text
+        materia = obtener_materias(archivo).obtener_materia_name_(modo=1)
+        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=materia[0])
         materia = obtener_materias(archivo).obtener_materia_name()
-        obtener_materias(archivo).actualizar_DB(materia, activity_name)
+        obtener_materias(archivo).actualizar_DB(clave[0], activity_name)
         sm.current ="firstwindow"
         sm.current = "secondwindow"
 
@@ -256,77 +262,73 @@ class SecondWindow(Screen):
         sm.current = "secondwindow"
         sm.transition.direction = 'right'
         archivo = 'assests\BD\materias.csv'
-        obtener_materias(archivo).define_subject(text_item)
-        subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
-        estados = ['por entregar', 'entregadas con atraso', 'atrasadas', 'entregadas a tiempo']
-        num_act_estado = dict()
-        for estado in estados:
-            obtener_materias(archivo).estado_actividad(estado, 'TwoLineRightIconListItem')
-            num_actividades = len(obtener_materias(archivo).total_actividades(subject_name))
-            num_act_estado[estado] = num_actividades
-        obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
+
+        self.cur.execute("UPDATE user_settings SET materia_sel = '" + text_item + "' WHERE user_id = 1")
+        self.cur.execute("UPDATE user_settings SET status = 'Por entregar' WHERE user_id = 1")
+        self.cur.execute("UPDATE user_settings SET tipo_lista = 'TwoLineRightIconListItem' WHERE user_id = 1")
+        self.conn.commit()
+
+        obtener_materias(archivo).define_subject(text_item) ##listo
         self.update_screen()
 
     def entregas_a_tiempo(self, *args):
         archivo = 'assests\BD\materias.csv'
-        obtener_materias(archivo).estado_actividad('entregadas a tiempo', 'TwoLineListItem')
-
-        subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
-        actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
+        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1)  ## listo
+        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        obtener_materias(archivo).status(modo=4,status_='Entregada a tiempo')
+        actividades = obtener_materias(archivo).status(modo=2,materia=clave[0],status_='Entregada a tiempo') ##listo
         self.update_screen()
 
 
     def entregas_con_atraso(self, *args):
         archivo = 'assests\BD\materias.csv'
-        obtener_materias(archivo).estado_actividad('entregadas con atraso', 'TwoLineListItem')
-
-        subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
-        actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
+        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1)  ## listo
+        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        obtener_materias(archivo).status(modo=4,status_='Entregada con atraso') ##listo
         self.update_screen()
 
 
     def atrasadas(self, *args):
         archivo = 'assests\BD\materias.csv'
-        obtener_materias(archivo).estado_actividad('atrasadas', 'TwoLineRightIconListItem')
-        subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
-        actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
+        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1)  ## listo
+        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        obtener_materias(archivo).status(modo=4,status_='Atrasada') ## listo
         self.update_screen()
 
 
     def por_entregar(self, *args):
         archivo = 'assests\BD\materias.csv'
-        obtener_materias(archivo).estado_actividad('por entregar', 'TwoLineRightIconListItem')
-        subject_name = obtener_materias(archivo).obtener_materia_name()  # consulta
-        actividades = obtener_materias(archivo).total_actividades(subject_name)  # consulta
+        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1)  ## listo
+        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        obtener_materias(archivo).status(modo=4,status_='Por entregar') ## listo
         self.update_screen()
+
 
     ##Los métodos del MDBottomNavigation
     def consultar_calificaciones(self):  # Extrae el feedback de internet
         archivo = 'assests\BD\materias.csv'
         archivo_aux = 'assests\BD\semestres_materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name()
-        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
-        obtener_materias(archivo).estado_actividad("todas", 'TwoLineRightIconListItem')
-        actividades = obtener_materias(archivo).total_actividades(subject_name)
-        print(actividades)
+        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## listo
+        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0]) ##listo
+        actividades = obtener_materias(archivo).status(modo=5,materia=clave[0]) ##listo
         opts = Options()
         opts.add_argument(
             "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36")
 
         driver = webdriver.Chrome('C:\Program Files (x86)\chromedriver_win32\chromedriver.exe', options=opts)
-        activity_feedback = Feedback([subject_clave], actividades, driver).extraccion_feedback()
-        vaciar_feedback(archivo_aux, subject_name, activity_feedback).vaciar_resultados()
+        activity_feedback = Feedback([str(clave[0])], actividades, driver).extraccion_feedback()
+
 
     def abrir_plan_trabajo(self):
         archivo = 'assests\BD\materias.csv'
         archivo_clave_grupo = 'assests\BD\materia_grupo.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name()
-        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
-        subject_grupo = obtener_materias(archivo_clave_grupo).obtener_materia_grupo(subject_clave)
-
-        carpeta = subject_name + r'\1. Materiales\plan_'+subject_clave +'_'+ subject_grupo+'_'+'ED.pdf'
+        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## listo
+        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0]) ##listo
+        subject_grupo = obtener_materias(archivo_clave_grupo).obtener_materia_grupo(clave[0])
+        carpeta = subject_name[0] + r'\1. Materiales\plan_'+str(clave[0]) +'_'+ subject_grupo +'_'+'ED.pdf'
         path = r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Documents\Administracion\Ivan\4.Semestre 22-2" + r'"\"' + carpeta
         path = path.replace('"',"")
+        print(path)
         subprocess.Popen([path], shell=True)
 
 

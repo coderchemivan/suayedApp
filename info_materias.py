@@ -21,7 +21,6 @@ class obtener_materias():
         self.cur = self.conn.cursor()
     def lista_semester(self):  # Devuelve una lista con los semestres disponibles
 
-
         self.cur.execute(
             '''
                 SELECT DISTINCT semestre FROM actividades
@@ -38,8 +37,18 @@ class obtener_materias():
         self.cur.execute('''
             UPDATE user_settings SET tipo_lista = 'TwoLineRightIconListItem' WHERE user_id = 1
         ''')
+        self.cur.execute('''
+            UPDATE user_settings SET status = 'Por entregar' WHERE user_id = 1
+        ''')
         self.cur.execute("UPDATE user_settings SET semestre_sel = '" + semestre + "' WHERE user_id = 1")
+        subject_name = self.obtener_materia_name_(modo=2)
+        self.cur.execute("UPDATE user_settings SET materia_sel = '" + subject_name[0] + "' WHERE user_id = 1")
         self.conn.commit()
+
+
+
+
+
 
         # with open(archivo_aux, 'r') as file:
         #     reader = csv.reader(file)
@@ -161,7 +170,7 @@ class obtener_materias():
 
 
         materias = "SELECT DISTINCT materia FROM materias_fca JOIN actividades ON materias_fca.clave = actividades.clave_materia WHERE actividades.semestre ='" + semestre + "'"
-        print(materias)
+
         #materias = "SELECT DISTINCT clave_materia FROM actividades WHERE semestre = '" + semestre + "'"
         self.cur.execute(materias)
         materias = self.cur.fetchall()
@@ -231,7 +240,6 @@ class obtener_materias():
                             activity_date[row[2]] = f'Delivered {diff_fechaEntregada_Hoy} days ago'
                         elif diff < 0 and row[4] == "":
                             activity_date[row[2]] = f'{diff_fechaEntrega_Hoy} days delayed'
-
                     elif estado == 'por entregar' and diff >= 0 and row[1] == materia and row[5] == 'Por entregar':
                         actividades.append(row[2])
                         activity_date[row[2]] = f'Due to {row[3]}'
@@ -254,29 +262,78 @@ class obtener_materias():
 
         return activity_date
 
-    def actualizar_estados(self):  # Actualiza los estados de las actividades en cuanto abre la app
-        with open(self.archivo_materias, 'r') as file:
-            tabla_info_materias = csv.reader(file)
-            reader = csv.reader(file)
-            myList = list(reader)
-            c = 0
-            for row in myList:
-                if c > 0:
-                    partes = row[3].split('/')
-                    fecha_de_entrega = partes[0] + "-" + partes[1] + "-" + partes[2]
-                    fecha_de_entrega = datetime.datetime.strptime(fecha_de_entrega, '%d-%m-%Y')
+    def status(self,modo,materia=None,status_=None):
+        if modo == 1:  ## Actualiza solo el estado
+            act_estatus = self.cur.execute("SELECT name,date_format(fecha_entrega,'%d-%m-%Y'),date_format(entregada_el,'%d-%m-%Y'),status FROM actividades")
+            act_status = [list(i) for i in self.cur.fetchall()]
 
-                    if row[4] == "":
-                        diff = (datetime.datetime.today() - fecha_de_entrega).days
-                        if diff <= 0:
-                            estado = 'Por entregar'
-                        else:
-                            estado = 'Atrasada'
-                        myList[c][5] = estado
-                        my_new_list = open(self.archivo_materias, 'w', newline='')
-                        csv_writer = csv.writer(my_new_list)
-                        csv_writer.writerows(myList)
-                c += 1
+            i = 0
+            for status in act_status:
+                fecha_entrega = status[1]
+                entregada_el = status[2]
+                fecha_entrega = datetime.datetime.strptime(fecha_entrega, '%d-%m-%Y')
+                if entregada_el == None:
+                    status_ = 'Por entregar' if datetime.datetime.today() < fecha_entrega else 'Atrasada'
+                else:
+                    entregada_el = datetime.datetime.strptime(entregada_el, '%d-%m-%Y')
+                    status_ = 'Entregada a tiempo' if entregada_el<=fecha_entrega else 'Entregada con atraso'
+                i+=1
+
+                self.cur.execute("UPDATE actividades SET status = '" +status_ + "' WHERE id ='" + str(i) +"'")
+                self.conn.commit()
+        elif modo ==2: ## Trae las actividaddes de las materias con el estado dado
+            act_estatus = self.cur.execute(
+                "SELECT name,date_format(fecha_entrega,'%d-%m-%Y'),date_format(entregada_el,'%d-%m-%Y'),status FROM actividades WHERE clave_materia= '" + str(materia) + "' AND status = '" + status_ +"'")
+            act_status = [list(i) for i in self.cur.fetchall()]
+            activity_date = dict()
+            for act in act_status:
+                actividad = act[0]
+                fecha_entrega = act[1]
+                entregada_el = act[2]
+                fecha_entrega = datetime.datetime.strptime(fecha_entrega, '%d-%m-%Y')
+                if status_ == 'Por entregar':
+                    activity_date[actividad] = f'Due to {fecha_entrega}'
+                    self.cur.execute('''
+                        UPDATE user_settings SET tipo_lista = 'TwoLineRightIconListItem' WHERE user_id = 1
+                    ''')
+                elif status_ == 'Entregada a tiempo':
+                    self.cur.execute('''
+                        UPDATE user_settings SET tipo_lista = 'TwoLineListItem' WHERE user_id = 1
+                    ''')
+                    entregada_el = datetime.datetime.strptime(entregada_el, '%d-%m-%Y')
+                    activity_date[actividad] = f'Delivered {(datetime.datetime.today()-entregada_el).days} days ago'
+                elif status_ == 'Entregada con atraso':
+                    self.cur.execute('''
+                        UPDATE user_settings SET tipo_lista = 'TwoLineListItem' WHERE user_id = 1
+                    ''')
+                    entregada_el = datetime.datetime.strptime(entregada_el, '%d-%m-%Y')
+                    activity_date[actividad] = f'Delivered {(datetime.datetime.today()-entregada_el).days} days ago'
+                elif status_ == 'Atrasada':
+                    self.cur.execute('''
+                        UPDATE user_settings SET tipo_lista = 'TwoLineRightIconListItem' WHERE user_id = 1
+                    ''')
+                    activity_date[actividad] = f'This activity was due for {(fecha_entrega)} days delayed'
+            self.conn.commit()
+            return activity_date
+        elif modo ==3: ## Busca cual es el estado en user_settings
+            self.cur.execute("SELECT status FROM user_settings WHERE user_id = 1")
+            status = self.cur.fetchone()[0]
+            return status
+
+        elif modo == 4: ## Cambia el estado en user_setting según lo seleccionado
+            self.cur.execute('''
+                UPDATE user_settings SET status = "'''     + status_  + '''" WHERE user_id = 1
+            ''')
+            self.conn.commit()
+
+        elif modo ==5:
+            actividades = self.cur.execute(
+                "SELECT name FROM actividades WHERE clave_materia= '" + str(materia) + "'")
+
+            actividades = [i[0] for i in self.cur.fetchall()]
+            return actividades
+
+
 
     def obtener_fecha_entrega(self, materia):
         with open(self.archivo_materias, 'r') as file:
@@ -290,16 +347,11 @@ class obtener_materias():
 
 
     def define_activity(self, actividad):
-        with open(self.archivo_materias, 'r') as file:
-            reader = csv.reader(file)
-            myList = list(reader)
-            for line in reader:
-                myList.append(line)
+        self.cur.execute('''
+            UPDATE user_settings SET act_sel = "''' + actividad + '''" WHERE user_id = 1
+        ''')
+        self.conn.commit()
 
-            myList[1][9] = actividad
-            my_new_list = open(self.archivo_materias, 'w', newline='')
-            csv_writer = csv.writer(my_new_list)
-            csv_writer.writerows(myList)
 
     def define_subject(self, materia):
         with open(self.archivo_materias, 'r') as file:
@@ -334,6 +386,26 @@ class obtener_materias():
             actividad = myList[1][9]
             return actividad
 
+    def obtener_materia_name_(self,modo,subject_name_=None):
+        if modo ==1: ## Busca el nombre de la materia
+            self.cur.execute("SELECT materia_sel FROM user_settings WHERE user_id = 1")
+            subject_name = self.cur.fetchone()
+            return subject_name
+        elif modo ==2: ## Seleccionad el primer nombre de la materia que encuentre de acuerdo al semestre
+            self.cur.execute( '''SELECT DISTINCT materia FROM materias_fca  
+                                JOIN actividades 
+                                ON materias_fca.clave = actividades.clave_materia LIMIT 1''')
+            subject_name = self.cur.fetchone()
+            return subject_name
+        elif modo ==3:   ## Busca la clave de la materia
+            self.cur.execute( '''
+            SELECT DISTINCT clave FROM materias_fca
+            JOIN actividades
+            ON materias_fca.clave = actividades.clave_materia
+            WHERE materia = "''' + subject_name_ + '''"''')
+            clave = self.cur.fetchone()
+            return clave
+
     def obtener_materia_name(self):
         with open(self.archivo_materias, 'r') as file:
             reader = csv.reader(file)
@@ -344,13 +416,9 @@ class obtener_materias():
             return materia
 
     def list_type(self):
-        with open(self.archivo_materias, 'r') as file:
-            reader = csv.reader(file)
-            myList = list(reader)
-            for line in reader:
-                myList.append(line)
-            list_type_ = myList[1][14]
-            return list_type_
+        self.cur.execute("SELECT tipo_lista FROM user_settings WHERE user_id = 1")
+        tipo_lista = self.cur.fetchone()
+        return tipo_lista[0]
 
     def obtener_materia_clave(self, materia):
         with open(self.archivo_materias, 'r') as file:
@@ -364,38 +432,32 @@ class obtener_materias():
         return clave
 
     def obtener_materia_grupo(self, clave):
-        with open(self.archivo_materias, 'r') as file:
-            reader = csv.reader(file)
-            grupo = ""
-            for line in reader:
-                if line[0] == clave:
-                    grupo = str(line[1])
-                    break
+        self.cur.execute("SELECT DISTINCT grupo FROM actividades WHERE clave_materia= '" + str(
+            clave)  + "'")
+        grupo = self.cur.fetchone()[0]
         return grupo
 
-    def actualizar_DB(self, materia, actividad):
-        with open(self.archivo_materias, 'r') as file:
-            reader = csv.reader(file)
-            myList = list(reader)
 
-            c = 0
-            for row in myList:
-                if row[1] == materia and row[2] == actividad:
-                    hoy = date.today().strftime('%d/%m/%Y')
-                    myList[c][4] = hoy
-                    partes = row[3].split('/')
-                    fecha_de_entrega = partes[0] + "-" + partes[1] + "-" + partes[2]
-                    fecha_de_entrega = datetime.datetime.strptime(fecha_de_entrega, '%d-%m-%Y')
-                    diff = (fecha_de_entrega - datetime.datetime.today()).days
-                    if diff >= 0:
-                        myList[c][5] = 'Entregada a tiempo'
-                    else:
-                        myList[c][5] = 'Entregada con atraso'
-                    break
-                c += 1
-            my_new_list = open(self.archivo_materias, 'w', newline='')
-            csv_writer = csv.writer(my_new_list)
-            csv_writer.writerows(myList)
+
+
+    def actualizar_DB(self, materia, actividad):
+        self.cur.execute("SELECT date_format(fecha_entrega,'%d-%m-%Y') FROM actividades WHERE clave_materia= '" + str(
+            materia) + "' AND name = '" + actividad + "'")
+        datos_act = self.cur.fetchone()
+
+        hoy = datetime.datetime.today()
+        self.cur.execute("UPDATE actividades SET entregada_el = '" + datetime.datetime.strftime(hoy,"%Y-%m-%d") + "' WHERE clave_materia= '" + str(
+            materia) + "' AND name = '" + actividad + "'")
+
+        fecha_entrega = datos_act[0]
+        fecha_entrega = datetime.datetime.strptime(fecha_entrega,"%d-%m-%Y")
+        if hoy > fecha_entrega:
+            estado = "Entregada con atraso"
+        else:
+            estado = "Entregada a tiempo"
+        self.cur.execute("UPDATE actividades SET status = '" + estado + "' WHERE clave_materia= '" + str(
+            materia) + "' AND name = '" + actividad + "'")
+        self.conn.commit()
 
 
 class estatus_feedback():
@@ -518,11 +580,13 @@ class goal_file():
         macro1()
         wb.save()
         wb.app.quit()
-        print(resultados)
+
         return resultados
 
 
-#archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\semestres_materias.csv'
+archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
+obtener_materias(archivo).status(modo=2,materia='1255',status_='Entregada con atraso')
+
 #archiv = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
 #goal_file(archiv,archivo,'1343','COMPORTAMIENTO EN LAS ORGANIZACIONES').change_cell()
 

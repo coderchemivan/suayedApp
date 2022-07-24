@@ -89,7 +89,7 @@ class Feedback():
                 status_calificacion, = list(zip(*status_calificacion))
                 status_calificacion = status_calificacion[0]
 
-                if status_calificacion == 45:
+                if status_calificacion == 1:
                     continue
 
                 # Abriendo la actividad
@@ -157,12 +157,12 @@ class Feedback():
         conn.close()
         return actividad_feedback
 
-opts = Options()
-opts.add_argument(
-             "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36")
+#opts = Options()
+#opts.add_argument(
+#             "user-agent=Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36")
 
-driver = webdriver.Chrome('C:\Program Files (x86)\chromedriver_win32\chromedriver.exe', options=opts)
-prueba1 = Feedback(['1255'], ['Unidad 1 / Actividad 5 /','Unidad 2 / Actividad 1 /','Unidad 3 / Actividad 1 /'], driver).extraccion_feedback()
+#driver = webdriver.Chrome('C:\Program Files (x86)\chromedriver_win32\chromedriver.exe', options=opts)
+#prueba1 = Feedback(['1255'], ['Unidad 1 / Actividad 5 /','Unidad 2 / Actividad 1 /','Unidad 3 / Actividad 1 /'], driver).extraccion_feedback()
 
 
 
