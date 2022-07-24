@@ -6,124 +6,180 @@ import chardet
 import pandas as pd
 import xlwings as xw
 from openpyxl import load_workbook
-import re
-
+import calendar
+import mysql.connector
 
 class obtener_materias():
 
     def __init__(self, archivo_materias):
         self.archivo_materias = archivo_materias
-
+        self.conn = mysql.connector.connect(user="root", password="123456",
+                                       host="localhost",
+                                       database="fca_materias",
+                                       port='3306'
+                                       )
+        self.cur = self.conn.cursor()
     def lista_semester(self):  # Devuelve una lista con los semestres disponibles
-        with open(self.archivo_materias, 'rb') as rawdata:
-            result = chardet.detect(rawdata.read(100000))
-        df = pd.read_csv(self.archivo_materias, encoding=result['encoding'])
-        semestres = df['Semestre'].unique()
-        return semestres
+
+
+        self.cur.execute(
+            '''
+                SELECT DISTINCT semestre FROM actividades
+            '''
+        )
+        semestres = self.cur.fetchall()
+        semestres_ = list()
+        for semestre in semestres:
+            semestres_.append(semestre[0])
+        return semestres_
+
 
     def define_semester(self, semestre, archivo_aux):
-        with open(archivo_aux, 'r') as file:
-            reader = csv.reader(file)
-            myList = list(reader)
-            semester_list = list()
+        self.cur.execute('''
+            UPDATE user_settings SET tipo_lista = 'TwoLineRightIconListItem' WHERE user_id = 1
+        ''')
+        self.cur.execute("UPDATE user_settings SET semestre_sel = '" + semestre + "' WHERE user_id = 1")
+        self.conn.commit()
 
-            myList[1][16] = "TwoLineRightIconListItem"
-            first_subject_semester = False
-
-            for x, row in enumerate(myList):
-                if x == 0:
-                    semester_list.append(row[2:])
-
-                elif x > 0:
-                    if first_subject_semester is False and row[1] == semestre:
-                        myList[1][12] = row[3]
-                        materia = row[3]
-                        first_subject_semester = True
-                    if myList[x][1] == semestre:
-                        if len(semester_list) == 1:
-                            row = row[2:]
-                            row[10] = materia
-                            semester_list.append(row)
-                        else:
-                            semester_list.append(row[2:])
-
-            my_new_list = open(self.archivo_materias, 'w', newline='')
-            csv_writer = csv.writer(my_new_list)
-            csv_writer.writerows(semester_list)
-            first_subject_semester = False
+        # with open(archivo_aux, 'r') as file:
+        #     reader = csv.reader(file)
+        #     myList = list(reader)
+        #     semester_list = list()
+        #
+        #     myList[1][16] = "TwoLineRightIconListItem"
+        #     first_subject_semester = False
+        #
+        #     for x, row in enumerate(myList):
+        #         if x == 0:
+        #             semester_list.append(row[2:])
+        #
+        #         elif x > 0:
+        #             if first_subject_semester is False and row[1] == semestre:
+        #                 myList[1][12] = row[3]
+        #                 materia = row[3]
+        #                 first_subject_semester = True
+        #             if myList[x][1] == semestre:
+        #                 if len(semester_list) == 1:
+        #                     row = row[2:]
+        #                     row[10] = materia
+        #                     semester_list.append(row)
+        #                 else:
+        #                     semester_list.append(row[2:])
+        #
+        #     my_new_list = open(self.archivo_materias, 'w', newline='')
+        #     csv_writer = csv.writer(my_new_list)
+        #     csv_writer.writerows(semester_list)
+        #     first_subject_semester = False
 
     def dias_con_pendientes(self, modo, month=None, año=None, fecha=None):
         with open(self.archivo_materias, 'r') as file:
             reader = csv.reader(file)
             myList = list(reader)
 
-        if modo == 1:
+
+
+
+        if modo == 1:  ## Regresa una lista con los días que tienen pendientes
+            primer_dia_mes = año + '-' + str(month).zfill(2) +'-' + '01'
+            ultimo_dia_mes = año + '-' + str(month).zfill(2) + '-' + str(calendar.monthrange(int(año), month)[1])
+
+            fechas_mes = "SELECT fecha_entrega FROM actividades " \
+                                  "WHERE fecha_entrega BETWEEN '" + primer_dia_mes + "' AND '" + ultimo_dia_mes + "'"
+
+            self.cur.execute(fechas_mes)
+            fechas_ = self.cur.fetchall()
             lista_dias = list()
-            for x, line in enumerate(myList):
-                if x > 0:
-                    fecha_entrega = myList[x][3]
-                    fecha_split = fecha_entrega.split('/')
-                    mes_ = fecha_split[1]
-                    año_ = fecha_split[2]
-                    if month == mes_ and año_ == año:
-                        lista_dias.append(fecha_split[0])
+            if len(fechas_)!=0:
+                fechas,= list(zip(*fechas_))
+                for fecha in fechas:
+                    fecha = fecha.strftime("%Y-%m-%d").split("-")[2]
+                    lista_dias.append(fecha)
 
             return lista_dias
-        elif modo == 2:
-            mes_trabajado = myList[1][15]
-            return mes_trabajado
+
         elif modo == 3:  # Se pone el mes actual en la BD
             myList[1][15] = month
             my_new_list = open(self.archivo_materias, 'w', newline='')
             csv_writer = csv.writer(my_new_list)
             csv_writer.writerows(myList)
 
-        elif modo == 4:
-            lista_dias = list()
+
+        elif modo ==2:
+            dia = "SELECT name,clave_materia FROM actividades " \
+                                  "WHERE fecha_entrega = '" + fecha + "'"
+
+            self.cur.execute(dia)
+            registros = self.cur.fetchall()
             materias = list()
             actividades = list()
-            estados = list()
             materia_actividad = list()
-            for x, line in enumerate(myList):
-                if x > 0:
-                    materia = myList[x][1]
-                    actividad = myList[x][2]
-                    fecha_entrega = myList[x][3]
-                    estado = myList[x][5]
-                    materia_act = dict()
-                    if fecha_entrega == fecha:
-                        lista_dias.append(fecha_entrega)
-                        materias.append(materia)
-                        actividades.append(actividad)
-                        estados.append(estado)
+            for registro in registros:
+                clave = registro[1]
+                actividades.append(registro[0])
+
+                materia_nombre = '''SELECT materia FROM materias_fca  
+                                    JOIN actividades 
+                                    ON materias_fca.clave = actividades.clave_materia
+                                    where materias_fca.clave =''' + str(clave) + ''' LIMIT 1'''
+                self.cur.execute(materia_nombre)
+                materia_nombre = self.cur.fetchone()
+
+                materias.append(materia_nombre[0])
             materia_actividad.append(materias)
             materia_actividad.append(actividades)
-            materia_actividad.append(estados)
             return materia_actividad
 
-    def remember_status(self):
-        with open(self.archivo_materias, 'r') as file:
-            reader = csv.reader(file)
-            myList = list(reader)
-            if myList[1][2] == 'True':
-                myList[1][2] = 'False'
+    def remember_status(self,modo):  ##Esta función juega con el remember_status
+        remember_status = ('''
+            SELECT recordar_inicio_sesion FROM user_settings WHERE user_id = 1
+        '''
+        )
+        self.cur.execute(remember_status)
+        remember_status = self.cur.fetchone()[0]
+
+        if modo ==1: ## Se presionó el butón
+
+
+            if remember_status == 1:
+                self.cur.execute('''
+                    UPDATE user_settings SET recordar_inicio_sesion=0 WHERE user_id = 1
+                ''')
             else:
-                myList[1][2] = 'True'
-            my_new_list = open(self.archivo_materias, 'w', newline='')
-            csv_writer = csv.writer(my_new_list)
-            csv_writer.writerows(myList)
+                self.cur.execute('''
+                    UPDATE user_settings SET recordar_inicio_sesion=1 WHERE user_id = 1
+                ''')
+
+            self.conn.commit()
+        else: #pura consulta
+            return remember_status
+
 
     def extracción_materias(self):
-        with open(self.archivo_materias, 'r') as file:
-            tabla_info_materias = csv.reader(file)
-            materias = list()
-            c = 0
-            for row in tabla_info_materias:
-                materia = row[1]
-                if not materia in materias and c != 0:
-                    materias.append(row[1])
-                c += 1
-        return materias
+        semestre = "SELECT semestre_sel FROM user_settings WHERE user_id = 1"
+        self.cur.execute(semestre)
+        semestre = self.cur.fetchone()[0]
+
+
+        materias = "SELECT DISTINCT materia FROM materias_fca JOIN actividades ON materias_fca.clave = actividades.clave_materia WHERE actividades.semestre ='" + semestre + "'"
+        print(materias)
+        #materias = "SELECT DISTINCT clave_materia FROM actividades WHERE semestre = '" + semestre + "'"
+        self.cur.execute(materias)
+        materias = self.cur.fetchall()
+        materias_ = list()
+        for materia in materias:
+            materias_.append(materia[0])
+        return materias_
+
+        # with open(self.archivo_materias, 'r') as file:
+        #     tabla_info_materias = csv.reader(file)
+        #     materias = list()
+        #     c = 0
+        #     for row in tabla_info_materias:
+        #         materia = row[1]
+        #         if not materia in materias and c != 0:
+        #             materias.append(row[1])
+        #         c += 1
+        # return materias
 
     def subject_actividades(self, subject):
         with open(self.archivo_materias, 'r') as file:

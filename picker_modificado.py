@@ -295,534 +295,6 @@ from info_materias import obtener_materias
 from pendientes import pendientes_list
 
 
-Builder.load_string(
-    """
-#:import os os
-#:import date datetime.date
-#:import calendar calendar
-#:import platform platform
-#:import Clock kivy.clock.Clock
-#:import images_path kivymd.images_path
-
-
-<DatePickerBaseTooltip>
-    on_enter:
-        self.tooltip_text = "" if self.owner \
-        and self.owner._input_date_dialog_open \
-        or self.owner._select_year_dialog_open \
-        else self.hint_text
-
-
-<DatePickerIconTooltipButton>
-
-
-<MDDatePicker>
-    _calendar_layout: _calendar_layout
-    size_hint: None, None
-    size:
-        (dp(328), dp(512) - root._shift_dialog_height) \
-        if root.theme_cls.device_orientation == "portrait" \
-        else (dp(528), dp(328) - root._shift_dialog_height)
-
-    MDRelativeLayout:
-        id: container
-        background: os.path.join(images_path, "transparent.png")
-
-        canvas:
-            Color:
-                rgb:
-                    app.theme_cls.primary_color \
-                    if not root.primary_color else root.primary_color
-            RoundedRectangle:
-                size:
-                    (dp(328), dp(120)) \
-                    if root.theme_cls.device_orientation == "portrait" \
-                    else (dp(168), dp(328) - root._shift_dialog_height)
-                pos:
-                    (0, root.height - dp(120)) \
-                    if root.theme_cls.device_orientation == "portrait" \
-                    else (0, 0)
-                radius:
-                    (root.radius[0], root.radius[1], dp(0), dp(0)) \
-                    if root.theme_cls.device_orientation == "portrait" \
-                    else (root.radius[0], dp(0), dp(0), root.radius[3])
-            Color:
-                rgba:
-                    app.theme_cls.bg_normal \
-                    if not root.accent_color else root.accent_color
-            RoundedRectangle:
-                size:
-                    (dp(328), dp(512) - dp(120) - root._shift_dialog_height) \
-                    if root.theme_cls.device_orientation == "portrait" \
-                    else (dp(360), dp(328) - root._shift_dialog_height)
-                pos:
-                    (0, 0) \
-                    if root.theme_cls.device_orientation == "portrait" \
-                    else (dp(168), 0)
-                radius:
-                    (dp(0), dp(0), root.radius[2], root.radius[3]) \
-                    if root.theme_cls.device_orientation == "portrait" \
-                    else (dp(0), root.radius[1], root.radius[2], dp(0))
-
-        MDLabel:
-            id: label_title
-            font_style: "Body2"
-            bold: True
-            theme_text_color: "Custom"
-            size_hint_x: None
-            width: root.width
-            adaptive_height: True
-            text: root.title
-            font_name: root.font_name
-            pos:
-                (dp(24), root.height - self.height - dp(18)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else (dp(24), root.height - self.height - dp(24))
-            text_color:
-                root.specific_text_color \
-                if not root.text_toolbar_color else root.text_toolbar_color
-
-        MDLabel:
-            id: label_full_date
-            font_style: "H4"
-            theme_text_color: "Custom"
-            size_hint_x: None
-            width: root.width
-            adaptive_height: True
-            font_name: root.font_name
-            markup: True
-            pos:
-
-                (dp(24), root.height - dp(120) + dp(18)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else \
-                ( \
-                dp(24) if not root._input_date_dialog_open else dp(168) + dp(24), \
-                root.height - self.height - dp(96) \
-                )
-            text:
-                root.set_text_full_date(root.sel_year, root.sel_month, root.sel_day, \
-                root.theme_cls.device_orientation)
-            text_color:
-                ( \
-                root.specific_text_color \
-                if not root.text_toolbar_color else root.text_toolbar_color \
-                ) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else \
-                ( \
-                ( \
-                self.theme_cls.primary_color \
-                if not root.primary_color else root.primary_color \
-                ) \
-                if root._input_date_dialog_open \
-                else \
-                ( \
-                root.specific_text_color \
-                if not root.text_toolbar_color else root.text_toolbar_color \
-                ) \
-                )
-
-        RecycleView:
-            id: _year_layout
-            key_viewclass: "viewclass"
-            size_hint: None, None
-            size: _calendar_layout.size
-            pos: _calendar_layout.pos
-            disabled: True
-
-            canvas.before:
-                PushMatrix
-                Scale:
-                    x: root._scale_year_layout
-                    y: root._scale_year_layout
-                    origin: self.center
-            canvas.after:
-                PopMatrix
-
-            SelectYearList:
-                cols: 3
-                default_size: dp(170), dp(36)
-                default_size_hint: 1, None
-                size_hint_y: None
-                height: self.minimum_height
-
-        MDIconButton:
-            id: edit_icon
-            icon: "pencil"
-            user_font_size: "24sp"
-            theme_text_color: "Custom"
-            on_release:
-                root.transformation_to_dialog_input_date() \
-                if not root._input_date_dialog_open else \
-                Clock.schedule_once(root.transformation_from_dialog_input_date, .15)
-            x:
-                (root.width - self.width - dp(12)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else dp(12)
-            y:
-                (root.height - dp(120) + dp(12)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else  dp(12)
-            text_color:
-                root.specific_text_color \
-                if not root.text_toolbar_color else root.text_toolbar_color
-
-        MDLabel:
-            id: label_month_selector
-            font_style: "Body2"
-            -text_size: None, None
-            theme_text_color: "Custom"
-            adaptive_size: True
-            text: calendar.month_name[root.month].capitalize() + " " + str(root.year)
-            pos:
-                (dp(24), root.height - dp(120) - self.height - dp(20)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else (dp(168) + dp(24), label_title.y)
-            text_color:
-                app.theme_cls.text_color \
-                if not root.text_color else root.text_color
-
-        DatePickerIconTooltipButton:
-            id: triangle
-            owner: root
-            icon: "pencil"
-            ripple_scale: .5
-            theme_text_color: "Custom"
-            hint_text: "Choose year"
-            on_release:
-                root.transformation_to_dialog_select_year() \
-                if not root._select_year_dialog_open else \
-                root.transformation_from_dialog_select_year()
-            pos:
-                (label_month_selector.width + dp(14), root.height - dp(123) - self.height) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else (dp(180) + label_month_selector.width, label_title.y - dp(14))
-            text_color:
-                app.theme_cls.text_color \
-                if not root.text_color else root.text_color
-            md_bg_color_disabled: 0, 0, 0, 0
-
-        DatePickerIconTooltipButton:
-            id: chevron_left
-            owner: root
-            icon: "chevron-left"
-            theme_text_color: "Secondary"
-            on_release: root.change_month("prev")
-            theme_text_color: "Custom"
-            hint_text: "Previous month"
-            x:
-                dp(228) if root.theme_cls.device_orientation == "portrait" \
-                else dp(418)
-            y:
-                root.height - dp(120) - self.height / 2 - dp(30) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else dp(272)
-            text_color:
-                app.theme_cls.text_color \
-                if not root.text_color else root.text_color
-
-        DatePickerIconTooltipButton:
-            id: chevron_right
-            owner: root
-            icon: "chevron-right"
-            theme_text_color: "Secondary"
-            on_release: root.change_month("next")
-            theme_text_color: "Custom"
-            hint_text: "Next month"
-            x:
-                dp(272) if root.theme_cls.device_orientation == "portrait" \
-                else dp(464)
-            y:
-                root.height - dp(120) - self.height / 2 - dp(30) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else dp(272)
-            text_color:
-                app.theme_cls.text_color \
-                if not root.text_color else root.text_color
-
-        # TODO: Replace the GridLayout with a RecycleView
-        # if it improves performance.
-        GridLayout:
-            id: _calendar_layout
-            cols: 7
-            size_hint: None, None
-            size:
-                (dp(44 * 7), dp(40 * 7)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else (dp(46 * 7), dp(32 * 7))
-            col_default_width:
-                dp(42) if root.theme_cls.device_orientation == "portrait" \
-                else dp(39)
-            padding:
-                (dp(2), 0) if root.theme_cls.device_orientation == "portrait" \
-                else (dp(7), 0)
-            spacing:
-                (dp(2), 0) if root.theme_cls.device_orientation == "portrait" \
-                else (dp(7), 0)
-            pos:
-                (dp(10), dp(56)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else (dp(168) + dp(20), dp(44))
-
-            canvas.before:
-                PushMatrix
-                Scale:
-                    x: root._scale_calendar_layout
-                    y: root._scale_calendar_layout
-                    origin: self.center
-            canvas.after:
-                PopMatrix
-
-        MDFlatButton:
-            id: ok_button
-            width: dp(32)
-            pos: root.width - self.width, dp(10)
-            text: "OK"
-            theme_text_color: "Custom"
-            font_name: root.font_name
-            text_color:
-                root.theme_cls.primary_color \
-                if not root.text_button_color else root.text_button_color
-            on_release:
-                root.dispatch(\
-                "on_save", \
-                date(root.sel_year, root.sel_month, root.sel_day), \
-                root._date_range \
-                )
-
-        MDFlatButton:
-            id: cancel_button
-            text: "CANCEL"
-            on_release: root.dispatch("on_cancel", None)
-            theme_text_color: "Custom"
-            pos: root.width - self.width - ok_button.width - dp(10), dp(10)
-            font_name: root.font_name
-            text_color:
-                root.theme_cls.primary_color \
-                if not root.text_button_color else root.text_button_color
-
-
-<DatePickerDaySelectableItem>
-    size_hint: None, None
-    size:
-        (dp(42), dp(42)) \
-        if root.theme_cls.device_orientation == "portrait" \
-        else (dp(32), dp(32))
-    disabled: True
-
-    canvas:
-        Color:
-            rgba:
-                ( \
-                ( \
-                self.theme_cls.primary_color if not root.owner.selector_color \
-                else root.owner.selector_color \
-                ) \
-                if root.is_selected and not self.disabled \
-                else (0, 0, 0, 0) \
-                ) \
-                if self.owner.mode != "range" else \
-                ( \
-                ( \
-                self.theme_cls.primary_color if not root.owner.selector_color \
-                else root.owner.selector_color \
-                ) \
-                if root.is_selected and not self.disabled \
-                and (self.owner.mode == "range" and self.owner._start_range_date) \
-                else (0, 0, 0, 0) \
-                )
-        Ellipse:
-            size:
-                (dp(42), dp(42)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else (dp(32), dp(32))
-            pos: self.pos
-
-    # Fill marking the available dates of the range, if using the `range` mode
-    # or use `min_date/max_date`.
-    canvas.before:
-        Color:
-            rgba:
-                (\
-                self.owner.selector_color[:-1] + [.3] \
-                if self.owner.selector_color \
-                else self.theme_cls.primary_color[:-1] + [.3] \
-                ) \
-                if not self.disabled \
-                and self.text \
-                and self.check_date(self.owner.year, self.owner.month, int(self.text)) \
-                else (0, 0, 0, 0)
-        RoundedRectangle:
-            size:
-                (dp(44), dp(32)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else \
-                (dp(32), dp(28)) \
-                if self.index in [6, 13, 20, 27, 30] or self.owner._date_range \
-                and self.text and self.owner._date_range[-1] == date( \
-                self.current_year, \
-                self.current_month, \
-                int(self.text) \
-                ) \
-                else (dp(46), dp(28))
-            pos:
-                (self.x - dp(1.5), self.y + dp(5)) \
-                if root.theme_cls.device_orientation == "portrait" else \
-                (self.x, self.y + 1)
-            radius:
-                [0, 0, 0, 0] if not self.owner._date_range else \
-                ( \
-                [self.width / 2, 0, 0, self.width / 2] \
-                if self.text and self.owner._date_range[0] == date( \
-                self.current_year, \
-                self.current_month, \
-                int(self.text) \
-                ) \
-                or (self.index in [0, 7, 14, 21, 28] and root.is_selected) \
-                else \
-                ( \
-                [0, 0, 0, 0] if self.text \
-                and self.owner._date_range[-1] != date( \
-                self.current_year, \
-                self.current_month, \
-                int(self.text) \
-                ) \
-                and self.index not in [6, 13, 20, 27, 30] \
-                else [0, self.width / 2, self.width, 0] \
-                if root.is_selected or self.text \
-                and self.owner._date_range[-1] == date( \
-                self.current_year, \
-                self.current_month, \
-                int(self.text) \
-                ) \
-                else [0, 0, 0, 0]) \
-                )
-
-        # Circle marking the beginning and end of the date range if the "range"
-        # mode is used.
-        Color:
-            rgba:
-                [0, 0, 0, 0] if not self.owner._date_range else \
-                (
-                ( \
-                self.theme_cls.primary_color if not root.owner.selector_color \
-                else root.owner.selector_color \
-                ) \
-                if self.text and self.owner._date_range[0] == date( \
-                self.current_year, \
-                self.current_month, \
-                int(self.text) \
-                ) \
-                or \
-                self.text and self.owner._date_range[-1] == date( \
-                self.current_year, \
-                self.current_month, \
-                int(self.text) \
-                ) \
-                else (0, 0, 0, 0) \
-                )
-        Ellipse:
-            size:
-                (dp(42), dp(42)) \
-                if root.theme_cls.device_orientation == "portrait" \
-                else (dp(32), dp(32))
-            pos: self.pos
-
-    MDLabel:
-        font_style: "Caption"
-        size_hint_x: None
-        halign: "center"
-        text: root.text
-        font_name: root.owner.font_name
-        theme_text_color: "Custom"
-        text_color:
-            ( \
-            root.theme_cls.primary_color \
-            if not root.owner.text_current_color \
-            else root.owner.text_current_color \
-            ) \
-            if root.is_today and not root.is_selected \
-            else ( \
-            ( \
-            root.theme_cls.text_color \
-            if not root.is_selected or root.owner.mode == "range" \
-            else (1, 1, 1, 1) \
-            ) \
-            if not root.owner.text_color \
-            else \
-            ( \
-            root.owner.text_color \
-            if not root.is_selected else (1, 1, 1, 1)) \
-            )
-
-
-<DatePickerWeekdayLabel>
-    font_style: "Caption"
-    theme_text_color: "Custom"
-    size_hint: None, None
-    text_size: self.size
-    halign: "center"
-    valign:
-        "middle" if root.theme_cls.device_orientation == "portrait" \
-        else "center"
-    size:
-        (dp(40), dp(40)) if root.theme_cls.device_orientation == "portrait" \
-        else (dp(32), dp(32))
-    text_color:
-        app.theme_cls.disabled_hint_text_color \
-        if not root.owner.text_weekday_color else root.owner.text_weekday_color
-
-
-<DatePickerYearSelectableItem>
-    font_style: "Caption"
-    size_hint_x: None
-    valign: "middle"
-    halign: "center"
-    text: root.text
-    theme_text_color: "Custom"
-    on_text: root.font_name = root.owner.font_name
-
-    canvas.before:
-        Color:
-            rgba:
-                root.selected_color if root.selected_color \
-                else self.theme_cls.primary_color
-        RoundedRectangle:
-            pos: self.x + dp(12), self.y
-            size: self.width - dp(24), self.height
-            radius: [root.height / 2, ]
-
-
-<DatePickerDatePickerEnterDataFieldContainer>
-    adaptive_height: True
-    size_hint_x: None
-    spacing: dp(8)
-    width:
-        self.owner.width - dp(48) \
-        if root.owner.theme_cls.device_orientation == "portrait" \
-        else self.owner.width - dp(168) - dp(48)
-    y:
-        self.owner.height - dp(123) - self.height - dp(20) \
-        if root.owner.theme_cls.device_orientation == "portrait" \
-        else self.owner.height - self.height - dp(24)
-    x:
-        dp(24) if root.owner.theme_cls.device_orientation == "portrait" \
-        else dp(168) + dp(24)
-
-
-<DatePickerEnterDataField>
-    mode: "fill"
-    opacity: 0
-    hint_text: "dd/mm/yyyy"
-    input_filter: root.input_filter
-    do_backspace: root.do_backspace
-    fill_color:
-        (0, 0, 0, .15) \
-        if not self.owner.input_field_background_color \
-        else root.owner.input_field_background_color
-"""
-)
 
 with open(
     r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\l.kv'
@@ -1275,9 +747,9 @@ class DatePickerDaySelectableItem(
                 self.owner.update_calendar_for_date_range()
             self.owner.set_selected_widget_modificado(self)
             archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
-            mes_trabajado = obtener_materias(archivo).dias_con_pendientes(modo=2)
-            mes_trabajado = str(mes_trabajado).zfill(2)
-            lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=mes_trabajado, año=str(self.current_year))
+
+            mes_trabajado = str(self.owner.sel_month).zfill(2)
+            lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=self.owner.sel_month, año=str(self.current_year))
 
             lista_days = list()
             for day in lista:
@@ -1286,8 +758,8 @@ class DatePickerDaySelectableItem(
                     day = day.strip('0')
                 lista_days.append(day)
             if self.text in lista_days:
-                fecha = f'{str(self.text).zfill(2)}/{mes_trabajado}/{str(self.current_year)}'
-                pendientes_fecha = obtener_materias(archivo).dias_con_pendientes(modo=4,fecha=fecha)
+                fecha = f'{str(self.current_year)}/{mes_trabajado}/{str(self.text).zfill(2)}'
+                pendientes_fecha = obtener_materias(archivo).dias_con_pendientes(modo=2,fecha=fecha)
 
         if self.is_selected == True:
 
@@ -1617,7 +1089,7 @@ class MDDatePicker(BaseDialogPicker):
             )
 
         self.ids.container.add_widget(self._enter_data_field_container)
-        self.ids.edit_icon.icon = "calendar"
+        self.ids.edit_icon.icon = "pencil"
         self.ids.label_title.text = self.title_input
 
         Animation(
@@ -1763,9 +1235,9 @@ class MDDatePicker(BaseDialogPicker):
             self.year = year
             self.month = month
             archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
-            mes_trabajado = obtener_materias(archivo).dias_con_pendientes(modo=2)
-            mes_trabajado = str(mes_trabajado).zfill(2)
-            lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=mes_trabajado,año=str(self.year))
+
+            mes_trabajado = str(self.month).zfill(2)
+            lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=self.month,año=str(self.year))
             lista_days = list()
 
 
@@ -1997,9 +1469,9 @@ class MDDatePicker(BaseDialogPicker):
 
         # #widget.is_selected = True
         archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
-        mes_trabajado = obtener_materias(archivo).dias_con_pendientes(modo=2)
-        mes_trabajado =str(str(mes_trabajado).zfill(2))
-        lista_days = obtener_materias(archivo).dias_con_pendientes(modo=1,month=mes_trabajado,año=str(self.year))
+
+        mes_trabajado =str(str(self.month).zfill(2))
+        lista_days = obtener_materias(archivo).dias_con_pendientes(modo=1,month=self.month,año=str(self.year))
         primer_dia_del_mes = datetime.datetime.strptime(f'01/{mes_trabajado}/{str(self.year)}','%d/%m/%Y').weekday()
 
 
@@ -2114,9 +1586,6 @@ class MDDatePicker(BaseDialogPicker):
         archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
         ultimo_dia_mes = calendar.monthrange(year, month)
         mes_ = str(str(month).zfill(2))
-        obtener_materias(archivo).dias_con_pendientes(modo=3, month=mes_)
-
-
         self.update_calendar(year, month)
         if self.sel_day:
             x = calendar.monthrange(year, month)[1]

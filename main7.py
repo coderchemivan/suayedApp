@@ -83,24 +83,21 @@ class LoginPage(Screen):
 
     def remember_(self,*args):
         archivo = r'assests\BD\usuarioData.csv'
-        with open(archivo, 'r') as file:
-            reader = csv.reader(file)
-            myList = list(reader)
-            user = myList[1][0]
-            pass_ = myList[1][1]
-            remember = myList[1][2]
-            if remember == 'True':
-                self.login_cb.active = True
-                self.username.text = user
-                self.password.text = pass_
-            else:
-                self.login_cb.active = False
-                self.username.text = ""
-                self.password.text = ""
+        remember = obtener_materias(archivo).remember_status(modo=2)  ##listo
+        user = '421157110'
+        pass_ = '16091997'
+        if remember == 1:
+            self.login_cb.active = True
+            self.username.text = user
+            self.password.text = pass_
+        else:
+            self.login_cb.active = False
+            self.username.text = ""
+            self.password.text = ""
 
     def remember_me(self):
         archivo = r'assests\BD\usuarioData.csv'
-        obtener_materias(archivo).remember_status()
+        obtener_materias(archivo).remember_status(modo = 1) ##listo
 
     def login(self):
         archivo = r'assests\BD\usuarioData.csv'
@@ -130,7 +127,7 @@ class FirstWindow(Screen):
 
     def lista_semestres(self, dt): # Llena el MDlist del NavigationDrawer
         archivo_aux = r'assests\BD\semestres_materias.csv'
-        semestres = obtener_materias(archivo_aux).lista_semester()
+        semestres = obtener_materias(archivo_aux).lista_semester()   #listo
         #Limpiando los semestres anteriores
         self.ids.nav_drawer_content.ids.md_list.clear_widgets()
 
@@ -145,7 +142,7 @@ class FirstWindow(Screen):
         archivo_aux = "assests\BD\semestres_materias.csv"
         archivo = "assests\BD\materias.csv"
         semestre = instance.text
-        obtener_materias(archivo).define_semester(semestre,archivo_aux)
+        obtener_materias(archivo).define_semester(semestre,archivo_aux) ##listo
 
 
     def on_save(self, instance, value, date_range):
@@ -160,8 +157,8 @@ class FirstWindow(Screen):
 
     def show_date_picker(self):
         archivo = r'assests\BD\materias.csv'
-        current_month = date.today().month
-        obtener_materias(archivo).dias_con_pendientes(modo=3, month=current_month,año='2022')
+        #current_month = date.today().month
+        #obtener_materias(archivo).dias_con_pendientes(modo=3, month=current_month,año='2022')
         date_dialog = MDDatePicker()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
