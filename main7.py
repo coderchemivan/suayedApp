@@ -78,7 +78,6 @@ class LoginPage(Screen):
     password = ObjectProperty()
     login_cb = ObjectProperty()
 
-
     def on_pre_enter(self, *args):
         Clock.schedule_once(self.remember_)
 
@@ -120,11 +119,14 @@ class LoginPage(Screen):
 
 
 class FirstWindow(Screen):
+    nav_drawer2 = ObjectProperty()
     def __init_(self,**kwargs):
-        super(FirstWindow,self).__init__(**kwargs)   
+        super(FirstWindow,self).__init__(**kwargs)
+
     
-    def on_enter(self):
-        Clock.schedule_once(self.lista_semestres)   
+    def on_pre_enter(self):
+        Clock.schedule_once(self.lista_semestres)
+        self.nav_drawer2.set_state("close")
 
     def lista_semestres(self, dt): # Llena el MDlist del NavigationDrawer
         archivo_aux = r'assests\BD\semestres_materias.csv'
@@ -199,20 +201,20 @@ class SecondWindow(Screen):
             items=menu_items,
             width_mult=4,
         )
-        archivo = 'assests\BD\materias.csv'
+        ##
 
-        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## listo
-        status = obtener_materias(archivo).status(modo=3) ## listo
-        clave = obtener_materias(archivo).obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo
-        actividades = obtener_materias(archivo).status(modo=2,materia = clave[0],status_=status) ## listo **
+        archivo = 'assests\BD\materias.csv'
+        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## busca la materia que se va a mostrar en la pantalla
+        status = obtener_materias(archivo).status(modo=3) ## buscando el status del cual se van a buscar las act conformes al él
+        clave = obtener_materias(archivo).obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## buscando la clave de la materia que se va a mostrar en pantalla
+        actividades = obtener_materias(archivo).status(modo=2,materia = clave[0],status_=status) ## busca las act conforme a la materia y status seleccionados
 
         #actividades = obtener_materias(archivo).total_actividades(subject_name)
 
         self.ids.nombre_materia.title = subject_name[0]
 
-        lista = obtener_materias(archivo).list_type()  ## listo
-
-
+        ## (TwoLineRightIconListItem) para actividades por entregar y atrasadas (TwoLineListItem) para entregadas
+        lista = obtener_materias(archivo).list_type()
         if lista == 'TwoLineRightIconListItem':
             for k, v in actividades.items():
                 self.ids.list_one.add_widget(
@@ -223,18 +225,19 @@ class SecondWindow(Screen):
                 self.ids.list_one.add_widget(
                     ListItemWithoutCheckbox(text=k, secondary_text=v)
                 )
+        ##
 
+        ## Cuenta cuantas actividades hay de la materia por status para mostrarlo en pantalla
         estados = ['Por entregar', 'Entregada con atraso', 'Atrasada', 'Entregada a tiempo']
         num_act_estado = dict()
         for estado in estados:
             num_actividades = len(obtener_materias(archivo).status(modo=2, materia=clave[0], status_=estado)) ##listo
             num_act_estado[estado] = num_actividades
-
-
         self.ids.por_entregar_text.text = str(num_act_estado['Por entregar'])
         self.ids.Entregas_con_retraso_text.text = str(num_act_estado['Entregada con atraso'])
         self.ids.Atrasada_text.text = str(num_act_estado['Atrasada'])
         self.ids.Entregas_a_tiempo_text.text = str(num_act_estado['Entregada a tiempo'])
+        ##
 
     def press_actividad(self):  # Abre la ventana donde se muestran los detalles de la actividad
         activity_name = obtener_materias('assests\BD\materias.csv').define_activity(self.text) ##listo
@@ -267,8 +270,6 @@ class SecondWindow(Screen):
         self.cur.execute("UPDATE user_settings SET status = 'Por entregar' WHERE user_id = 1")
         self.cur.execute("UPDATE user_settings SET tipo_lista = 'TwoLineRightIconListItem' WHERE user_id = 1")
         self.conn.commit()
-
-        obtener_materias(archivo).define_subject(text_item) ##listo
         self.update_screen()
 
     def entregas_a_tiempo(self, *args):
@@ -324,7 +325,7 @@ class SecondWindow(Screen):
         archivo_clave_grupo = 'assests\BD\materia_grupo.csv'
         subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## listo
         clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0]) ##listo
-        subject_grupo = obtener_materias(archivo_clave_grupo).obtener_materia_grupo(clave[0])
+        subject_grupo = obtener_materias(archivo_clave_grupo).obtener_materia_grupo(clave[0]) ## listo
         carpeta = subject_name[0] + r'\1. Materiales\plan_'+str(clave[0]) +'_'+ subject_grupo +'_'+'ED.pdf'
         path = r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Documents\Administracion\Ivan\4.Semestre 22-2" + r'"\"' + carpeta
         path = path.replace('"',"")
@@ -339,17 +340,20 @@ class SecondWindow(Screen):
 
 class ThirdWindow(Screen):
     def on_enter(self, *args):
-        activity_name = obtener_materias('assests\BD\materias.csv').obtener_activity_name()
-        subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name()
-        activity_status = estatus_feedback('assests\BD\materias.csv', subject_name, activity_name).resultados()
+        activity_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=4) ##listo
+        subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1) ## listo
+        clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        activity_status = obtener_materias('assests\BD\materias.csv').estado_actividad(clave=clave[0],actividad=activity_name[0]) ## listo
 
-        self.ids.nombre_actividad.title = activity_name
+
+        self.ids.nombre_actividad.title = activity_name[0]
         self.ids.enviado_el.text = f' Enviada el : {activity_status[0]}'
-        self.ids.estatus_entrega.text = f' Status : {activity_status[1]}'
-        self.ids.calificacion.text = f' Calificación :  {activity_status[2]}'
-        self.ids.calificado_el.text = f' Calificada el : {activity_status[3]}'
-        self.ids.scroll_lable.ids.comentarios.text = f' {activity_status[4]}'
-        self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[5]) * 100)}'
+        self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[1]) * 100)}'
+        self.ids.estatus_entrega.text = f' Status : {activity_status[2]}'
+        self.ids.calificacion.text = f' Calificación :  {activity_status[3]}'
+        self.ids.calificado_el.text = f' Calificada el : {activity_status[4]}'
+        self.ids.scroll_lable.ids.comentarios.text = f' {activity_status[5]}'
+
 
 
     #Click OK
@@ -373,23 +377,21 @@ class ThirdWindow(Screen):
 class FourthWindow(Screen):
     def __init_(self,**kwargs):
         super(FourthWindow,self).__init__(**kwargs)
-
     def on_pre_enter(self, *args):
-        Clock.schedule_once(self.imagen)
-        archivo = 'assests\BD\materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name()
-        subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
+        subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1) ## listo
+        subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
         archivo_grafica_progreso = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
-        archivo_meta = 'assests\BD\materia_grupo.csv'
-        resultados = goal_file(archivo_grafica_progreso,archivo,archivo_meta,subject_clave,subject_name).change_cell()
+        resultados = goal_file(archivo_grafica_progreso,'1',subject_clave[0],subject_name).progreso()
         self.ids.acumulado.text = "Acumulado \n" + str(resultados['acumulado'])
         self.ids.meta.text = "Mi meta: \n" + str(resultados['meta'])
+        self.ids.max_cal.text = "Calificación \n máxima\n" + str(resultados['max_posible'])
+        Clock.schedule_once(self.imagen)
     def imagen(self, *args):
        archivo = 'assests\BD\materias.csv'
-       subject_name = obtener_materias(archivo).obtener_materia_name()
-       subject_clave = obtener_materias(archivo).obtener_materia_clave(subject_name)
+       subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1)  ## listo
+       subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo
        self.ids.materia_progreso.clear_widgets()
-       self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave}.gif'
+       #self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave}.gif'
     def go_back(self):
        sm.current = "secondwindow"
 
@@ -398,7 +400,7 @@ class ContentNavigationDrawer(MDBoxLayout): #Pertenece a la página principal
     nav_drawer = ObjectProperty()
     sm2 = ScreenManager()
     screen_two = SecondWindow
-    screen_one = FirstWindow
+
 
 class DrawerList(ThemableBehavior, MDList): #Pertenece a la página principal
     def set_color_item(self, instance_item):
@@ -410,9 +412,12 @@ class DrawerList(ThemableBehavior, MDList): #Pertenece a la página principal
                 item.text_color = self.theme_cls.text_color
                 break
         instance_item.text_color = self.theme_cls.primary_color
+    nav_drawer = ObjectProperty()
+
 
 class ItemList(TwoLineListItem):  #Pertenece a la página principal
     screen_one = FirstWindow
+    nav_drawer2 = ObjectProperty()
 
 
 class ListItemWithCheckbox(TwoLineRightIconListItem): #Pertenece a la pantalla donde se muestran las actividades por materia (se muestra para actividades por entregar o atrasadas)

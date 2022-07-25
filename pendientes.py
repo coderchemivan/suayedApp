@@ -37,9 +37,9 @@ class pendientes_list():
                 type="confirmation",
                 items=[ItemConfirm(text=str(materia),
                                    secondary_text = materias_act[1][i],
-                                   #tertiary_text = materias_act[2][i],
+                                   tertiary_text = materias_act[0][i],
                                    on_release=lambda x=3: self.hola()
-                                   ) for i,materia in enumerate(materias_act[0])
+                                   ) for i,materia in enumerate(materias_act[2])
                 ],
                 buttons=[
                     MDFlatButton(

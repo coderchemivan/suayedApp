@@ -60,6 +60,7 @@ WindowManager:
 
 #'''Contenido de la primera principal'''
 <FirstWindow>:
+    nav_drawer2:nav_drawer
     MDScreen:
 
         RelativeLayout:
@@ -463,7 +464,7 @@ WindowManager:
                         pos: self.pos
                         size: self.size
                 MDRectangleFlatButton:
-                    id:"max_cal"
+                    id:max_cal
                     text: "Calificación\n máxima"
                     text_size: root.width, root.height
                     valign: "top"
@@ -495,29 +496,3 @@ WindowManager:
 
 
 
-    # FloatLayout:
-
-    #     spacing:5
-
-
-    #     BoxLayout:
-    #         size_hint:1,0.3
-    #         pos_hint:{"x":0, "y":0.6}
-    #         orientation: "horizontal"
-
-    #         canvas.before:
-    #             Color:
-    #                 rgba: [1,0,0,0]
-    #             Rectangle:
-    #                 size: self.size
-    #                 pos: self.pos
-                 
-
-    #     BoxLayout:
-    #         orientation: "horizontal"
-    #         size_hint:1,0.5
-    #         pos_hint:{"y":0.10}
-    #         Image:
-    #             id: materia_progreso
-    #             size_hint: 0.2,1
-    #             pos_hint:{"top":1}
