@@ -1,7 +1,6 @@
 # https://github.com/vipinjangra/KivyMD
 
 ## VERSION 5
-
 from kivy.lang import Builder
 from kivy.properties import StringProperty, ListProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -16,7 +15,7 @@ from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.list import IconRightWidget
 
 from kivy.properties import ObjectProperty
-from pyparsing import FollowedBy
+
 
 from picker_modificado import MDDatePicker 
 #from kivymd.uix.pickers import MDDatePicker
@@ -29,7 +28,6 @@ from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.selectioncontrol import MDCheckbox
 from kivymd.icon_definitions import md_icons
 
-from kivymd.uix.behaviors.toggle_behavior import MDToggleButton
 from kivymd.uix.menu import MDDropdownMenu
 from kivy.uix.scrollview import ScrollView
 from kivy.core.window import Window
@@ -49,8 +47,6 @@ from kivy.metrics import dp
 import csv
 import subprocess
 from info_materias import obtener_materias
-from info_materias import vaciar_feedback
-from info_materias import estatus_feedback
 from info_materias import goal_file
 
 # Web scrapping
@@ -63,9 +59,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
 from plataformaSuayed import Feedback
-
-import datetime
-from datetime import date
 import mysql.connector
 
 
@@ -250,7 +243,6 @@ class SecondWindow(Screen):
         activity_name = self.text
         materia = obtener_materias(archivo).obtener_materia_name_(modo=1)
         clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=materia[0])
-        materia = obtener_materias(archivo).obtener_materia_name()
         obtener_materias(archivo).actualizar_DB(clave[0], activity_name)
         sm.current ="firstwindow"
         sm.current = "secondwindow"

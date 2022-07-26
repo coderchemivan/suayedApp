@@ -1,13 +1,12 @@
 import csv
-
 import datetime
 from datetime import date
 import chardet
-import pandas as pd
 import xlwings as xw
 from openpyxl import load_workbook
 import calendar
 import mysql.connector
+
 
 class obtener_materias():
 
@@ -243,9 +242,9 @@ class obtener_materias():
             subject_name = self.cur.fetchone()
             return subject_name
         elif modo ==2: ## Seleccionad el primer nombre de la materia que encuentre de acuerdo al semestre
-            self.cur.execute( '''SELECT DISTINCT materia FROM materias_fca  
-                                JOIN actividades 
-                                ON materias_fca.clave = actividades.clave_materia LIMIT 1''')
+            self.cur.execute( '''SELECT DISTINCT materia FROM materias
+                                ON materias_fca.clave = actividades.cl_fca  
+                                JOIN actividades ave_materia LIMIT 1''')
             subject_name = self.cur.fetchone()
             return subject_name
         elif modo ==3:   ## Busca la clave de la materia

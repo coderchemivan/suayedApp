@@ -65,7 +65,7 @@ WindowManager:
 
         RelativeLayout:
 
-            MDToolbar:
+            MDTopAppBar:
                 title: 'HOME'
                 elevation: 10
                 left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
@@ -163,7 +163,7 @@ WindowManager:
         BoxLayout:
             size_hint_y : 0.1
             orientation: 'horizontal'
-            MDToolbar:
+            MDTopAppBar:
                 id: nombre_materia
                 title: 'ACTIVIDADES'
                 right_action_items: [["menu", lambda x: root.abrir_menu(x)]]
@@ -311,7 +311,7 @@ WindowManager:
 <ThirdWindow>:
     FloatLayout:
         spacing:5
-        MDToolbar:
+        MDTopAppBar:
             id: nombre_actividad
             title : ""
             size_hint: 1,0.1
@@ -402,7 +402,7 @@ WindowManager:
                 size: self.size
         BoxLayout:
             orientation: "horizontal" 
-            MDToolbar:
+            MDTopAppBar:
                 title : ""
                 size_hint: 1,0.1
                 pos_hint:{"top":1}
