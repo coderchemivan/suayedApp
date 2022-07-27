@@ -393,6 +393,7 @@ WindowManager:
 
 
 <FourthWindow>:
+
     FloatLayout:
         canvas.before:
             Color:
@@ -401,14 +402,14 @@ WindowManager:
                 pos: self.pos
                 size: self.size
         BoxLayout:
-            orientation: "horizontal" 
+            orientation: "horizontal"
             MDTopAppBar:
                 id: top_bar_w4
                 title : ""
                 size_hint: 1,0.1
                 pos_hint:{"top":1}
                 elevation: 10
-                left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]  
+                left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]
 
         BoxLayout:
             orientation: "horizontal"
@@ -419,13 +420,13 @@ WindowManager:
             FloatLayout:
                 spacing:5
                 padding:5
-                orientation:"vertical"  
+                orientation:"vertical"
                 canvas.before:
                     Color:
                         rgba: 1, 1, 1, 0.4
                     Rectangle:
                         pos: self.pos
-                        size: self.size        
+                        size: self.size
                 MDRectangleFlatButton:
                     id:meta
                     text: "Mi meta\n"
@@ -475,24 +476,35 @@ WindowManager:
                     size_hint: 0.9,0.8
                     pos_hint: {"x":0.05,"y":0.1}
 
-
         FloatLayout:
-            orientation: "horizontal"
-            spacing:5
-            size_hint:1,0.7
-            pos_hint:{"x":0,"y":0}
-            canvas.before:
-                Color:
-                    rgba: 1, 1, 1, 0.4
-                Rectangle:
-                    pos: self.pos
-                    size: self.size  
-            Image:
-                id: materia_progreso
-                size_hint: 0.8,0.9
-                pos_hint:{"x":0.1,"top":1}
-                allow_stretch: True
-                keep_ratio: False
+
+            MDCarousel:
+                FloatLayout:
+                    id: tabla
+                    spacing:5
+                    size_hint:1,0.7
+                    pos_hint:{"x":0,"y":0}
+                    canvas.before:
+                        Color:
+                            rgba: 1, 1, 1, 0.4
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+
+                FloatLayout:
+                    id: tabla2
+                    spacing:5
+                    size_hint:1,0.7
+                    pos_hint:{"x":0,"y":0}
+                    canvas.before:
+                        Color:
+                            rgba: 1, 1, 1, 0.4
+                        Rectangle:
+                            pos: self.pos
+                            size: self.size
+                    MDLabel:
+                        text: "hola"
+
 
 <Content>
     orientation: "vertical"

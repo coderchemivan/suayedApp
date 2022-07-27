@@ -2,6 +2,7 @@ import csv
 import datetime
 from datetime import date
 import chardet
+import pandas as pd
 import xlwings as xw
 from openpyxl import load_workbook
 import calendar
@@ -316,6 +317,27 @@ class obtener_materias():
         self.cur.execute("UPDATE actividades SET status = '" + estado + "' WHERE clave_materia= '" + str(
             materia) + "' AND name = '" + actividad + "'")
         self.conn.commit()
+    def condensado_tareas(self,clave):
+        semestre = "SELECT semestre_sel FROM user_settings WHERE user_id = 1"
+        self.cur.execute(semestre)
+        semestre = self.cur.fetchone()[0]
+        act_valor_cali = list()
+        d = ("SELECT name,valor,calificacion FROM actividades WHERE usuario = 1 AND semestre = '{}' AND clave_materia = '{}'").format(str(semestre),str(clave))
+        self.cur.execute(d)
+        table_rows = self.cur.fetchall()
+        df = pd.read_sql(d,con = self.conn)
+
+        char_to_replace = {" / ":"_",
+                           "Unidad ": "U",
+                           "Actividad complementaria": "Act_compl",
+                           "Cuestionario de reforzamiento": "Cuest_refor",
+                            "Actividad": "Act"}
+        for key,value in char_to_replace.items():
+            df['name'] = df['name'].str.replace(key,value)
+        return df
+
+
+
 
 class estatus_feedback():
     def __init__(self, archivo_materias, materia, actividad):
@@ -425,18 +447,18 @@ class goal_file():
         resultados['max_posible'] = float("{:.2f}".format(max_posible*10))
         resultados['meta'] = meta
         ## Enviando la suma de calificaciones al libro de excel
-        wb = load_workbook(filename=self.archivo_excel,read_only=False,keep_vba=True)
-        ws = wb['Hoja1']
-        ws['a2'] = self.subject_name[0]
-        ws['b2'] = int(self.clave)
-        ws['d2'] = acumulado*10
-        wb.save(self.archivo_excel)
-        app = xw.App(visible=False)
-        wb = xw.Book('assests/materia_dashboard_material/meta.xlsm')
-        macro1 = wb.macro('modulo.progress')
-        macro1()
-        wb.save()
-        wb.app.quit()
+        # wb = load_workbook(filename=self.archivo_excel,read_only=False,keep_vba=True)
+        # ws = wb['Hoja1']
+        # ws['a2'] = self.subject_name[0]
+        # ws['b2'] = int(self.clave)
+        # ws['d2'] = acumulado*10
+        # wb.save(self.archivo_excel)
+        # app = xw.App(visible=False)
+        # wb = xw.Book('assests/materia_dashboard_material/meta.xlsm')
+        # macro1 = wb.macro('modulo.progress')
+        # macro1()
+        # wb.save()
+        # wb.app.quit()
 
         return resultados
 

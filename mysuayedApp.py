@@ -1,6 +1,8 @@
 # https://github.com/vipinjangra/KivyMD
 
 ## VERSION 5
+
+import pandas as pd
 from kivy.lang import Builder
 from kivy.properties import StringProperty, ListProperty
 from kivy.uix.screenmanager import ScreenManager, Screen
@@ -8,6 +10,7 @@ from kivymd.app import MDApp
 from kivy.uix.scrollview import ScrollView
 from kivymd.theming import ThemableBehavior
 from kivymd.uix.boxlayout import MDBoxLayout
+from kivy.uix.anchorlayout import AnchorLayout
 from kivymd.uix.boxlayout import BoxLayout
 from kivymd.uix.list import OneLineIconListItem, MDList
 from kivymd.uix.list import OneLineListItem
@@ -15,7 +18,7 @@ from kivymd.uix.list import TwoLineListItem
 from kivymd.uix.list import IconRightWidget
 
 from kivy.properties import ObjectProperty
-
+from kivymd.uix.datatables import MDDataTable
 
 from picker_modificado import MDDatePicker
 
@@ -380,15 +383,30 @@ class FourthWindow(Screen):
         self.ids.meta.text = "Mi meta: \n" + str(resultados['meta'])
         self.ids.max_cal.text = "Calificación \n máxima\n" + str(resultados['max_posible'])
         Clock.schedule_once(self.imagen)
+        df = obtener_materias("").condensado_tareas(subject_clave[0])
+        df = df.iloc[:, 0:]
+        cols = df.columns.values
+        values = df.values
+        self.data_tables = MDDataTable(
+            size_hint=(0.9, 0.9),
+            pos_hint = {"x":0.05,"y":0.05},
+            use_pagination=True,
+            column_data=[
+                (col, dp(20))
+                for col in cols
+            ],
+            row_data=values
+        )
+        self.ids.tabla.add_widget(self.data_tables)
+
     def imagen(self, *args):
        archivo = 'assests\BD\materias.csv'
        subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1)  ## listo
        subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo
-       self.ids.materia_progreso.clear_widgets()
-       self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave[0]}.gif'
+
+
     def go_back(self):
        sm.current = "secondwindow"
-
 
     dialog = None
     def show_confirmation_dialog(self):
@@ -475,14 +493,6 @@ class ScrolllabelLabel(ScrollView):   #Pertenece a la pantalla donde se muestra 
 
 
 class Content(BoxLayout):pass
-
-
-
-
-
-
-
-
 
 sm = ScreenManager()
 class TestNavigationDrawer(MDApp):
