@@ -17,7 +17,8 @@ from kivymd.uix.list import IconRightWidget
 from kivy.properties import ObjectProperty
 
 
-from picker_modificado import MDDatePicker 
+from picker_modificado import MDDatePicker
+from dialog.dialog_meta import insertar_meta
 #from kivymd.uix.pickers import MDDatePicker
 
 from kivymd.uix.button import MDRoundFlatIconButton
@@ -387,7 +388,10 @@ class FourthWindow(Screen):
        self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave[0]}.gif'
     def go_back(self):
        sm.current = "secondwindow"
-
+    def insertar_meta(self):
+        print("hola")
+        c = insertar_meta()
+        c.show_confirmation_dialog()
 
 class ContentNavigationDrawer(MDBoxLayout): #Pertenece a la página principal
     nav_drawer = ObjectProperty()

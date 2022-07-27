@@ -3,6 +3,7 @@ from kivy.lang import Builder
 from kivymd.app import MDApp
 from kivymd.uix.button import MDFlatButton
 from kivymd.uix.dialog import MDDialog
+from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.list import ThreeLineListItem
 from kivymd.uix.list import OneLineAvatarIconListItem
 
@@ -55,6 +56,7 @@ class pendientes_list():
                 ],
             )
         self.dialog.open()
+
 
 
 
