@@ -435,7 +435,7 @@ WindowManager:
                     multiline: True
                     size_hint: 0.9,0.8
                     pos_hint: {"x":0.05,"y":0.1}
-                    on_press: root.insertar_meta()
+                    on_press: root.show_confirmation_dialog()
             FloatLayout:
                 spacing:5
                 padding:5
@@ -494,6 +494,14 @@ WindowManager:
                 allow_stretch: True
                 keep_ratio: False
 
+<Content>
+    orientation: "vertical"
+    spacing: "12dp"
+    size_hint_y: None
+    height: "120dp"
+
+    MDTextField:
+        hint_text: "Introduce tu calificación objetivo"
 
 
 

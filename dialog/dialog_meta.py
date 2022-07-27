@@ -11,58 +11,7 @@ from info_materias import obtener_materias
 
 
 
-class Content(BoxLayout):pass
 
-
-
-class insertar_meta(MDApp):
-    def __init_(self,**kwargs):
-        super(insertar_meta,self).__init__(**kwargs)
-
-
-    dialog = None
-
-    def show_confirmation_dialog(self):
-        kv_file = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\dialog\dialog_meta.kv'
-        Builder.unload_file(kv_file)
-        Builder.load_file(kv_file)
-
-        if not self.dialog:
-            self.dialog = MDDialog(
-                title="",
-                type="custom",
-                content_cls=Content(),
-                buttons=[
-                    MDFlatButton(
-                        text="CANCEL", on_release= self.closeDialog
-                    ),
-                    MDFlatButton(
-                        text="OK", on_press=self.grabText
-                    ),
-                ],
-            )
-        self.dialog.get_normal_height()
-        self.dialog.open()
-
-
-    def grabText(self,int):
-        self.conn = mysql.connector.connect(user="root", password="123456",
-                                            host="localhost",
-                                            database="fca_materias",
-                                            port='3306'
-                                            )
-        self.cur = self.conn.cursor()
-        for obj in self.dialog.content_cls.children:
-            archivo = ""
-            subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## busca la materia que se va a mostrar en la pantalla
-            clave = obtener_materias(archivo).obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## buscando la clave de la materia que se va a mostrar en pantalla
-            query = "UPDATE materias_usuario SET meta = '{}' WHERE clave_materia = '{}'".format(obj.text,clave[0])
-            self.cur.execute(query)
-            self.conn.commit()
-            self.dialog.dismiss()
-
-    def closeDialog(self,int):
-        self.dialog.dismiss()
 
 
 

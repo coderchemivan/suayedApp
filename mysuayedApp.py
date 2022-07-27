@@ -18,7 +18,7 @@ from kivy.properties import ObjectProperty
 
 
 from picker_modificado import MDDatePicker
-from dialog.dialog_meta import insertar_meta
+
 #from kivymd.uix.pickers import MDDatePicker
 
 from kivymd.uix.button import MDRoundFlatIconButton
@@ -388,10 +388,48 @@ class FourthWindow(Screen):
        self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave[0]}.gif'
     def go_back(self):
        sm.current = "secondwindow"
-    def insertar_meta(self):
-        print("hola")
-        c = insertar_meta()
-        c.show_confirmation_dialog()
+
+
+    dialog = None
+    def show_confirmation_dialog(self):
+        if not self.dialog:
+            self.dialog = MDDialog(
+                title="",
+                type="custom",
+                content_cls=Content(),
+                buttons=[
+                    MDFlatButton(
+                        text="CANCEL", on_release= self.closeDialog
+                    ),
+                    MDFlatButton(
+                        text="OK", on_press=self.grabText
+                    ),
+                ],
+            )
+        self.dialog.get_normal_height()
+        self.dialog.open()
+
+
+    def grabText(self,int):
+        self.conn = mysql.connector.connect(user="root", password="123456",
+                                            host="localhost",
+                                            database="fca_materias",
+                                            port='3306'
+                                            )
+        self.cur = self.conn.cursor()
+        for obj in self.dialog.content_cls.children:
+            archivo = ""
+            subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## busca la materia que se va a mostrar en la pantalla
+            clave = obtener_materias(archivo).obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## buscando la clave de la materia que se va a mostrar en pantalla
+            query = "UPDATE materias_usuario SET meta = '{}' WHERE clave_materia = '{}'".format(obj.text,clave[0])
+            self.cur.execute(query)
+            self.conn.commit()
+            self.ids.meta.text = "Mi meta: \n" + str(float(obj.text))
+            obj.text = ""
+            self.dialog.dismiss()
+    def closeDialog(self,int):
+        self.dialog.dismiss()
+
 
 class ContentNavigationDrawer(MDBoxLayout): #Pertenece a la página principal
     nav_drawer = ObjectProperty()
@@ -433,6 +471,18 @@ class RightCheckbox(IRightBodyTouch, MDCheckbox): #Pertenece a la pantalla donde
 class ScrolllabelLabel(ScrollView):   #Pertenece a la pantalla donde se muestra el feedback de las materias, y es es el scroll que permite hacer scroll a los comentarios del feedback
     text = StringProperty('')
     comentarios = ObjectProperty()
+
+
+
+class Content(BoxLayout):pass
+
+
+
+
+
+
+
+
 
 sm = ScreenManager()
 class TestNavigationDrawer(MDApp):
