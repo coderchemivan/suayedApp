@@ -67,7 +67,7 @@ class obtener_materias():
 
             return lista_dias
 
-        elif modo ==2:
+        elif modo ==2:  ## Regresa una lista con el nomnbre de las materias, act y status
             dia = "SELECT name,clave_materia FROM actividades " \
                                   "WHERE fecha_entrega = '" + fecha + "'"
 
@@ -79,8 +79,11 @@ class obtener_materias():
             materia_actividad = list()
             for registro in registros:
                 clave = registro[1]
-                actividades.append(registro[0])
-
+                acti_name = registro[0]
+                acti_name = acti_name.replace(" / ", "_").replace("Unidad ", "U").replace("/", "").replace(
+                    "Actividad complementaria", "Act_compl"). \
+                    replace("Cuestionario de reforzamiento", "Cuest_refor").replace("Actividad", "Act")
+                actividades.append(acti_name)
                 materia_nombre = '''SELECT materia FROM materias_fca  
                                     JOIN actividades 
                                     ON materias_fca.clave = actividades.clave_materia
@@ -164,6 +167,8 @@ class obtener_materias():
             act_status = [list(i) for i in self.cur.fetchall()]
             activity_date = dict()
             for act in act_status:
+                act[0] = act[0].replace(" / ", "_").replace("Unidad ", "U").replace("/", "").replace("Actividad complementaria","Act_compl"). \
+                replace("Cuestionario de reforzamiento","Cuest_refor").replace("Actividad","Act")
                 actividad = act[0]
                 fecha_entrega = act[1]
                 entregada_el = act[2]
@@ -212,16 +217,33 @@ class obtener_materias():
 
 
     def define_activity(self, actividad):
+        '''Estblece en la tabla user_settings el valor de la act seleccionada en la pantalla 2'''
+        if "Act_compl" in actividad:
+            actividad = actividad.replace("U", "Unidad ").replace(
+                "Act_compl", "Actividad complementaria").replace("_", " / ") + "/"
+        else:
+            actividad = actividad.replace("U", "Unidad ").replace(
+                "Act_compl", "Actividad complementaria"). \
+                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "/"
         self.cur.execute('''
             UPDATE user_settings SET act_sel = "''' + actividad + '''" WHERE user_id = 1
         ''')
         self.conn.commit()
 
     def estado_actividad(self, clave, actividad):
+        if "Act_compl" in actividad:
+            actividad = actividad.replace("U", "Unidad ").replace(
+                "Act_compl", "Actividad complementaria").replace("_", " / ") + "/"
+        else:
+            actividad = actividad.replace("U", "Unidad ").replace(
+                "Act_compl", "Actividad complementaria"). \
+                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "/"
+        '''Busca los valores del feedback de la actividad seleccionada en la p2 y los muestra en la pantalla de feedback'''
         self.cur.execute(
             "SELECT date_format(entregada_el,'%d-%m-%Y'),valor,status,calificacion,calificada_en,comentarios FROM actividades WHERE clave_materia= '" + str(clave) + "' AND name = '" + actividad + "'")
         feedback = self.cur.fetchone()
         feedback_ = list()
+        feedback = [elem if elem != None else "" for elem in feedback]
         entregada_el = feedback[0]
         valor = feedback[1]
         status = feedback[2]
@@ -242,9 +264,9 @@ class obtener_materias():
             subject_name = self.cur.fetchone()
             return subject_name
         elif modo ==2: ## Seleccionad el primer nombre de la materia que encuentre de acuerdo al semestre
-            self.cur.execute( '''SELECT DISTINCT materia FROM materias
-                                ON materias_fca.clave = actividades.cl_fca  
-                                JOIN actividades ave_materia LIMIT 1''')
+            self.cur.execute( '''SELECT DISTINCT materia FROM materias_fca
+                                JOIN actividades  
+                                ON materias_fca.clave = actividades.clave_materia   LIMIT 1''')
             subject_name = self.cur.fetchone()
             return subject_name
         elif modo ==3:   ## Busca la clave de la materia
@@ -258,8 +280,12 @@ class obtener_materias():
 
         elif modo == 4: ## Busca el nombre de la actividdad seleccionada en la pantalla 2
             self.cur.execute("SELECT act_sel FROM user_settings WHERE user_id = 1")
-            act_name = self.cur.fetchone()
-            return act_name
+            acti_name = self.cur.fetchone()
+            acti_name = acti_name[0]
+            acti_name = acti_name.replace(" / ", "_").replace("Unidad ", "U").replace("/", "").replace(
+                "Actividad complementaria", "Act_compl"). \
+                replace("Cuestionario de reforzamiento", "Cuest_refor").replace("Actividad", "Act")
+            return acti_name
 
     def list_type(self):
         self.cur.execute("SELECT tipo_lista FROM user_settings WHERE user_id = 1")
@@ -395,15 +421,15 @@ class goal_file():
                 max_posible += ponderacion
             else:
                 max_posible += valor
-        resultados['acumulado'] = float("{:.2f}".format(acumulado))
-        resultados['max_posible'] = float("{:.2f}".format(max_posible))
+        resultados['acumulado'] = float("{:.2f}".format(acumulado*10))
+        resultados['max_posible'] = float("{:.2f}".format(max_posible*10))
         resultados['meta'] = meta
         ## Enviando la suma de calificaciones al libro de excel
         wb = load_workbook(filename=self.archivo_excel,read_only=False,keep_vba=True)
         ws = wb['Hoja1']
         ws['a2'] = self.subject_name[0]
         ws['b2'] = int(self.clave)
-        ws['d2'] = acumulado
+        ws['d2'] = acumulado*10
         wb.save(self.archivo_excel)
         app = xw.App(visible=False)
         wb = xw.Book('assests/materia_dashboard_material/meta.xlsm')

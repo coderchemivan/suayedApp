@@ -33,7 +33,7 @@ class pendientes_list():
 
         if not self.dialog:
             self.dialog = MDDialog(
-                title=f"Actividades para el {fecha}",
+                title=f"Actividades para el \n {fecha}",
                 type="confirmation",
                 items=[ItemConfirm(text=str(materia),
                                    secondary_text = materias_act[1][i],

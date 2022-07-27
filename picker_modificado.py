@@ -762,7 +762,8 @@ class DatePickerDaySelectableItem(
                 pendientes_fecha = obtener_materias(archivo).dias_con_pendientes(modo=2,fecha=fecha)
 
         if self.is_selected == True:
-
+            mes_trabajado = str(self.owner.sel_month).zfill(2)
+            fecha = f'{str(self.text).zfill(2)}/{mes_trabajado}/{str(self.current_year)}'
             c = pendientes_list()
             c.show_dialog(pendientes_fecha,fecha)
 

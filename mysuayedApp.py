@@ -331,14 +331,14 @@ class SecondWindow(Screen):
         
 
 class ThirdWindow(Screen):
-    def on_enter(self, *args):
+    def on_pre_enter(self, *args):
         activity_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=4) ##listo
         subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1) ## listo
         clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
-        activity_status = obtener_materias('assests\BD\materias.csv').estado_actividad(clave=clave[0],actividad=activity_name[0]) ## listo
+        activity_status = obtener_materias('assests\BD\materias.csv').estado_actividad(clave=clave[0],actividad=activity_name) ## listo
 
 
-        self.ids.nombre_actividad.title = activity_name[0]
+        self.ids.nombre_actividad.title = activity_name
         self.ids.enviado_el.text = f' Enviada el : {activity_status[0]}'
         self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[1]) * 100)}'
         self.ids.estatus_entrega.text = f' Status : {activity_status[2]}'
@@ -374,6 +374,7 @@ class FourthWindow(Screen):
         subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
         archivo_grafica_progreso = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
         resultados = goal_file(archivo_grafica_progreso,'1',subject_clave[0],subject_name).progreso()
+        self.ids.top_bar_w4.title = subject_name[0]
         self.ids.acumulado.text = "Acumulado \n" + str(resultados['acumulado'])
         self.ids.meta.text = "Mi meta: \n" + str(resultados['meta'])
         self.ids.max_cal.text = "Calificación \n máxima\n" + str(resultados['max_posible'])
@@ -383,7 +384,7 @@ class FourthWindow(Screen):
        subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1)  ## listo
        subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo
        self.ids.materia_progreso.clear_widgets()
-       #self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave}.gif'
+       self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave[0]}.gif'
     def go_back(self):
        sm.current = "secondwindow"
 
