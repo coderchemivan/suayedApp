@@ -334,6 +334,7 @@ class obtener_materias():
                             "Actividad": "Act"}
         for key,value in char_to_replace.items():
             df['name'] = df['name'].str.replace(key,value)
+        df.rename(columns={'name':'Act','valor':'Valor','calificacion':'Calificación'},inplace=True)
         return df
 
 
@@ -447,18 +448,18 @@ class goal_file():
         resultados['max_posible'] = float("{:.2f}".format(max_posible*10))
         resultados['meta'] = meta
         ## Enviando la suma de calificaciones al libro de excel
-        # wb = load_workbook(filename=self.archivo_excel,read_only=False,keep_vba=True)
-        # ws = wb['Hoja1']
-        # ws['a2'] = self.subject_name[0]
-        # ws['b2'] = int(self.clave)
-        # ws['d2'] = acumulado*10
-        # wb.save(self.archivo_excel)
-        # app = xw.App(visible=False)
-        # wb = xw.Book('assests/materia_dashboard_material/meta.xlsm')
-        # macro1 = wb.macro('modulo.progress')
-        # macro1()
-        # wb.save()
-        # wb.app.quit()
+        wb = load_workbook(filename=self.archivo_excel,read_only=False,keep_vba=True)
+        ws = wb['Hoja1']
+        ws['a2'] = self.subject_name[0]
+        ws['b2'] = int(self.clave)
+        ws['d2'] = acumulado*10
+        wb.save(self.archivo_excel)
+        app = xw.App(visible=False)
+        wb = xw.Book('assests/materia_dashboard_material/meta.xlsm')
+        macro1 = wb.macro('modulo.progress')
+        macro1()
+        wb.save()
+        wb.app.quit()
 
         return resultados
 

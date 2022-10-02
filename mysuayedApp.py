@@ -398,12 +398,11 @@ class FourthWindow(Screen):
             row_data=values
         )
         self.ids.tabla.add_widget(self.data_tables)
-
+        self.imagen()
     def imagen(self, *args):
-       archivo = 'assests\BD\materias.csv'
-       subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1)  ## listo
-       subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo
-
+        subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1)  ## listo
+        subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo       self.ids.materia_progreso.clear_widgets()
+        self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave[0]}.gif'
 
     def go_back(self):
        sm.current = "secondwindow"

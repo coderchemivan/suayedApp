@@ -476,34 +476,38 @@ WindowManager:
                     size_hint: 0.9,0.8
                     pos_hint: {"x":0.05,"y":0.1}
 
-        FloatLayout:
 
-            MDCarousel:
-                FloatLayout:
-                    id: tabla
-                    spacing:5
-                    size_hint:1,0.7
-                    pos_hint:{"x":0,"y":0}
-                    canvas.before:
-                        Color:
-                            rgba: 1, 1, 1, 0.4
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
 
-                FloatLayout:
-                    id: tabla2
-                    spacing:5
-                    size_hint:1,0.7
-                    pos_hint:{"x":0,"y":0}
-                    canvas.before:
-                        Color:
-                            rgba: 1, 1, 1, 0.4
-                        Rectangle:
-                            pos: self.pos
-                            size: self.size
-                    MDLabel:
-                        text: "hola"
+        MDCarousel:
+            FloatLayout:
+                spacing:5
+                size_hint:1,0.7
+                pos_hint:{"x":0,"y":0}
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.4
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+                Image:
+                    id: materia_progreso
+                    size_hint: 0.8,0.9
+                    pos_hint:{"x":0.1,"top":1}
+                    allow_stretch: True
+                    keep_ratio: False
+            FloatLayout:
+                id: tabla
+                spacing:5
+                size_hint:1,0.7
+                pos_hint:{"x":0,"y":0}
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.4
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+
 
 
 <Content>
