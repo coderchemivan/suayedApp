@@ -318,9 +318,7 @@ class obtener_materias():
             materia) + "' AND name = '" + actividad + "'")
         self.conn.commit()
     def condensado_tareas(self,clave):
-        semestre = "SELECT semestre_sel FROM user_settings WHERE user_id = 1"
-        self.cur.execute(semestre)
-        semestre = self.cur.fetchone()[0]
+        semestre =self.semestre_seleccionado()
         act_valor_cali = list()
         d = ("SELECT name,valor,calificacion FROM actividades WHERE usuario = 1 AND semestre = '{}' AND clave_materia = '{}'").format(str(semestre),str(clave))
         self.cur.execute(d)
@@ -337,7 +335,11 @@ class obtener_materias():
         df.rename(columns={'name':'Act','valor':'Valor','calificacion':'Calificación'},inplace=True)
         return df
 
-
+    def semestre_seleccionado(self):
+        semestre = "SELECT semestre_sel FROM user_settings WHERE user_id = 1"
+        self.cur.execute(semestre)
+        semestre = self.cur.fetchone()[0]
+        return semestre
 
 
 class estatus_feedback():
@@ -429,7 +431,8 @@ class goal_file():
         cal_valor = self.cur.fetchall()
         self.cur.execute("SELECT meta FROM materias_usuario WHERE user_id = '1' and clave_materia= '" + str(self.clave) +
                          "' AND semestre_id = '" + self.semestre + "'")
-
+        print("SELECT meta FROM materias_usuario WHERE user_id = '1' and clave_materia= '" + str(self.clave) +
+                         "' AND semestre_id = '" + self.semestre + "'")
         meta = self.cur.fetchone()[0]
 
         resultados = dict()
