@@ -21,7 +21,7 @@ from kivy.properties import ObjectProperty
 from kivymd.uix.datatables import MDDataTable
 
 from picker_modificado import MDDatePicker
-
+ 
 #from kivymd.uix.pickers import MDDatePicker
 
 from kivymd.uix.button import MDRoundFlatIconButton
@@ -117,7 +117,7 @@ class LoginPage(Screen):
 
 class FirstWindow(Screen):
     nav_drawer2 = ObjectProperty()
-    def __init_(self,**kwargs):
+    def __init__(self,**kwargs):
         super(FirstWindow,self).__init__(**kwargs)
 
     
@@ -377,7 +377,8 @@ class FourthWindow(Screen):
         subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1) ## listo
         subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
         archivo_grafica_progreso = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
-        resultados = goal_file(archivo_grafica_progreso,'1',subject_clave[0],subject_name).progreso()
+        semestre_seleccionado = obtener_materias('assests\BD\semestres_materias.csv').semestre_seleccionado()
+        resultados = goal_file(archivo_grafica_progreso,semestre_seleccionado,subject_clave[0],subject_name).progreso()
         self.ids.top_bar_w4.title = subject_name[0]
         self.ids.acumulado.text = "Acumulado \n" + str(resultados['acumulado'])
         self.ids.meta.text = "Mi meta: \n" + str(resultados['meta'])
@@ -494,7 +495,7 @@ class ScrolllabelLabel(ScrollView):   #Pertenece a la pantalla donde se muestra 
 class Content(BoxLayout):pass
 
 sm = ScreenManager()
-class TestNavigationDrawer(MDApp):
+class suayedApp(MDApp):
     def build(self):
         Window.size = (350, 600)
         self.title = "Gestor de tareas"
@@ -508,6 +509,7 @@ class TestNavigationDrawer(MDApp):
         return sm
 
     def go_back(self,pantalla):
+        print("que pedoooooooooooooooooooooooooooooooooooooooo")
         if pantalla == 1:
             sm.current = "firstwindow"
             sm.transition.direction = 'right'
@@ -515,4 +517,4 @@ class TestNavigationDrawer(MDApp):
             sm.current = "secondwindow"
             sm.transition.direction = 'right'
 
-TestNavigationDrawer().run()
+suayedApp().run()
