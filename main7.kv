@@ -1,523 +1,523 @@
-#:kivy 2.1.0
-WindowManager:
-    id: screen_manager
-    LoginPage:
-        id:login_screen
-        name: 'login_page'
-    FirstWindow:
-        name: 'firstwindow'
-    SecondWindow:
-        id:sw
-        name: 'secondwindow'
-    ThirdWindow:
-        id:tw
-        name: 'thirdwindow'
-    FourthWindow:
-        id:fw
-        name: 'fourthwindow'
+# #:kivy 2.1.0
+# WindowManager:
+#     id: screen_manager
+#     LoginPage:
+#         id:login_screen
+#         name: 'login_page'
+#     FirstWindow:
+#         name: 'firstwindow'
+#     SecondWindow:
+#         id:sw
+#         name: 'secondwindow'
+#     ThirdWindow:
+#         id:tw
+#         name: 'thirdwindow'
+#     FourthWindow:
+#         id:fw
+#         name: 'fourthwindow'
 
-## Contenido de la página de Login
-<LoginPage>:
-    username: User
-    password: Pass
-    login_cb: login_cb2
-    MDTextField:
-        id: User
-        hint_text: "Username"
-        size_hint: 0.5, 0.1
-        pos_hint: {"center_x": 0.5, "center_y": 0.7}
-        icon_right: "account"
+# ## Contenido de la página de Login
+# <LoginPage>:
+#     username: User
+#     password: Pass
+#     login_cb: login_cb2
+#     MDTextField:
+#         id: User
+#         hint_text: "Username"
+#         size_hint: 0.5, 0.1
+#         pos_hint: {"center_x": 0.5, "center_y": 0.7}
+#         icon_right: "account"
 
-    MDTextField:
-        id: Pass
-        hint_text: "Password"
-        size_hint: 0.5, 0.1
-        pos_hint: {"center_x": 0.5, "center_y": 0.6}
-        icon_right: "key"
-        password: True
-        cursor_color: 0,0,0,1
-    MDLabel:
-        text: "Remember me"
-        size_hint: 0.5,0.06
-        pos_hint:{"x":0.35,"y":0.47}
+#     MDTextField:
+#         id: Pass
+#         hint_text: "Password"
+#         size_hint: 0.5, 0.1
+#         pos_hint: {"center_x": 0.5, "center_y": 0.6}
+#         icon_right: "key"
+#         password: True
+#         cursor_color: 0,0,0,1
+#     MDLabel:
+#         text: "Remember me"
+#         size_hint: 0.5,0.06
+#         pos_hint:{"x":0.35,"y":0.47}
 
-    RightCheckbox:
-        id: login_cb2
-        #active: True
-        size_hint:0.055, 0.055
-        pos_hint: {"x": 0.68, "center_y": 0.5}
-        on_press:
-            root.remember_me()
-
-
-    MDFillRoundFlatButton:
-        id:login_button
-        text: "Login"
-        size_hint: 0.5, 0.06
-        pos_hint: {"center_x": 0.5, "center_y": 0.35}
-        on_release:
-            root.login()
-
-#'''Contenido de la primera principal'''
-<FirstWindow>:
-    nav_drawer2:nav_drawer
-    MDScreen:
-
-        RelativeLayout:
-
-            MDTopAppBar:
-                title: 'HOME'
-                elevation: 10
-                left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
-                pos_hint:{'x':0,'top':1}
-                size_hint_y: 0.1
-                size_hint_x:1
-
-            Image:
-                source: 'assests\multimedia\Administracion.jpg'
-                size_hint: 1, 0.3
-                pos_hint: {"x": 0, "y": 0.6}
+#     RightCheckbox:
+#         id: login_cb2
+#         #active: True
+#         size_hint:0.055, 0.055
+#         pos_hint: {"x": 0.68, "center_y": 0.5}
+#         on_press:
+#             root.remember_me()
 
 
-            MDRectangleFlatIconButton:
-                text: 'Mostrar calendario'
-                size_hint: 0.8, 0.2
-                pos_hint: {"x": 0.1, "y": 0.4}
-                icon:"calendar"
-                on_press:
-                    root.show_date_picker()
-                # Image:
-                #     id: avatar
-                #     size:self.parent.width, self.parent.height
-                #     center_x: self.parent.center_x
-                #     center_y: self.parent.center_y
-                #     source: r"assests\multimedia\calendar.png"    
+#     MDFillRoundFlatButton:
+#         id:login_button
+#         text: "Login"
+#         size_hint: 0.5, 0.06
+#         pos_hint: {"center_x": 0.5, "center_y": 0.35}
+#         on_release:
+#             root.login()
 
-            MDFloatingActionButton:
-                elevation: 8
-                icon: 'plus'
-                pos_hint: {'center_x': .5}
-                on_press:
-                    app.root.current = 'secondwindow'
-                    root.manager.transition.direction = 'left'
+# #'''Contenido de la primera principal'''
+# <FirstWindow>:
+#     nav_drawer2:nav_drawer
+#     MDScreen:
 
+#         RelativeLayout:
 
-        MDNavigationDrawer:
-            id: nav_drawer
-            ContentNavigationDrawer:
-                id: nav_drawer_content
-                nav_drawer: nav_drawer
-                size_hint_y: 1
-                size_hint_x:0.3
-                pos_hint:{"x":0,"top":1}
+#             MDTopAppBar:
+#                 title: 'HOME'
+#                 elevation: 10
+#                 left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
+#                 pos_hint:{'x':0,'top':1}
+#                 size_hint_y: 0.1
+#                 size_hint_x:1
+
+#             Image:
+#                 source: 'assests\multimedia\Administracion.jpg'
+#                 size_hint: 1, 0.3
+#                 pos_hint: {"x": 0, "y": 0.6}
 
 
+#             MDRectangleFlatIconButton:
+#                 text: 'Mostrar calendario'
+#                 size_hint: 0.8, 0.2
+#                 pos_hint: {"x": 0.1, "y": 0.4}
+#                 icon:"calendar"
+#                 on_press:
+#                     root.show_date_picker()
+#                 # Image:
+#                 #     id: avatar
+#                 #     size:self.parent.width, self.parent.height
+#                 #     center_x: self.parent.center_x
+#                 #     center_y: self.parent.center_y
+#                 #     source: r"assests\multimedia\calendar.png"    
+
+#             MDFloatingActionButton:
+#                 elevation: 8
+#                 icon: 'plus'
+#                 pos_hint: {'center_x': .5}
+#                 on_press:
+#                     app.root.current = 'secondwindow'
+#                     root.manager.transition.direction = 'left'
 
 
-<ContentNavigationDrawer>:
-    orientation: "vertical"
-    padding: "8dp"
-    spacing: "8dp"
-
-    AnchorLayout:
-        anchor_x: "left"
-        size_hint_y: None
-        height: avatar.height
-
-        Image:
-            id: avatar
-            size_hint: None, None
-            size: "56dp", "56dp"
-            source: r"assests\multimedia\school.png"
-
-    MDLabel:
-        text: "Semestres"
-        font_style: "Button"
-        size_hint_y: None
-        height: self.texture_size[1]
-
-
-
-    ScrollView:
-        id: scroll
-        DrawerList:
-            id: md_list
+#         MDNavigationDrawer:
+#             id: nav_drawer
+#             ContentNavigationDrawer:
+#                 id: nav_drawer_content
+#                 nav_drawer: nav_drawer
+#                 size_hint_y: 1
+#                 size_hint_x:0.3
+#                 pos_hint:{"x":0,"top":1}
 
 
 
 
-<ItemList>:
-    on_press:
-        root.screen_one.definir_semestre(root)
-        app.root.current = "secondwindow"
+# <ContentNavigationDrawer>:
+#     orientation: "vertical"
+#     padding: "8dp"
+#     spacing: "8dp"
+
+#     AnchorLayout:
+#         anchor_x: "left"
+#         size_hint_y: None
+#         height: avatar.height
+
+#         Image:
+#             id: avatar
+#             size_hint: None, None
+#             size: "56dp", "56dp"
+#             source: r"assests\multimedia\school.png"
+
+#     MDLabel:
+#         text: "Semestres"
+#         font_style: "Button"
+#         size_hint_y: None
+#         height: self.texture_size[1]
+
+
+
+#     ScrollView:
+#         id: scroll
+#         DrawerList:
+#             id: md_list
+
+
+
+
+# <ItemList>:
+#     on_press:
+#         root.screen_one.definir_semestre(root)
+#         app.root.current = "secondwindow"
         
 
 
 
 
-#'''Contenido de la pantalla donde se muestran las actividades por materia'''
-<SecondWindow>:
-    BoxLayout:
-        spacing: 5
-        orientation: "vertical"
-        BoxLayout:
-            size_hint_y : 0.1
-            orientation: 'horizontal'
-            MDTopAppBar:
-                id: nombre_materia
-                title: 'ACTIVIDADES'
-                right_action_items: [["menu", lambda x: root.abrir_menu(x)]]
-                left_action_items: [["keyboard-backspace", lambda x: app.go_back(1)]]
-                elevation:10
+# #'''Contenido de la pantalla donde se muestran las actividades por materia'''
+# <SecondWindow>:
+#     BoxLayout:
+#         spacing: 5
+#         orientation: "vertical"
+#         BoxLayout:
+#             size_hint_y : 0.1
+#             orientation: 'horizontal'
+#             MDTopAppBar:
+#                 id: nombre_materia
+#                 title: 'ACTIVIDADES'
+#                 right_action_items: [["menu", lambda x: root.abrir_menu(x)]]
+#                 left_action_items: [["keyboard-backspace", lambda x: app.go_back(1)]]
+#                 elevation:10
 
 
 
-        FloatLayout:
-            orientation : "horizontal"
-            size_hint_x : 1
-            size_hint_y : 0.20
+#         FloatLayout:
+#             orientation : "horizontal"
+#             size_hint_x : 1
+#             size_hint_y : 0.20
 
 
-            MDFloatingActionButton:
-                id: Por_entregar
-                icon: "bookmark-check-outline"
-                opposite_colors: True
-                elevation: 8
-                md_bg_color: 0, 0.1, 0, .5
-                pos_hint: {"x":0.10,"y":0.40}
-                on_press: root.por_entregar()
+#             MDFloatingActionButton:
+#                 id: Por_entregar
+#                 icon: "bookmark-check-outline"
+#                 opposite_colors: True
+#                 elevation: 8
+#                 md_bg_color: 0, 0.1, 0, .5
+#                 pos_hint: {"x":0.10,"y":0.40}
+#                 on_press: root.por_entregar()
 
-            MDTextButton:
-                id:por_entregar_text
-                text: "8"
-                pos_hint:{"x":0.17,"y":0.12}
-                font_size:18
-                size_hint: 0.2,0.1
-
-
-            MDFloatingActionButton:
-                id: Entregas_a_tiempo
-                icon: "bookmark-check-outline"
-                opposite_colors: True
-                elevation: 8
-                md_bg_color: 0, 1, 0, .5
-                pos_hint: {"x":0.32,"y":0.40}
-
-                on_press: root.entregas_a_tiempo()
-
-            MDTextButton:
-                id:Entregas_a_tiempo_text
-                text: "hola"
-                pos_hint:{"x":0.38,"y":0.12}
-                font_size:18
-                size_hint: 0.2,0.1
+#             MDTextButton:
+#                 id:por_entregar_text
+#                 text: "8"
+#                 pos_hint:{"x":0.17,"y":0.12}
+#                 font_size:18
+#                 size_hint: 0.2,0.1
 
 
-            MDFloatingActionButton:
-                id: Entregas_con_retraso
-                icon: "bookmark-check-outline"
-                opposite_colors: True
-                elevation: 8
-                md_bg_color: 0, 0, 1, 1
-                pos_hint: {"x":0.54,"y":0.40}
-                on_press: root.entregas_con_atraso()
+#             MDFloatingActionButton:
+#                 id: Entregas_a_tiempo
+#                 icon: "bookmark-check-outline"
+#                 opposite_colors: True
+#                 elevation: 8
+#                 md_bg_color: 0, 1, 0, .5
+#                 pos_hint: {"x":0.32,"y":0.40}
 
-            MDTextButton:
-                id:Entregas_con_retraso_text
-                text: "5"
-                pos_hint:{"x":0.60,"y":0.12}
-                font_size:18
-                size_hint: 0.2,0.1
+#                 on_press: root.entregas_a_tiempo()
 
-            MDFloatingActionButton:
-                icon: "backspace-reverse"
-                opposite_colors: True
-                elevation: 8
-                md_bg_color: 1, 0, 0, .5
-                pos_hint: {"x":0.76,"y":0.40}
-                on_press: root.atrasadas()
-
-            MDTextButton:
-                id:Atrasada_text
-                text: "5"
-                pos_hint:{"x":0.82,"y":0.12}
-                font_size:18
-                size_hint: 0.2,0.1
-
-        BoxLayout:
-            id: cotenido
-            orientation : "horizontal"
-            size_hint_x : 1
-            size_hint_y : 0.7
+#             MDTextButton:
+#                 id:Entregas_a_tiempo_text
+#                 text: "hola"
+#                 pos_hint:{"x":0.38,"y":0.12}
+#                 font_size:18
+#                 size_hint: 0.2,0.1
 
 
-            ScrollView:
-                MDList:
-                    id: list_one
+#             MDFloatingActionButton:
+#                 id: Entregas_con_retraso
+#                 icon: "bookmark-check-outline"
+#                 opposite_colors: True
+#                 elevation: 8
+#                 md_bg_color: 0, 0, 1, 1
+#                 pos_hint: {"x":0.54,"y":0.40}
+#                 on_press: root.entregas_con_atraso()
+
+#             MDTextButton:
+#                 id:Entregas_con_retraso_text
+#                 text: "5"
+#                 pos_hint:{"x":0.60,"y":0.12}
+#                 font_size:18
+#                 size_hint: 0.2,0.1
+
+#             MDFloatingActionButton:
+#                 icon: "backspace-reverse"
+#                 opposite_colors: True
+#                 elevation: 8
+#                 md_bg_color: 1, 0, 0, .5
+#                 pos_hint: {"x":0.76,"y":0.40}
+#                 on_press: root.atrasadas()
+
+#             MDTextButton:
+#                 id:Atrasada_text
+#                 text: "5"
+#                 pos_hint:{"x":0.82,"y":0.12}
+#                 font_size:18
+#                 size_hint: 0.2,0.1
+
+#         BoxLayout:
+#             id: cotenido
+#             orientation : "horizontal"
+#             size_hint_x : 1
+#             size_hint_y : 0.7
 
 
-        BoxLayout:
-            orientation : "horizontal"
-            size_hint_x : 1
-            size_hint_y : 0.1
+#             ScrollView:
+#                 MDList:
+#                     id: list_one
 
 
-            MDBottomNavigation:
-                panel_color: get_color_from_hex("#eeeaea")
-                selected_color_background: get_color_from_hex("#97ecf8")
-                text_color_active: 0, 0, 0, 1
-
-                MDBottomNavigationItem:
-                    name: 'plan_trabajo'
-                    hint_text: 'Abrir plan de trabajo'
-                    icon: 'text-box-multiple'
-                    hint_text: "hola perros"
-                    #badge_icon: "numeric-5"
-                    on_tab_press: root.abrir_plan_trabajo()
-
-                MDBottomNavigationItem:
-                    name: 'progreso'
-                    hint_text: 'Progreso'
-                    icon: 'progress-star'
-                    on_tab_press: root.ver_progreso()
-                    #badge_icon: "numeric-10"
-
-                MDBottomNavigationItem:
-                    name: 'calificaciones'
-                    hint_text: 'Consultar calificaciones'
-                    icon: 'search-web'
-                    #badge_icon: "numeric-5"
-                    on_tab_press: root.consultar_calificaciones()
-
-                MDBottomNavigationItem:
-                    name: 'correo'
-                    hint_text: 'Consultar calificaciones'
-                    icon: 'email'
-                    #badge_icon: "numeric-5"
+#         BoxLayout:
+#             orientation : "horizontal"
+#             size_hint_x : 1
+#             size_hint_y : 0.1
 
 
-<ListItemWithCheckbox>:
-    on_press: root.screen_two.press_actividad(self)
-    RightCheckbox:
-        on_press: root.screen_two.activity_check(root)
+#             MDBottomNavigation:
+#                 panel_color: get_color_from_hex("#eeeaea")
+#                 selected_color_background: get_color_from_hex("#97ecf8")
+#                 text_color_active: 0, 0, 0, 1
+
+#                 MDBottomNavigationItem:
+#                     name: 'plan_trabajo'
+#                     hint_text: 'Abrir plan de trabajo'
+#                     icon: 'text-box-multiple'
+#                     hint_text: "hola perros"
+#                     #badge_icon: "numeric-5"
+#                     on_tab_press: root.abrir_plan_trabajo()
+
+#                 MDBottomNavigationItem:
+#                     name: 'progreso'
+#                     hint_text: 'Progreso'
+#                     icon: 'progress-star'
+#                     on_tab_press: root.ver_progreso()
+#                     #badge_icon: "numeric-10"
+
+#                 MDBottomNavigationItem:
+#                     name: 'calificaciones'
+#                     hint_text: 'Consultar calificaciones'
+#                     icon: 'search-web'
+#                     #badge_icon: "numeric-5"
+#                     on_tab_press: root.consultar_calificaciones()
+
+#                 MDBottomNavigationItem:
+#                     name: 'correo'
+#                     hint_text: 'Consultar calificaciones'
+#                     icon: 'email'
+#                     #badge_icon: "numeric-5"
 
 
-<ListItemWithoutCheckbox>:
-    on_press:
-        root.screen_two.press_actividad(self)
+# <ListItemWithCheckbox>:
+#     on_press: root.screen_two.press_actividad(self)
+#     RightCheckbox:
+#         on_press: root.screen_two.activity_check(root)
 
 
-#'''Contenido de la pantalla donde se muestra el feddback de las tareas entregadas'''
-<ThirdWindow>:
-    FloatLayout:
-        spacing:5
-        MDTopAppBar:
-            id: nombre_actividad
-            title : ""
-            size_hint: 1,0.1
-            pos_hint:{"top":1}
-            elevation: 10
-            left_action_items: [["keyboard-backspace", lambda x: app.go_back(2)]]
+# <ListItemWithoutCheckbox>:
+#     on_press:
+#         root.screen_two.press_actividad(self)
 
 
-        MDRoundFlatIconButton:
-            id: estatus_entrega
-            text: "Estatus de la entrega"
-            font_size: 14
-            size_hint: 0.98,0.06
-            pos_hint:{"x":0.01,"y":0.83}
-            icon: 'pencil'
-
-        MDRoundFlatIconButton:
-            id: enviado_el
-            text: "Enviado el: "
-            size_hint: 0.98,0.06
-            font_size: 14
-            pos_hint:{"x":0.01,"y":0.75}
-            icon: 'calendar'
-            on_press:
-                root.show_date_picker()
-
-        MDRoundFlatIconButton:
-            id: calificacion
-            text: "Calificación :"
-            size_hint: 0.98,0.06
-            pos_hint:{"x":0.01,"y":0.67}
-            icon: 'school'
-
-        MDRoundFlatIconButton:
-            id: ponderacion
-            text: "Valor :"
-            size_hint: 0.98,0.06
-            pos_hint:{"x":0.01,"y":0.59}
-            icon: 'menu'
+# #'''Contenido de la pantalla donde se muestra el feddback de las tareas entregadas'''
+# <ThirdWindow>:
+#     FloatLayout:
+#         spacing:5
+#         MDTopAppBar:
+#             id: nombre_actividad
+#             title : ""
+#             size_hint: 1,0.1
+#             pos_hint:{"top":1}
+#             elevation: 10
+#             left_action_items: [["keyboard-backspace", lambda x: app.go_back(2)]]
 
 
-        MDRoundFlatIconButton:
-            id: calificado_el
-            text: "Calificado el:"
-            font_size: 13
-            size_hint: 0.98,0.06
-            pos_hint:{"x":0.01,"y":0.51}
-            icon: 'calendar'
+#         MDRoundFlatIconButton:
+#             id: estatus_entrega
+#             text: "Estatus de la entrega"
+#             font_size: 14
+#             size_hint: 0.98,0.06
+#             pos_hint:{"x":0.01,"y":0.83}
+#             icon: 'pencil'
 
-        MDLabel:
-            id: comentarios_etiqueta
-            text: "Comentarios:"
-            size_hint: 0.98,0.06
-            pos_hint:{"x":0.01,"y":0.43}
+#         MDRoundFlatIconButton:
+#             id: enviado_el
+#             text: "Enviado el: "
+#             size_hint: 0.98,0.06
+#             font_size: 14
+#             pos_hint:{"x":0.01,"y":0.75}
+#             icon: 'calendar'
+#             on_press:
+#                 root.show_date_picker()
 
-        BoxLayout
-            size_hint: 0.9,0.44
-            pos_hint:{"x":0.05,"y":0}
-            GridLayout:
-                cols:1
-                size_hint_x: 0.5
-                #width:"600dp"
-                #size_hint_x:None
-                #size_hint:0.8,1
-                #pos_hint: {"x":0.1,"y":0.5}
-                ScrolllabelLabel:
-                    id:scroll_lable
+#         MDRoundFlatIconButton:
+#             id: calificacion
+#             text: "Calificación :"
+#             size_hint: 0.98,0.06
+#             pos_hint:{"x":0.01,"y":0.67}
+#             icon: 'school'
 
-<ScrolllabelLabel>:
-    MDLabel:
-        comentarios:comentarios
-        id: comentarios
-        text: ""
-
-        font_size: 20
-        text_size: self.width, None
-        size_hint_y: None
-        height: self.texture_size[1]
+#         MDRoundFlatIconButton:
+#             id: ponderacion
+#             text: "Valor :"
+#             size_hint: 0.98,0.06
+#             pos_hint:{"x":0.01,"y":0.59}
+#             icon: 'menu'
 
 
-<FourthWindow>:
+#         MDRoundFlatIconButton:
+#             id: calificado_el
+#             text: "Calificado el:"
+#             font_size: 13
+#             size_hint: 0.98,0.06
+#             pos_hint:{"x":0.01,"y":0.51}
+#             icon: 'calendar'
 
-    FloatLayout:
-        canvas.before:
-            Color:
-                rgba: 0.6, 0.63, 0.65, 0
-            Rectangle:
-                pos: self.pos
-                size: self.size
-        BoxLayout:
-            orientation: "horizontal"
-            MDTopAppBar:
-                id: top_bar_w4
-                title : ""
-                size_hint: 1,0.1
-                pos_hint:{"top":1}
-                elevation: 10
-                left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]
+#         MDLabel:
+#             id: comentarios_etiqueta
+#             text: "Comentarios:"
+#             size_hint: 0.98,0.06
+#             pos_hint:{"x":0.01,"y":0.43}
 
-        BoxLayout:
-            orientation: "horizontal"
-            spacing:5
-            padding:5
-            size_hint:1,0.2
-            pos_hint:{"x":0,"y":0.7}
-            FloatLayout:
-                spacing:5
-                padding:5
-                orientation:"vertical"
-                canvas.before:
-                    Color:
-                        rgba: 1, 1, 1, 0.4
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                MDRectangleFlatButton:
-                    id:meta
-                    text: "Mi meta\n"
-                    text_size: root.width, root.height
-                    valign: "top"
-                    halign: "center"
-                    multiline: True
-                    size_hint: 0.9,0.8
-                    pos_hint: {"x":0.05,"y":0.1}
-                    on_press: root.show_confirmation_dialog()
-            FloatLayout:
-                spacing:5
-                padding:5
-                orientation:"vertical"
-                canvas.before:
-                    Color:
-                        rgba: 1, 1, 1, 0.4
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                MDRectangleFlatButton:
-                    id:acumulado
-                    #text: "Acumulado\n"
-                    text_size: root.width, root.height
-                    valign: "top"
-                    halign: "center"
-                    multiline: True
-                    size_hint: 0.9,0.8
-                    pos_hint: {"x":0.05,"y":0.1}
-            FloatLayout:
-                spacing:5
-                padding:5
-                orientation:"vertical"
-                canvas.before:
-                    Color:
-                        rgba: 1, 1, 1, 0.4
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                MDRectangleFlatButton:
-                    id:max_cal
-                    text: "Calificación\n máxima"
-                    text_size: root.width, root.height
-                    valign: "top"
-                    halign: "center"
-                    multiline: True
-                    size_hint: 0.9,0.8
-                    pos_hint: {"x":0.05,"y":0.1}
+#         BoxLayout
+#             size_hint: 0.9,0.44
+#             pos_hint:{"x":0.05,"y":0}
+#             GridLayout:
+#                 cols:1
+#                 size_hint_x: 0.5
+#                 #width:"600dp"
+#                 #size_hint_x:None
+#                 #size_hint:0.8,1
+#                 #pos_hint: {"x":0.1,"y":0.5}
+#                 ScrolllabelLabel:
+#                     id:scroll_lable
+
+# <ScrolllabelLabel>:
+#     MDLabel:
+#         comentarios:comentarios
+#         id: comentarios
+#         text: ""
+
+#         font_size: 20
+#         text_size: self.width, None
+#         size_hint_y: None
+#         height: self.texture_size[1]
 
 
+# <FourthWindow>:
 
-        MDCarousel:
-            FloatLayout:
-                spacing:5
-                size_hint:1,0.7
-                pos_hint:{"x":0,"y":0}
-                canvas.before:
-                    Color:
-                        rgba: 1, 1, 1, 0.4
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
-                Image:
-                    id: materia_progreso
-                    size_hint: 0.8,0.9
-                    pos_hint:{"x":0.1,"top":1}
-                    allow_stretch: True
-                    keep_ratio: False
-            FloatLayout:
-                id: tabla
-                spacing:5
-                size_hint:1,0.7
-                pos_hint:{"x":0,"y":0}
-                canvas.before:
-                    Color:
-                        rgba: 1, 1, 1, 0.4
-                    Rectangle:
-                        pos: self.pos
-                        size: self.size
+#     FloatLayout:
+#         canvas.before:
+#             Color:
+#                 rgba: 0.6, 0.63, 0.65, 0
+#             Rectangle:
+#                 pos: self.pos
+#                 size: self.size
+#         BoxLayout:
+#             orientation: "horizontal"
+#             MDTopAppBar:
+#                 id: top_bar_w4
+#                 title : ""
+#                 size_hint: 1,0.1
+#                 pos_hint:{"top":1}
+#                 elevation: 10
+#                 left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]
+
+#         BoxLayout:
+#             orientation: "horizontal"
+#             spacing:5
+#             padding:5
+#             size_hint:1,0.2
+#             pos_hint:{"x":0,"y":0.7}
+#             FloatLayout:
+#                 spacing:5
+#                 padding:5
+#                 orientation:"vertical"
+#                 canvas.before:
+#                     Color:
+#                         rgba: 1, 1, 1, 0.4
+#                     Rectangle:
+#                         pos: self.pos
+#                         size: self.size
+#                 MDRectangleFlatButton:
+#                     id:meta
+#                     text: "Mi meta\n"
+#                     text_size: root.width, root.height
+#                     valign: "top"
+#                     halign: "center"
+#                     multiline: True
+#                     size_hint: 0.9,0.8
+#                     pos_hint: {"x":0.05,"y":0.1}
+#                     on_press: root.show_confirmation_dialog()
+#             FloatLayout:
+#                 spacing:5
+#                 padding:5
+#                 orientation:"vertical"
+#                 canvas.before:
+#                     Color:
+#                         rgba: 1, 1, 1, 0.4
+#                     Rectangle:
+#                         pos: self.pos
+#                         size: self.size
+#                 MDRectangleFlatButton:
+#                     id:acumulado
+#                     #text: "Acumulado\n"
+#                     text_size: root.width, root.height
+#                     valign: "top"
+#                     halign: "center"
+#                     multiline: True
+#                     size_hint: 0.9,0.8
+#                     pos_hint: {"x":0.05,"y":0.1}
+#             FloatLayout:
+#                 spacing:5
+#                 padding:5
+#                 orientation:"vertical"
+#                 canvas.before:
+#                     Color:
+#                         rgba: 1, 1, 1, 0.4
+#                     Rectangle:
+#                         pos: self.pos
+#                         size: self.size
+#                 MDRectangleFlatButton:
+#                     id:max_cal
+#                     text: "Calificación\n máxima"
+#                     text_size: root.width, root.height
+#                     valign: "top"
+#                     halign: "center"
+#                     multiline: True
+#                     size_hint: 0.9,0.8
+#                     pos_hint: {"x":0.05,"y":0.1}
 
 
 
+#         MDCarousel:
+#             FloatLayout:
+#                 spacing:5
+#                 size_hint:1,0.7
+#                 pos_hint:{"x":0,"y":0}
+#                 canvas.before:
+#                     Color:
+#                         rgba: 1, 1, 1, 0.4
+#                     Rectangle:
+#                         pos: self.pos
+#                         size: self.size
+#                 Image:
+#                     id: materia_progreso
+#                     size_hint: 0.8,0.9
+#                     pos_hint:{"x":0.1,"top":1}
+#                     allow_stretch: True
+#                     keep_ratio: False
+#             FloatLayout:
+#                 id: tabla
+#                 spacing:5
+#                 size_hint:1,0.7
+#                 pos_hint:{"x":0,"y":0}
+#                 canvas.before:
+#                     Color:
+#                         rgba: 1, 1, 1, 0.4
+#                     Rectangle:
+#                         pos: self.pos
+#                         size: self.size
 
-<Content>
-    orientation: "vertical"
-    spacing: "12dp"
-    size_hint_y: None
-    height: "120dp"
 
-    MDTextField:
-        hint_text: "Introduce tu calificación objetivo"
+
+
+# <Content>
+#     orientation: "vertical"
+#     spacing: "12dp"
+#     size_hint_y: None
+#     height: "120dp"
+
+#     MDTextField:
+#         hint_text: "Introduce tu calificación objetivo"
 
 
 
