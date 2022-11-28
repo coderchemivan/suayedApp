@@ -20,9 +20,9 @@ from kivymd.uix.list import IconRightWidget
 from kivy.properties import ObjectProperty
 from kivymd.uix.datatables import MDDataTable
 
-from picker_modificado import MDDatePicker
+from picker_modificado import MDDatePickerModificado
  
-#from kivymd.uix.pickers import MDDatePicker
+from kivymd.uix.pickers import MDDatePicker
 
 from kivymd.uix.button import MDRoundFlatIconButton
 from kivymd.uix.button import MDFillRoundFlatIconButton
@@ -159,7 +159,7 @@ class FirstWindow(Screen):
         archivo = r'assests\BD\materias.csv'
         #current_month = date.today().month
         #obtener_materias(archivo).dias_con_pendientes(modo=3, month=current_month,año='2022')
-        date_dialog = MDDatePicker()
+        date_dialog = MDDatePickerModificado()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
 
