@@ -297,7 +297,7 @@ from pendientes import pendientes_list
 
 
 with open(
-    r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\l.kv'
+    r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\picker_modificado.kv'
 ) as kv_file:
     Builder.load_string(kv_file.read())
 
@@ -328,7 +328,7 @@ class BaseDialogPicker(
     and defaults to `INPUT DATE`.
     """
 
-    title = StringProperty("SELECT DATE")
+    #title = StringProperty("SELECT DATE")
     """
     Dialog title fot select date.
 
@@ -559,7 +559,7 @@ class BaseDialogPicker(
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.register_event_type("on_save")
+        #self.register_event_type("on_save")
         self.register_event_type("on_cancel")
 
     def on_save(self, *args):
@@ -834,7 +834,7 @@ class DatePickerYearSelectableItem(RecycleDataViewBehavior, MDLabel):
 
 # TODO: Add the feature to embed the `MDDatePicker` class in other layouts
 #  and not use it as a modal dialog.
-class MDDatePicker(BaseDialogPicker):
+class MDDatePickerModificado(BaseDialogPicker):
     text_weekday_color = ColorProperty(None)
     """
     Text color of weekday names.
@@ -1090,7 +1090,7 @@ class MDDatePicker(BaseDialogPicker):
             )
 
         self.ids.container.add_widget(self._enter_data_field_container)
-        self.ids.edit_icon.icon = "pencil"
+        #self.ids.edit_icon.icon = "pencil"
         self.ids.label_title.text = self.title_input
 
         Animation(
@@ -1144,7 +1144,7 @@ class MDDatePicker(BaseDialogPicker):
         Animation(opacity=1, d=0.15).start(self.ids.label_month_selector)
         Animation(opacity=1, d=0.15).start(self.ids.triangle)
         Animation(opacity=0, d=0.15).start(self._enter_data_field)
-        self.ids.edit_icon.icon = "pencil"
+        #self.ids.edit_icon.icon = "pencil"
         self.ids.label_title.text = self.title
 
         if not self.min_date and not self.max_date:
@@ -1911,24 +1911,25 @@ Builder.load_string(
             text: "CANCEL"
             on_release: root.dispatch("on_cancel", None)
             theme_text_color: "Custom"
-            pos: root.width - self.width - ok_button.width - dp(10), dp(10)
+            #pos: root.width - self.width - ok_button.width - dp(10), dp(10)
+            pos: root.width - self.width - dp(10), dp(10)
             font_name: root.font_name
             text_color:
                 root.theme_cls.primary_color \
                 if not root.text_button_color else root.text_button_color
 
-        MDFlatButton:
-            id: ok_button
-            width: dp(32)
-            pos: root.width - self.width, dp(10)
-            text: "OK"
-            theme_text_color: "Custom"
-            font_name: root.font_name
-            text_color:
-                root.theme_cls.primary_color \
-                if not root.text_button_color else root.text_button_color
-            on_release: root.dispatch("on_save", root._get_data())
-""",
+#         MDFlatButton:
+#             id: ok_button
+#             width: dp(32)
+#             pos: root.width - self.width, dp(10)
+#             text: "OK"
+#             theme_text_color: "Custom"
+#             font_name: root.font_name
+#             text_color:
+#                 root.theme_cls.primary_color \
+#                 if not root.text_button_color else root.text_button_color
+#             on_release: root.dispatch("on_save", root._get_data())
+# """,
     filename="picker.kv",
 )
 
