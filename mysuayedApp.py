@@ -492,8 +492,12 @@ class ScrolllabelLabel(ScrollView):   #Pertenece a la pantalla donde se muestra 
     text = StringProperty('')
     comentarios = ObjectProperty()
 
+
+
+class Content(BoxLayout):pass
+
 sm = ScreenManager()
-class TestNavigationDrawer(MDApp):
+class suayedApp(MDApp):
     def build(self):
         Window.size = (350, 600)
         self.title = "Gestor de tareas"
@@ -514,4 +518,5 @@ class TestNavigationDrawer(MDApp):
             sm.current = "secondwindow"
             sm.transition.direction = 'right'
 
-TestNavigationDrawer().run()
+suayedApp().run()
+
