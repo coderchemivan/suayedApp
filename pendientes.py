@@ -44,18 +44,20 @@ class pendientes_list():
                 ],
                 buttons=[
                     MDFlatButton(
-                        text="CANCEL",
-                        theme_text_color="Custom",
-
-                    ),
-                    MDFlatButton(
                         text="OK",
-                        theme_text_color="Custom",
+                        theme_text_color="Custom",on_release= self.closeDialog
 
                     ),
+                    # MDFlatButton(
+                    #     text="OK",
+                    #     theme_text_color="Custom",
+
+                    # ),
                 ],
             )
         self.dialog.open()
+    def closeDialog(self,obj):
+        self.dialog.dismiss()
 
 
 
