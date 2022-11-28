@@ -1,6 +1,5 @@
 import csv
 import datetime
-from datetime import date
 import chardet
 import pandas as pd
 import xlwings as xw
@@ -32,6 +31,18 @@ class obtener_materias():
             semestres_.append(semestre[0])
         return semestres_
 
+    def fetch_semester_selected_id(self):
+        semestre_info = {}
+        name= self.cur.execute('''
+            select name from semestres where id = 
+            (SELECT semestre_sel FROM user_settings);
+        ''')
+        name = self.cur.fetchone()[0]
+        id = self.cur.execute('''SELECT semestre_sel FROM user_settings''')
+        id = self.cur.fetchone()[0]
+        semestre_info['name'] = name
+        semestre_info['id'] = id
+        return semestre_info
 
     def define_semester(self, semestre, archivo_aux):
         '''SET THE SEMESTER WE'RE GONNA WORK WITH IN USER_SETTINGS TABLE'''
@@ -45,7 +56,7 @@ class obtener_materias():
             UPDATE user_settings SET status = 'Por entregar' WHERE user_id = 1
         ''')
         self.cur.execute("UPDATE user_settings SET semestre_sel = '" + str(semestre) + "' WHERE user_id = 1") ## establece el semestre seleccionado en la tabla user_settings
-        subject_name = self.obtener_materia_name_(modo=2)
+        subject_name = self.obtener_materia_name_(modo=2,semestre_=semestre)
         self.cur.execute("UPDATE user_settings SET materia_sel = '" + subject_name[0] + "' WHERE user_id = 1") ## establece la primera materia econtrada del semestre establecido
         self.conn.commit()
 
