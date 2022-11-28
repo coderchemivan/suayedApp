@@ -206,7 +206,9 @@ class obtener_materias():
                     self.cur.execute('''
                         UPDATE user_settings SET tipo_lista = 'TwoLineRightIconListItem' WHERE user_id = 1
                     ''')
-                    activity_date[actividad] = f'This activity was due for {(fecha_entrega)} days delayed'
+                    #tranform fecha_entrega to %d-%b-%Y format
+                    fecha_entrega = fecha_entrega.date().strftime('%d-%b-%y')
+                    activity_date[actividad] = f'This activity was due for {(fecha_entrega)}'
             self.conn.commit()
             return activity_date
         elif modo ==3: ## Busca cual es el estado en user_settings
@@ -270,7 +272,7 @@ class obtener_materias():
         feedback_.append(comentarios)
         return feedback_
 
-    def obtener_materia_name_(self,modo,subject_name_=None):
+    def obtener_materia_name_(self,modo,subject_name_=None,semestre_=None):
         if modo ==1: ## Busca el nombre de la materia
             self.cur.execute("SELECT materia_sel FROM user_settings WHERE user_id = 1")
             subject_name = self.cur.fetchone()
@@ -278,7 +280,9 @@ class obtener_materias():
         elif modo ==2: ## Seleccionad el primer nombre de la materia que encuentre de acuerdo al semestre
             self.cur.execute( '''SELECT DISTINCT materia FROM materias_fca
                                 JOIN actividades  
-                                ON materias_fca.clave = actividades.clave_materia   LIMIT 1''')
+                                ON materias_fca.clave = actividades.clave_materia   
+                                WHERE semestre = {}
+                                LIMIT 1'''.format(semestre_))
             subject_name = self.cur.fetchone()
             return subject_name
         elif modo ==3:   ## Busca la clave de la materia
@@ -340,9 +344,18 @@ class obtener_materias():
                            "Unidad ": "U",
                            "Actividad complementaria": "Act_compl",
                            "Cuestionario de reforzamiento": "Cuest_refor",
-                            "Actividad": "Act"}
+                            "Actividad": "Act",
+                            "Actividad integradora": "Act_integradora",
+                            "/": ""}
         for key,value in char_to_replace.items():
             df['name'] = df['name'].str.replace(key,value)
+        df['valor'] = df['valor'].apply(lambda x: float(x)*100)
+        df['valor'] = df['valor'].apply(lambda x: round(x,1))
+        df['valor'] = df['valor'].apply(lambda x: str(x) + "%")
+        
+
+        #reemplazar nan por "pendiente"
+        df['calificacion'] = df['calificacion'].fillna("Pendiente")
         df.rename(columns={'name':'Act','valor':'Valor','calificacion':'Calificación'},inplace=True)
         return df
 
