@@ -155,23 +155,26 @@ class obtener_materias():
         return materias_
 
     def status(self,modo,materia=None,status_=None):
+        semestre_id = self.fetch_semester_selected_info()['id']
         if modo == 1:  ## Actualiza solo el estado
-            act_estatus = self.cur.execute("SELECT name,date_format(fecha_entrega,'%d-%m-%Y'),date_format(entregada_el,'%d-%m-%Y'),status FROM actividades")
+            act_status = self.cur.execute("SELECT name,clave_materia,date_format(fecha_entrega,'%d-%m-%Y'),date_format(entregada_el,'%d-%m-%Y'),status FROM actividades where semestre = {}".format(semestre_id))
             act_status = [list(i) for i in self.cur.fetchall()]
 
             i = 0
             for status in act_status:
-                fecha_entrega = status[1]
-                entregada_el = status[2]
+                act = status[0]
+                clave_materia = status[1]
+                fecha_entrega = status[2]
+                entregada_el = status[3]
                 fecha_entrega = datetime.datetime.strptime(fecha_entrega, '%d-%m-%Y')
+                hoy = datetime.datetime.today()
                 if entregada_el == None:
-                    status_ = 'Por entregar' if datetime.datetime.today() < fecha_entrega else 'Atrasada'
+                    status_ = 'Por entregar' if hoy <= fecha_entrega else 'Atrasada'
                 else:
                     entregada_el = datetime.datetime.strptime(entregada_el, '%d-%m-%Y')
                     status_ = 'Entregada a tiempo' if entregada_el<=fecha_entrega else 'Entregada con atraso'
                 i+=1
-
-                self.cur.execute("UPDATE actividades SET status = '" +status_ + "' WHERE id ='" + str(i) +"'")
+                self.cur.execute("UPDATE actividades SET status = '{}' WHERE name = '{}' and clave_materia = {}".format(status_,act,clave_materia))
                 self.conn.commit()
         elif modo ==2: ## Trae las actividaddes de las materias con el estado dado
             act_estatus = self.cur.execute(
@@ -315,6 +318,11 @@ class obtener_materias():
         return grupo
 
     def actualizar_DB(self, materia, actividad):
+        #transform U8_Act integradora to Unidad 8 / Actividad integradora  /
+        actividad = actividad.replace("U", "Unidad ").replace(
+            "Act_compl", "Actividad complementaria"). \
+            replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace('Act_int','Actividad integradora').replace("_", " / ") + "/"
+        
         self.cur.execute("SELECT date_format(fecha_entrega,'%d-%m-%Y') FROM actividades WHERE clave_materia= '" + str(
             materia) + "' AND name = '" + actividad + "'")
         datos_act = self.cur.fetchone()
@@ -332,6 +340,17 @@ class obtener_materias():
         self.cur.execute("UPDATE actividades SET status = '" + estado + "' WHERE clave_materia= '" + str(
             materia) + "' AND name = '" + actividad + "'")
         self.conn.commit()
+    
+    def update_fecha_entregada(self, fecha_entregada):
+        materia_act = self.cur.execute("SELECT materia_sel,act_sel FROM user_settings WHERE user_id = 1")
+        materia_act = self.cur.fetchone()
+        materia = materia_act[0]
+        actividad = materia_act[1]
+        clave_materia = self.cur.execute("SELECT clave FROM materias_fca WHERE materia = '{}'".format(materia))
+        clave_materia = self.cur.fetchone()[0]
+        self.cur.execute("UPDATE actividades SET entregada_el = date_format('{}','%Y-%m-%d') WHERE clave_materia= '{}' AND name = '{}'".format(fecha_entregada,clave_materia,actividad))
+        self.conn.commit()
+
     def condensado_tareas(self,clave):
         semestre =self.semestre_seleccionado()
         act_valor_cali = list()
@@ -449,13 +468,11 @@ class goal_file():
         self.cur = self.conn.cursor()
 
     def progreso(self):
-        self.cur.execute("SELECT valor,calificacion FROM actividades WHERE usuario = '1' and clave_materia= '" + str(self.clave) +
+        self.cur.execute("SELECT valor,calificacion,status FROM actividades WHERE usuario = '1' and clave_materia= '" + str(self.clave) +
                          "' AND semestre = '" + self.semestre + "'")
 
         cal_valor = self.cur.fetchall()
         self.cur.execute("SELECT meta FROM materias_usuario WHERE user_id = '1' and clave_materia= '" + str(self.clave) +
-                         "' AND semestre_id = '" + self.semestre + "'")
-        print("SELECT meta FROM materias_usuario WHERE user_id = '1' and clave_materia= '" + str(self.clave) +
                          "' AND semestre_id = '" + self.semestre + "'")
         meta = self.cur.fetchone()[0]
 
@@ -465,11 +482,14 @@ class goal_file():
         for registro in cal_valor:
             valor = registro[0]
             calificacion = registro[1]
-            if calificacion != None:
+            status = registro[2]
+            if calificacion != None and status != "Atrasada":
                 ponderacion = (calificacion*valor)/10
                 acumulado += ponderacion
                 max_posible += ponderacion
-            else:
+            elif status == "Atrasada":
+                max_posible += 0
+            elif status == "Por entregar":
                 max_posible += valor
         resultados['acumulado'] = float("{:.2f}".format(acumulado*10))
         resultados['max_posible'] = float("{:.2f}".format(max_posible*10))
