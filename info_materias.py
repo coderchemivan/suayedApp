@@ -10,7 +10,7 @@ import mysql.connector
 
 class obtener_materias():
 
-    def __init__(self, archivo_materias):
+    def __init__(self, archivo_materias=None):
         self.archivo_materias = archivo_materias
         self.conn = mysql.connector.connect(user="root", password="123456",
                                        host="localhost",
@@ -31,7 +31,7 @@ class obtener_materias():
             semestres_.append(semestre[0])
         return semestres_
 
-    def fetch_semester_selected_id(self):
+    def fetch_semester_selected_info(self):
         semestre_info = {}
         name= self.cur.execute('''
             select name from semestres where id = 
