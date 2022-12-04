@@ -171,19 +171,23 @@ class SecondWindow(Screen):
     def __init_(self,**kwargs):
         super(SecondWindow,self).__init__(**kwargs)
 
-
-    def on_pre_enter(self, *args):
+    def db_connection(self):
         self.conn = mysql.connector.connect(user="root", password="123456",
                                             host="localhost",
                                             database="fca_materias",
                                             port='3306'
                                             )
         self.cur = self.conn.cursor()
+
+    def on_pre_enter(self, *args):
+        self.db_connection()
         self.por_entregar()
         #self.update_screen()
 
     def update_screen(self):
         # Limpiando las materias de la pantalla
+        archivo = 'assests\BD\materias.csv'
+        status = obtener_materias(archivo).status(modo=1)
         self.ids.list_one.clear_widgets()
 
         ## Rellenando las materias del menú
