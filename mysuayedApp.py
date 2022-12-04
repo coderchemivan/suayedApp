@@ -331,13 +331,12 @@ class SecondWindow(Screen):
         subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) 
         clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0]) 
         subject_grupo = obtener_materias(archivo_clave_grupo).obtener_materia_grupo(clave[0]) 
-        semestre_info = obtener_materias(archivo).fetch_semester_selected_id()
+        semestre_info = obtener_materias(archivo).fetch_semester_selected_info()
         semestre_name = semestre_info['name']
         semestre_id = semestre_info['id']
         carpeta = subject_name[0] + '//1. Materiales//plan_'+str(clave[0]) +'_'+ subject_grupo +'_'+'ED.pdf'
         path = "C://Users//ivan_//OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO//Documents//Administracion//Ivan//{}. {}//{}".format(str(int(semestre_id)+3), semestre_name, carpeta)
         path = path.replace('"',"")
-        print(path)
         subprocess.Popen([path], shell=True)
 
 
@@ -366,9 +365,8 @@ class ThirdWindow(Screen):
 
     #Click OK
     def on_save(self, instance, value, date_range):
-        print(instance, value, date_range)
-        # self.root.ids.date_label.text = str(value)
         self.ids.enviado_el.text = str(value)
+        obtener_materias().update_fecha_entregada(value)        
 
     #
     # Click Cancel
