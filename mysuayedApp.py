@@ -20,7 +20,7 @@ from kivymd.uix.list import IconRightWidget
 from kivy.properties import ObjectProperty
 from kivymd.uix.datatables import MDDataTable
 
-from picker_modificado import MDDatePickerModificado
+from aux_scripts.picker_modificado import MDDatePickerModificado
  
 from kivymd.uix.pickers import MDDatePicker
 
@@ -50,8 +50,8 @@ from kivy.metrics import dp
 # Base de datos
 import csv
 import subprocess
-from info_materias import DB_admin
-from info_materias import goal_file
+from aux_scripts.info_materias import DB_admin
+from aux_scripts.info_materias import goal_file
 
 # Web scrapping
 from time import sleep
@@ -64,7 +64,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 
-from plataformaSuayed import Feedback
+from aux_scripts.plataformaSuayed import Feedback
 import mysql.connector
 
 
@@ -369,7 +369,7 @@ class FourthWindow(Screen):
     def on_pre_enter(self, *args):
         subject_name = DB_admin().obtener_materia_name_(modo=1) ## listo
         subject_clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
-        archivo_grafica_progreso = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
+        archivo_grafica_progreso = r'assests\materia_dashboard_material\meta.xlsm'
         semestre_seleccionado = DB_admin().semestre_seleccionado()
         resultados = goal_file(archivo_grafica_progreso,semestre_seleccionado,subject_clave[0],subject_name).progreso()
         self.ids.top_bar_w4.title = subject_name[0]
@@ -491,7 +491,7 @@ class suayedApp(MDApp):
         Window.size = (350, 600)
         self.title = "Gestor de tareas"
         sm2 = ScreenManager()
-        Builder.load_file('main7.kv')
+        Builder.load_file('mysuayedApp.kv')
         sm.add_widget(LoginPage(name='login_page'))
         sm.add_widget(FirstWindow(name='firstwindow'))
         sm.add_widget(SecondWindow(name='secondwindow'))

@@ -291,13 +291,13 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.relativelayout import MDRelativeLayout
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.tooltip import MDTooltip
-from info_materias import DB_admin
-from pendientes import pendientes_list
+from aux_scripts.info_materias import DB_admin
+from aux_scripts.pendientes import pendientes_list
 
 
 
 with open(
-    r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\picker_modificado.kv'
+    r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\aux_scripts\picker_modificado.kv'
 ) as kv_file:
     Builder.load_string(kv_file.read())
 
