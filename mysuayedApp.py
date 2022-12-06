@@ -489,7 +489,7 @@ sm = ScreenManager()
 class suayedApp(MDApp):
     def build(self):
         Window.size = (350, 600)
-        self.title = "Gestor de tareas"
+        self.title = "MysuayedApp"
         sm2 = ScreenManager()
         Builder.load_file('mysuayedApp.kv')
         sm.add_widget(LoginPage(name='login_page'))
