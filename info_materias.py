@@ -189,7 +189,7 @@ class obtener_materias():
                 entregada_el = act[2]
                 fecha_entrega = datetime.datetime.strptime(fecha_entrega, '%d-%m-%Y')
                 if status_ == 'Por entregar':
-                    activity_date[actividad] = f'Due to {fecha_entrega.date()}'
+                    activity_date[actividad] = f'Due to {fecha_entrega.date().strftime("%d-%m-%Y")}'
                     self.cur.execute('''
                         UPDATE user_settings SET tipo_lista = 'TwoLineRightIconListItem' WHERE user_id = 1
                     ''')
