@@ -50,7 +50,7 @@ from kivy.metrics import dp
 # Base de datos
 import csv
 import subprocess
-from info_materias import obtener_materias
+from info_materias import DB_admin
 from info_materias import goal_file
 
 # Web scrapping
@@ -81,8 +81,7 @@ class LoginPage(Screen):
         Clock.schedule_once(self.remember_)
 
     def remember_(self,*args):
-        archivo = r'assests\BD\usuarioData.csv'
-        remember = obtener_materias(archivo).remember_status(modo=2)  ##listo
+        remember = DB_admin().remember_status(modo=2)  ##listo
         user = '421157110'
         pass_ = '16091997'
         if remember == 1:
@@ -95,27 +94,23 @@ class LoginPage(Screen):
             self.password.text = ""
 
     def remember_me(self):
-        archivo = r'assests\BD\usuarioData.csv'
-        obtener_materias(archivo).remember_status(modo = 1) ##listo
+        
+        DB_admin().remember_status(modo = 1) ##listo
 
     def login(self):
-        archivo = r'assests\BD\usuarioData.csv'
-        with open(archivo, 'r') as file:
-            reader = csv.reader(file)
-            myList = list(reader)
-            user = myList[1][0]
-            pass_ = myList[1][1]
-            self.ids.User.text = user
-            self.ids.Pass.text = pass_
+        user_info = DB_admin().user_info(columnas=['username', 'password']) 
+        user = user_info['username']
+        pass_ = user_info['password']
+        self.ids.User.text = user
+        self.ids.Pass.text = pass_
 
 
-            if self.username.text == user and self.password.text == pass_:
-                sm.current = "firstwindow"
-                self.username.text = ""
-                self.password.text = ""
-            else:
-                print("Not here!")
-
+        if self.username.text == user and self.password.text == pass_:
+            sm.current = "firstwindow"
+            self.username.text = ""
+            self.password.text = ""
+        else:
+            print("Not here!")
 
 class FirstWindow(Screen):
     nav_drawer2 = ObjectProperty()
@@ -128,8 +123,7 @@ class FirstWindow(Screen):
         self.nav_drawer2.set_state("close")
 
     def lista_semestres(self, dt): # Llena el MDlist del NavigationDrawer
-        archivo_aux = r'assests\BD\semestres_materias.csv'
-        semestres = obtener_materias(archivo_aux).lista_semester()   #listo
+        semestres = DB_admin().lista_semester()  
         #Limpiando los semestres anteriores
         self.ids.nav_drawer_content.ids.md_list.clear_widgets()
 
@@ -141,10 +135,8 @@ class FirstWindow(Screen):
                 pass   
 
     def definir_semestre(instance):
-        archivo_aux = "assests\BD\semestres_materias.csv"
-        archivo = "assests\BD\materias.csv"
         semestre = instance.text
-        obtener_materias(archivo).define_semester(semestre,archivo_aux) ##listo
+        DB_admin().define_semester(semestre) 
 
 
     def on_save(self, instance, value, date_range):
@@ -158,9 +150,9 @@ class FirstWindow(Screen):
 
 
     def show_date_picker(self):
-        archivo = r'assests\BD\materias.csv'
+        archivo = r''
         #current_month = date.today().month
-        #obtener_materias(archivo).dias_con_pendientes(modo=3, month=current_month,año='2022')
+        #DB_admin(archivo).dias_con_pendientes(modo=3, month=current_month,año='2022')
         date_dialog = MDDatePickerModificado()
         date_dialog.bind(on_save=self.on_save, on_cancel=self.on_cancel)
         date_dialog.open()
@@ -186,12 +178,11 @@ class SecondWindow(Screen):
 
     def update_screen(self):
         # Limpiando las materias de la pantalla
-        archivo = 'assests\BD\materias.csv'
-        status = obtener_materias(archivo).status(modo=1)
+        status = DB_admin().status(modo=1)
         self.ids.list_one.clear_widgets()
 
         ## Rellenando las materias del menú
-        materias = obtener_materias("assests\BD\materias.csv").extracción_materias()  ##listo  **
+        materias = DB_admin().extracción_materias()  ##listo  **
         menu_items = [
             {
                 "viewclass": "OneLineListItem",
@@ -205,19 +196,17 @@ class SecondWindow(Screen):
             width_mult=4,
         )
         ##
+        subject_name = DB_admin().obtener_materia_name_(modo=1) ## busca la materia que se va a mostrar en la pantalla
+        status = DB_admin().status(modo=3) ## buscando el status del cual se van a buscar las act conformes al él
+        clave = DB_admin().obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## buscando la clave de la materia que se va a mostrar en pantalla
+        actividades = DB_admin().status(modo=2,materia = clave[0],status_=status) ## busca las act conforme a la materia y status seleccionados
 
-        archivo = 'assests\BD\materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## busca la materia que se va a mostrar en la pantalla
-        status = obtener_materias(archivo).status(modo=3) ## buscando el status del cual se van a buscar las act conformes al él
-        clave = obtener_materias(archivo).obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## buscando la clave de la materia que se va a mostrar en pantalla
-        actividades = obtener_materias(archivo).status(modo=2,materia = clave[0],status_=status) ## busca las act conforme a la materia y status seleccionados
-
-        #actividades = obtener_materias(archivo).total_actividades(subject_name)
+        #actividades = DB_admin(archivo).total_actividades(subject_name)
 
         self.ids.nombre_materia.title = subject_name[0]
 
         ## (TwoLineRightIconListItem) para actividades por entregar y atrasadas (TwoLineListItem) para entregadas
-        lista = obtener_materias(archivo).list_type()
+        lista = DB_admin().list_type()
         if lista == 'TwoLineRightIconListItem':
             for k, v in actividades.items():
                 self.ids.list_one.add_widget(
@@ -234,7 +223,7 @@ class SecondWindow(Screen):
         estados = ['Por entregar', 'Entregada con atraso', 'Atrasada', 'Entregada a tiempo']
         num_act_estado = dict()
         for estado in estados:
-            num_actividades = len(obtener_materias(archivo).status(modo=2, materia=clave[0], status_=estado)) ##listo
+            num_actividades = len(DB_admin().status(modo=2, materia=clave[0], status_=estado)) ##listo
             num_act_estado[estado] = num_actividades
         self.ids.por_entregar_text.text = str(num_act_estado['Por entregar'])
         self.ids.Entregas_con_retraso_text.text = str(num_act_estado['Entregada con atraso'])
@@ -243,17 +232,17 @@ class SecondWindow(Screen):
         ##
 
     def press_actividad(self):  # Abre la ventana donde se muestran los detalles de la actividad
-        activity_name = obtener_materias('assests\BD\materias.csv').define_activity(self.text) ##listo
+        activity_name = DB_admin().define_activity(self.text) ##listo
         sm.current = 'thirdwindow'
         sm.transition.direction = "left"
 
 
     def activity_check(self,*args):  # Se indica que se entregó una actividad
-        archivo = 'assests\BD\materias.csv'
+        archivo = ''
         activity_name = self.text
-        materia = obtener_materias(archivo).obtener_materia_name_(modo=1)
-        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=materia[0])
-        obtener_materias(archivo).actualizar_DB(clave[0], activity_name)
+        materia = DB_admin().obtener_materia_name_(modo=1)
+        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=materia[0])
+        DB_admin().actualizar_DB(clave[0], activity_name)
         sm.current ="firstwindow"
         sm.current = "secondwindow"
 
@@ -266,7 +255,7 @@ class SecondWindow(Screen):
         self.menu.dismiss()
         sm.current = "secondwindow"
         sm.transition.direction = 'right'
-        archivo = 'assests\BD\materias.csv'
+        archivo = ''
 
         self.cur.execute("UPDATE user_settings SET materia_sel = '" + text_item + "' WHERE user_id = 1")
         self.cur.execute("UPDATE user_settings SET status = 'Por entregar' WHERE user_id = 1")
@@ -275,45 +264,40 @@ class SecondWindow(Screen):
         self.update_screen()
 
     def entregas_a_tiempo(self, *args):
-        archivo = 'assests\BD\materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1)  ## listo
-        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
-        obtener_materias(archivo).status(modo=4,status_='Entregada a tiempo')
-        actividades = obtener_materias(archivo).status(modo=2,materia=clave[0],status_='Entregada a tiempo') ##listo
+        subject_name = DB_admin().obtener_materia_name_(modo=1)  ## listo
+        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        DB_admin().status(modo=4,status_='Entregada a tiempo')
+        actividades = DB_admin().status(modo=2,materia=clave[0],status_='Entregada a tiempo') ##listo
         self.update_screen()
 
 
     def entregas_con_atraso(self, *args):
-        archivo = 'assests\BD\materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1)  ## listo
-        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
-        obtener_materias(archivo).status(modo=4,status_='Entregada con atraso') ##listo
+        archivo = ''
+        subject_name = DB_admin().obtener_materia_name_(modo=1)  
+        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0])  
+        DB_admin().status(modo=4,status_='Entregada con atraso') ##listo
         self.update_screen()
 
 
     def atrasadas(self, *args):
-        archivo = 'assests\BD\materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1)  ## listo
-        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
-        obtener_materias(archivo).status(modo=4,status_='Atrasada') ## listo
+        subject_name = DB_admin().obtener_materia_name_(modo=1)  ## listo
+        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        DB_admin().status(modo=4,status_='Atrasada') ## listo
         self.update_screen()
 
 
     def por_entregar(self, *args):
-        archivo = 'assests\BD\materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1)  ## listo
-        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
-        obtener_materias(archivo).status(modo=4,status_='Por entregar') ## listo
+        subject_name = DB_admin().obtener_materia_name_(modo=1)  ## listo
+        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        DB_admin().status(modo=4,status_='Por entregar') ## listo
         self.update_screen()
 
 
     ##Los métodos del MDBottomNavigation
     def consultar_calificaciones(self):  # Extrae el feedback de internet
-        archivo = 'assests\BD\materias.csv'
-        archivo_aux = 'assests\BD\semestres_materias.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## listo
-        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0]) ##listo
-        actividades = obtener_materias(archivo).status(modo=5,materia=clave[0]) ##listo
+        subject_name = DB_admin().obtener_materia_name_(modo=1) ## listo
+        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0]) ##listo
+        actividades = DB_admin().status(modo=5,materia=clave[0]) ##listo
         opts = Options()
         opts.add_argument(
                     "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36.")
@@ -326,12 +310,10 @@ class SecondWindow(Screen):
 
 
     def abrir_plan_trabajo(self):
-        archivo = 'assests\BD\materias.csv'
-        archivo_clave_grupo = 'assests\BD\materia_grupo.csv'
-        subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) 
-        clave = obtener_materias(archivo).obtener_materia_name_(modo=3, subject_name_=subject_name[0]) 
-        subject_grupo = obtener_materias(archivo_clave_grupo).obtener_materia_grupo(clave[0]) 
-        semestre_info = obtener_materias(archivo).fetch_semester_selected_info()
+        subject_name = DB_admin().obtener_materia_name_(modo=1) 
+        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0]) 
+        subject_grupo = DB_admin().obtener_materia_grupo(clave[0]) 
+        semestre_info = DB_admin().fetch_semester_selected_info()
         semestre_name = semestre_info['name']
         semestre_id = semestre_info['id']
         carpeta = subject_name[0] + '//1. Materiales//plan_'+str(clave[0]) +'_'+ subject_grupo +'_'+'ED.pdf'
@@ -347,10 +329,10 @@ class SecondWindow(Screen):
 
 class ThirdWindow(Screen):
     def on_pre_enter(self, *args):
-        activity_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=4) ##listo
-        subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1) ## listo
-        clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
-        activity_status = obtener_materias('assests\BD\materias.csv').estado_actividad(clave=clave[0],actividad=activity_name) ## listo
+        activity_name = DB_admin().obtener_materia_name_(modo=4) ##listo
+        subject_name = DB_admin().obtener_materia_name_(modo=1) ## listo
+        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        activity_status = DB_admin().estado_actividad(clave=clave[0],actividad=activity_name) ## listo
 
 
         self.ids.nombre_actividad.title = activity_name
@@ -367,7 +349,7 @@ class ThirdWindow(Screen):
     def on_save(self, instance, value, date_range):
         fecha = value.strftime('%d/%m/%Y')
         self.ids.enviado_el.text = str(fecha)
-        obtener_materias().update_fecha_entregada(value)        
+        DB_admin().update_fecha_entregada(value)        
 
     #
     # Click Cancel
@@ -385,17 +367,17 @@ class FourthWindow(Screen):
     def __init_(self,**kwargs):
         super(FourthWindow,self).__init__(**kwargs)
     def on_pre_enter(self, *args):
-        subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1) ## listo
-        subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
+        subject_name = DB_admin().obtener_materia_name_(modo=1) ## listo
+        subject_clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
         archivo_grafica_progreso = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
-        semestre_seleccionado = obtener_materias('assests\BD\semestres_materias.csv').semestre_seleccionado()
+        semestre_seleccionado = DB_admin().semestre_seleccionado()
         resultados = goal_file(archivo_grafica_progreso,semestre_seleccionado,subject_clave[0],subject_name).progreso()
         self.ids.top_bar_w4.title = subject_name[0]
         self.ids.acumulado.text = "Acumulado \n" + str(resultados['acumulado'])
         self.ids.meta.text = "Mi meta: \n" + str(resultados['meta'])
         self.ids.max_cal.text = "Calificación \n máxima\n" + str(resultados['max_posible'])
         Clock.schedule_once(self.imagen)
-        df = obtener_materias("").condensado_tareas(subject_clave[0])
+        df = DB_admin().condensado_tareas(subject_clave[0])
         df = df.iloc[:, 0:]
         cols = df.columns.values
         values = df.values
@@ -411,8 +393,8 @@ class FourthWindow(Screen):
         )
         self.ids.tabla.add_widget(self.data_tables)
     def imagen(self, *args):
-        subject_name = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=1)  ## listo
-        subject_clave = obtener_materias('assests\BD\materias.csv').obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo       self.ids.materia_progreso.clear_widgets()
+        subject_name = DB_admin().obtener_materia_name_(modo=1)  ## listo
+        subject_clave = DB_admin().obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo       self.ids.materia_progreso.clear_widgets()
         self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave[0]}.gif'
 
     def go_back(self):
@@ -446,9 +428,8 @@ class FourthWindow(Screen):
                                             )
         self.cur = self.conn.cursor()
         for obj in self.dialog.content_cls.children:
-            archivo = ""
-            subject_name = obtener_materias(archivo).obtener_materia_name_(modo=1) ## busca la materia que se va a mostrar en la pantalla
-            clave = obtener_materias(archivo).obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## buscando la clave de la materia que se va a mostrar en pantalla
+            subject_name = DB_admin().obtener_materia_name_(modo=1) ## busca la materia que se va a mostrar en la pantalla
+            clave = DB_admin().obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## buscando la clave de la materia que se va a mostrar en pantalla
             query = "UPDATE materias_usuario SET meta = '{}' WHERE clave_materia = '{}'".format(obj.text,clave[0])
             self.cur.execute(query)
             self.conn.commit()

@@ -291,7 +291,7 @@ from kivymd.uix.label import MDLabel
 from kivymd.uix.relativelayout import MDRelativeLayout
 from kivymd.uix.textfield import MDTextField
 from kivymd.uix.tooltip import MDTooltip
-from info_materias import obtener_materias
+from info_materias import DB_admin
 from pendientes import pendientes_list
 
 
@@ -749,7 +749,7 @@ class DatePickerDaySelectableItem(
             archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
 
             mes_trabajado = str(self.owner.sel_month).zfill(2)
-            lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=self.owner.sel_month, año=str(self.current_year))
+            lista = DB_admin(archivo).dias_con_pendientes(modo=1, month=self.owner.sel_month, año=str(self.current_year))
 
             lista_days = list()
             for day in lista:
@@ -759,7 +759,7 @@ class DatePickerDaySelectableItem(
                 lista_days.append(day)
             if self.text in lista_days:
                 fecha = f'{str(self.current_year)}/{mes_trabajado}/{str(self.text).zfill(2)}'
-                pendientes_fecha = obtener_materias(archivo).dias_con_pendientes(modo=2,fecha=fecha)
+                pendientes_fecha = DB_admin(archivo).dias_con_pendientes(modo=2,fecha=fecha)
 
         if self.is_selected == True:
             mes_trabajado = str(self.owner.sel_month).zfill(2)
@@ -1238,7 +1238,7 @@ class MDDatePickerModificado(BaseDialogPicker):
             archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
 
             mes_trabajado = str(self.month).zfill(2)
-            lista = obtener_materias(archivo).dias_con_pendientes(modo=1, month=self.month,año=str(self.year))
+            lista = DB_admin(archivo).dias_con_pendientes(modo=1, month=self.month,año=str(self.year))
             lista_days = list()
 
 
@@ -1472,7 +1472,7 @@ class MDDatePickerModificado(BaseDialogPicker):
         archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
 
         mes_trabajado =str(str(self.month).zfill(2))
-        lista_days = obtener_materias(archivo).dias_con_pendientes(modo=1,month=self.month,año=str(self.year))
+        lista_days = DB_admin(archivo).dias_con_pendientes(modo=1,month=self.month,año=str(self.year))
         primer_dia_del_mes = datetime.datetime.strptime(f'01/{mes_trabajado}/{str(self.year)}','%d/%m/%Y').weekday()
 
 

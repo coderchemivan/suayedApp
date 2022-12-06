@@ -8,7 +8,7 @@ import calendar
 import mysql.connector
 
 
-class obtener_materias():
+class DB_admin():
 
     def __init__(self, archivo_materias=None):
         self.archivo_materias = archivo_materias
@@ -44,7 +44,7 @@ class obtener_materias():
         semestre_info['id'] = id
         return semestre_info
 
-    def define_semester(self, semestre, archivo_aux):
+    def define_semester(self, semestre, archivo_aux=None):
         '''SET THE SEMESTER WE'RE GONNA WORK WITH IN USER_SETTINGS TABLE'''
         self.cur.execute("SELECT id FROM semestres WHERE name = '" + semestre + "'")  ## busca el id del semestre que se seleccionó
         semestre = self.cur.fetchone()[0]
@@ -386,6 +386,17 @@ class obtener_materias():
         semestre = self.cur.fetchone()[0]
         return semestre
 
+    def user_info(self,columnas):
+        columnas = ",".join(columnas)
+        user_info = self.cur.execute("SELECT {} FROM users WHERE id = 1".format(columnas))
+        datos_usuario = self.cur.fetchall()
+        #convertir datos_usuario a diccionario
+        datos_usuario = dict(zip(columnas.split(","),datos_usuario[0]))
+       
+       
+        
+        return datos_usuario
+        
 
 class estatus_feedback():
     def __init__(self, archivo_materias, materia, actividad):
@@ -513,8 +524,7 @@ class goal_file():
         return resultados
 
 
-archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
-obtener_materias(archivo).status(modo=2,materia='1255',status_='Entregada con atraso')
+
 
 #archiv = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
 #goal_file(archiv,archivo,'1343','COMPORTAMIENTO EN LAS ORGANIZACIONES').change_cell()
