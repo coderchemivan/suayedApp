@@ -358,14 +358,15 @@ class ThirdWindow(Screen):
         self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[1]) * 100)}'
         self.ids.estatus_entrega.text = f' Status : {activity_status[2]}'
         self.ids.calificacion.text = f' Calificación :  {activity_status[3]}'
-        self.ids.calificado_el.text = f' Calificada el : {activity_status[4]}'
+        self.ids.calificado_el.text = f' Calificada el : {activity_status[4].strftime("%d/%m/%Y")}'
         self.ids.scroll_lable.ids.comentarios.text = f' {activity_status[5]}'
 
 
 
     #Click OK
     def on_save(self, instance, value, date_range):
-        self.ids.enviado_el.text = str(value)
+        fecha = value.strftime('%d/%m/%Y')
+        self.ids.enviado_el.text = str(fecha)
         obtener_materias().update_fecha_entregada(value)        
 
     #
