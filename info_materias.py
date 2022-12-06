@@ -242,6 +242,7 @@ class obtener_materias():
             actividad = actividad.replace("U", "Unidad ").replace(
                 "Act_compl", "Actividad complementaria"). \
                 replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "/"
+            actividad = actividad.replace('Examen/','Examen')
         self.cur.execute('''
             UPDATE user_settings SET act_sel = "''' + actividad + '''" WHERE user_id = 1
         ''')
@@ -255,6 +256,7 @@ class obtener_materias():
             actividad = actividad.replace("U", "Unidad ").replace(
                 "Act_compl", "Actividad complementaria"). \
                 replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "/"
+            actividad = actividad.replace('Examen/', 'Examen')
         '''Busca los valores del feedback de la actividad seleccionada en la p2 y los muestra en la pantalla de feedback'''
         self.cur.execute(
             "SELECT date_format(entregada_el,'%d-%m-%Y'),valor,status,calificacion,calificada_en,comentarios FROM actividades WHERE clave_materia= '" + str(clave) + "' AND name = '" + actividad + "'")
@@ -318,11 +320,11 @@ class obtener_materias():
         return grupo
 
     def actualizar_DB(self, materia, actividad):
-        #transform U8_Act integradora to Unidad 8 / Actividad integradora  /
         actividad = actividad.replace("U", "Unidad ").replace(
             "Act_compl", "Actividad complementaria"). \
-            replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace('Act_int','Actividad integradora').replace("_", " / ") + "/"
-        
+            replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace('Act_int','Actividad integradora'). \
+                replace("_", " / ") + "/"
+        actividad = actividad.replace('Examen/','Examen')
         self.cur.execute("SELECT date_format(fecha_entrega,'%d-%m-%Y') FROM actividades WHERE clave_materia= '" + str(
             materia) + "' AND name = '" + actividad + "'")
         datos_act = self.cur.fetchone()
