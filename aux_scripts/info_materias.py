@@ -10,14 +10,49 @@ import mysql.connector
 
 class DB_admin():
 
-    def __init__(self, archivo_materias=None):
+    def __init__(self, archivo_materias=None,usuario=None):
         self.archivo_materias = archivo_materias
+        self.usuario = usuario
+        self.db_connection()
+
+    def db_connection(self):
         self.conn = mysql.connector.connect(user="root", password="123456",
                                        host="localhost",
                                        database="fca_materias",
                                        port='3306'
                                        )
         self.cur = self.conn.cursor()
+
+    def load_semester(self,semestre):
+        try:
+            self.cur.execute("INSERT INTO semestres (name) VALUES ('{}')".format(semestre))
+            self.conn.commit()
+        except:
+            pass
+    def materias_por_semestre(self,semestre):
+        semestre = 'Semestre ' + semestre
+        self.cur.execute(f'''
+                        select materia,clave_materia,grupo from materias_usuario
+                        left join materias_fca 
+                        ON materias_usuario.clave_materia = materias_fca.clave
+                        where materias_usuario.semestre_id= (select id from semestres where name = '{semestre}');
+        ''')
+        materias = self.cur.fetchall()
+        materias = [dict(zip(['materia','clave_materia','grupo'],materia)) for materia in materias]
+        return materias
+
+    def load_data(self,archivo = None,semestre=None):
+        semestre_id = self.cur.execute("SELECT id FROM semestres WHERE name = '{}'".format(f"Semestre {semestre}"))
+        semestre_id = self.cur.fetchone()[0]
+        df_actividades = pd.read_excel(archivo)
+        for row in df_actividades.itertuples():
+            fecha_entrega = row.Fecha.split('/')
+            fecha_entrega = fecha_entrega[2] + '-' + fecha_entrega[1] + '-' + fecha_entrega[0]
+            ponderacion = row.Ponderación[0:1]
+            self.cur.execute('''INSERT INTO actividades (name,semestre,clave_materia,grupo,usuario,fecha_entrega,valor) 
+                                VALUES ('{}',{},{},{},{},'{}',{})'''.format(row.Actividad,semestre_id,row.Clave,row.Grupo,self.usuario,fecha_entrega,ponderacion))
+            self.conn.commit()
+
     def lista_semester(self):  # Devuelve una lista con los semestres disponibles
 
         self.cur.execute(
@@ -277,7 +312,7 @@ class DB_admin():
         feedback_.append(comentarios)
         return feedback_
 
-    def obtener_materia_name_(self,modo,subject_name_=None,semestre_=None):
+    def obtener_materia_name_(self,modo,subject_name_=None,semestre_=None,clave_materia= None):
         if modo ==1: ## Busca el nombre de la materia
             self.cur.execute("SELECT materia_sel FROM user_settings WHERE user_id = 1")
             subject_name = self.cur.fetchone()
@@ -307,6 +342,10 @@ class DB_admin():
                 "Actividad complementaria", "Act_compl"). \
                 replace("Cuestionario de reforzamiento", "Cuest_refor").replace("Actividad", "Act")
             return acti_name
+        elif modo == 5:
+            self.cur.execute("SELECT materia FROM materias_fca WHERE clave={} ".format(clave_materia))
+            subject_name = self.cur.fetchone()[0]
+            return subject_name
 
     def list_type(self):
         self.cur.execute("SELECT tipo_lista FROM user_settings WHERE user_id = 1")
@@ -314,7 +353,7 @@ class DB_admin():
         return tipo_lista[0]
 
     def obtener_materia_grupo(self, clave):
-        self.cur.execute("SELECT DISTINCT grupo FROM actividades WHERE clave_materia= '" + str(
+        self.cur.execute("SELECT  grupo FROM materias_usuario WHERE clave_materia= '" + str(
             clave)  + "'")
         grupo = self.cur.fetchone()[0]
         return grupo
@@ -524,6 +563,9 @@ class goal_file():
         return resultados
 
 
+#materias = DB_admin().materias_por_semestre(semestre='23-1')
+
+#DB_admin(usuario=1).load_data(semestre='23-2',archivo="assests/files/actividades_load.csv")
 
 
 #archiv = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
