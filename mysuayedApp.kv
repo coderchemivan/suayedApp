@@ -15,7 +15,9 @@ WindowManager:
     FourthWindow:
         id:fw
         name: 'fourthwindow'
-
+    AddSemesterWindow:
+        id:asw
+        name: 'addsemesterwindow'
 ## Contenido de la página de Login
 <LoginPage>:
     username: User
@@ -149,7 +151,7 @@ WindowManager:
 <ItemList>:
     on_press:
         root.screen_one.definir_semestre(root)
-        app.root.current = "secondwindow"
+        #app.root.current = "secondwindow"
         
 
 
@@ -506,38 +508,7 @@ WindowManager:
                             pos: self.pos
                             size: self.size
 
-        # MDCarousel:
-        #     FloatLayout:
-        #         spacing:5
-        #         size_hint:1,0.7
-        #         pos_hint:{"x":0,"y":0}
-        #         canvas.before:
-        #             Color:
-        #                 rgba: 1, 1, 1, 0.4
-        #             Rectangle:
-        #                 pos: self.pos
-        #                 size: self.size
-        #         Image:
-        #             id: materia_progreso
-        #             size_hint: 0.8,0.9
-        #             pos_hint:{"x":0.1,"top":1}
-        #             allow_stretch: True
-        #             keep_ratio: False
-        #     FloatLayout:
-        #         id: tabla
-        #         spacing:5
-        #         size_hint:1,0.7
-        #         pos_hint:{"x":0,"y":0}
-        #         canvas.before:
-        #             Color:
-        #                 rgba: 1, 1, 1, 0.4
-        #             Rectangle:
-        #                 pos: self.pos
-        #                 size: self.size
-
-
-
-
+ 
 <Content>
     orientation: "vertical"
     spacing: "12dp"
@@ -548,4 +519,87 @@ WindowManager:
         hint_text: "Introduce tu calificación objetivo"
 
 
+<AddSemesterWindow>:
+    FloatLayout:
+        FloatLayout:
+            orientation: "horizontal"
+            MDTopAppBar:
+                id: top_bar_w5
+                title : ""
+                size_hint: 1,0.1
+                pos_hint:{"top":1}
+                elevation: 10
+                left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]
 
+        FloatLayout:
+            orientation: "horizontal"
+            spacing:5
+            size_hint:1,0.1
+            pos_hint:{"x":0,"y":0.8}
+            MDRaisedButton:
+                id: semestre
+                text: "Semestre"
+                pos_hint: {"center_x": .2, "center_y": .5}
+                #size
+                size_hint: 0.2,0.2
+                on_release: root.menu_semestres.open()
+            MDRaisedButton:
+                id: materias
+                text: "Materia"
+                pos_hint: {"center_x": .5, "center_y": .5}
+                on_release: root.menu_materias.open()
+            MDTextField:
+                id: grupo
+                hint_text: "Grupo"
+                pos_hint: {"center_x": .8, "center_y": .5}
+                size_hint: 0.2,1
+
+        FloatLayout:
+            orientation: "horizontal"
+            spacing:5
+            size_hint:1,0.1
+            pos_hint:{"x":0,"y":0.70}
+            MDRaisedButton:
+                id: insertar_materia
+                text: "Aceptar"
+                pos_hint: {"center_x": .5, "center_y": .5}
+                on_release: root.menu_materias.open()
+                #color verde
+                md_bg_color: 0.2, 0.7, 0.2, 1
+                on_release: root.add_materia_a_tabla()
+
+        FloatLayout:
+            orientation: "horizontal"
+            spacing:5
+            size_hint:1,0.6
+            pos_hint:{"x":0,"y":0.1}
+            canvas.before:
+                Color:
+                    rgba: 1, 1, 1, 0.4
+                Rectangle:
+                    pos: self.pos
+                    size: self.size  
+            FloatLayout:
+                id: add_semester_table
+                spacing:5
+                size_hint:1,1
+                pos_hint:{"x":0,"y":0}
+                canvas.before:
+                    Color:
+                        rgba: 1, 1, 1, 0.4
+                    Rectangle:
+                        pos: self.pos
+                        size: self.size
+
+        FloatLayout:
+            orientation: "horizontal"
+            spacing:5
+            size_hint:1,0.1
+            pos_hint:{"x":0,"y":0}
+            MDRaisedButton:
+                id: insertar_semestre
+                text: "Insertar materias"
+                pos_hint: {"center_x": .5, "center_y": .5}
+                #color verde
+                md_bg_color: 0.2, 0.7, 0.2, 1
+                on_release: root.agregar_materias_DB()

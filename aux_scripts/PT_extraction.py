@@ -3,8 +3,8 @@ import pandas as pd
 import re
 import datetime
 from time import sleep
+#from aux_scripts.info_materias import DB_admin
 from info_materias import DB_admin
-
 
 from selenium import webdriver
 from selenium.webdriver.common.by import By
@@ -19,9 +19,8 @@ import requests
 class Planes_de_trabajo():
   def __init__(self,semestre=None):
     self.semestre = semestre
-   
 
-  def descargaPlanes(self,modalidad=None):
+  def define_driver_opts(self):
     opts = Options()
     opts.add_argument(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36.")
@@ -29,9 +28,45 @@ class Planes_de_trabajo():
         "download.default_directory": r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\files\planes_de_trabajo",
     })
     driver = webdriver.Chrome(service=ChromeService(executable_path=ChromeDriverManager().install()),options=opts)
+    return driver
+
+  def get_fca_subjects(self):
+    list_url = [f'https://planes-trabajo.fca.unam.mx/distancia/2012/{num}' for num in range(1,9)]
+    materias_ = []
+    for index,url in enumerate(list_url):
+        driver = self.define_driver_opts()
+        driver.get(url)
+        materias = driver.find_elements(By.XPATH,"//table[@class='table table-striped']//td[@style='width:10%']")
+        materias_name = [x.text for x in driver.find_elements(By.XPATH,"//th[@class='table-primary']")]
+        clave_carrera = []
+        for i in range(0,len(materias),6):
+            clave = materias[i].text
+            carrera = materias[i+2].text
+            clave_carrera.append(clave+'_'+carrera)
+        lista_clave_carrera =[]
+        for x in clave_carrera:
+            if x not in lista_clave_carrera:
+                lista_clave_carrera.append(x)
+        
+        #juntar materias_name y clave_carrera en una lista
+        for i in range(len(lista_clave_carrera)):
+            materias_.append(materias_name[i]+'_'+lista_clave_carrera[i]+'_'+str(index+1))
+    #pasar la lista a un dataframe
+    df = pd.DataFrame(materias_,columns=['Materia'])
+    df['clave_materia'] = df['Materia'].apply(lambda x: x.split('_')[1])
+    df['carrera'] = df['Materia'].apply(lambda x: x.split('_')[2])
+    df['materia'] = df['Materia'].apply(lambda x: x.split('_')[0]) 
+    df['semestre'] = df['Materia'].apply(lambda x: x.split('_')[3])
+    df.drop('Materia',axis=1,inplace=True)
+    #pasar las carreras a columnas con pivot
+    df = df.pivot(index=['clave_materia','materia','semestre'],columns='carrera',values='carrera').reset_index()
+    #guardar el df en un csv
+    df.to_csv('assests/files/materias_fca.csv',index=True)
+
+  def descargaPlanes(self,modalidad=None):
+    driver = self.define_driver_opts()
     if modalidad =="d":
-        materias = DB_admin().materias_por_semestre(self.semestre)
-        print(materias)
+        materias = DB_admin().materias_por_semestre(self.semestre,usuario='1')
         for materia in materias:
             materia_name = materia['materia']
             grupo = materia['grupo']
@@ -243,7 +278,6 @@ class Planes_de_trabajo():
         tipo = type(celda)
         if type(celda) != str:
           continue
-
         target_months = '|'.join(meses.keys())
         my_regex = "(\d{2}\sde\s("  + target_months + "))"                               
         fecha = re.findall(my_regex, celda)
@@ -265,6 +299,7 @@ class Planes_de_trabajo():
   def df_formating(self,table,año,semestre,meses):
     '''dataframe fromat prepareation '''
     table['Unidad'] = table['Unidad'].str.slice(0,8)
+    print(table)
     table['Unidad'] = table['Unidad'].str.replace('UNIDAD ','U')
     table['Actividad'] = table['Actividad'].str.replace('\n',' ')
     #concatenar el año a la fecha
@@ -289,5 +324,7 @@ class Planes_de_trabajo():
 
 
 c = Planes_de_trabajo(semestre ='23-1').descargaPlanes(modalidad='d')
+
+#c = Planes_de_trabajo().get_fca_subjects()
 
 

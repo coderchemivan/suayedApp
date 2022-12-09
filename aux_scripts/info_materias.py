@@ -23,22 +23,46 @@ class DB_admin():
                                        )
         self.cur = self.conn.cursor()
 
-    def load_semester(self,semestre):
-        try:
-            self.cur.execute("INSERT INTO semestres (name) VALUES ('{}')".format(semestre))
+    def semester_añadido_info(self,semestre=None,accion=None,materias=None):
+        if accion == 'insertar':
+            try:
+                self.cur.execute("INSERT INTO semestres (name) VALUES ('{}')".format(semestre))
+                self.conn.commit()
+            except:
+                pass
+        elif accion == 'update':
+            self.cur.execute("UPDATE user_settings SET semestre_a_seleccionar = {} WHERE user_id = 1".format(semestre))
             self.conn.commit()
-        except:
-            pass
-    def materias_por_semestre(self,semestre):
-        semestre = 'Semestre ' + semestre
-        self.cur.execute(f'''
-                        select materia,clave_materia,grupo from materias_usuario
-                        left join materias_fca 
-                        ON materias_usuario.clave_materia = materias_fca.clave
-                        where materias_usuario.semestre_id= (select id from semestres where name = '{semestre}');
-        ''')
-        materias = self.cur.fetchall()
-        materias = [dict(zip(['materia','clave_materia','grupo'],materia)) for materia in materias]
+        elif accion == 'select':
+            self.cur.execute("SELECT semestre_a_seleccionar FROM user_settings")
+            semestre = self.cur.fetchone()[0]
+            return semestre
+        elif accion == 'insertar_materias':
+            print("SELECT id FROM semestres WHERE name = '{}')".format(semestre))
+            semestre_id = self.cur.execute("SELECT id FROM semestres WHERE name = '{}'".format(semestre))
+            semestre_id = self.cur.fetchone()[0]
+            for materia in materias:
+                clave = materia['clave_materia']
+                grupo = materia['grupo']
+                self.cur.execute("INSERT INTO materias_usuario (clave_materia,user_id,semestre_id,grupo,meta) VALUES ({},{},{},{},{})".format(clave,self.usuario,semestre_id,grupo,10))
+                self.conn.commit()
+
+            
+    def materias_por_semestre(self,semestre,usuario=None,carrera=None):
+        if usuario == None:
+            self.cur.execute("SELECT*FROM materias_fca_ WHERE semestre = {} and {} = 1;".format(semestre,carrera))
+            materias = self.cur.fetchall()
+            materias = [dict(zip(['clave','materia','semestre','Administración'],materia)) for materia in materias]
+        else:
+            semestre = 'Semestre ' + semestre
+            self.cur.execute(f'''
+                            select materia,clave_materia,grupo from materias_usuario
+                            left join materias_fca 
+                            ON materias_usuario.clave_materia = materias_fca.clave
+                            where materias_usuario.semestre_id= (select id from semestres where name = '{semestre}');
+            ''')
+            materias = self.cur.fetchall()
+            materias = [dict(zip(['materia','clave_materia','grupo'],materia)) for materia in materias]
         return materias
 
     def load_data(self,archivo = None,semestre=None):
@@ -204,10 +228,10 @@ class DB_admin():
                 fecha_entrega = datetime.datetime.strptime(fecha_entrega, '%d-%m-%Y')
                 hoy = datetime.datetime.today()
                 if entregada_el == None:
-                    status_ = 'Por entregar' if hoy <= fecha_entrega else 'Atrasada'
+                    status_ = 'Por entregar' if hoy.date() <= fecha_entrega.date() else 'Atrasada'
                 else:
                     entregada_el = datetime.datetime.strptime(entregada_el, '%d-%m-%Y')
-                    status_ = 'Entregada a tiempo' if entregada_el<=fecha_entrega else 'Entregada con atraso'
+                    status_ = 'Entregada a tiempo' if entregada_el.date()<=fecha_entrega.date() else 'Entregada con atraso'
                 i+=1
                 self.cur.execute("UPDATE actividades SET status = '{}' WHERE name = '{}' and clave_materia = {}".format(status_,act,clave_materia))
                 self.conn.commit()
@@ -343,9 +367,15 @@ class DB_admin():
                 replace("Cuestionario de reforzamiento", "Cuest_refor").replace("Actividad", "Act")
             return acti_name
         elif modo == 5:
-            self.cur.execute("SELECT materia FROM materias_fca WHERE clave={} ".format(clave_materia))
+            self.cur.execute("SELECT materia FROM materias_fca_ WHERE clave={} ".format(clave_materia))
             subject_name = self.cur.fetchone()[0]
             return subject_name
+        elif modo == 6:
+            print("SELECT clave FROM materias_fca WHERE materia={} ".format(subject_name_))
+            self.cur.execute("SELECT clave_materia FROM materias_fca_ WHERE materia='{}' ".format(subject_name_))
+            clave_materia = self.cur.fetchone()[0]
+            return clave_materia
+
 
     def list_type(self):
         self.cur.execute("SELECT tipo_lista FROM user_settings WHERE user_id = 1")

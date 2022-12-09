@@ -52,6 +52,7 @@ import csv
 import subprocess
 from aux_scripts.info_materias import DB_admin
 from aux_scripts.info_materias import goal_file
+from aux_scripts.PT_extraction import Planes_de_trabajo
 
 # Web scrapping
 from time import sleep
@@ -133,10 +134,16 @@ class FirstWindow(Screen):
                 ItemList(text = semestre))
             except:
                 pass   
-
+        self.ids.nav_drawer_content.ids.md_list.add_widget(
+        ItemList(text = 'Agregar semestre'))
     def definir_semestre(instance):
-        semestre = instance.text
-        DB_admin().define_semester(semestre) 
+        if instance.text != 'Agregar semestre':
+            semestre = instance.text
+            DB_admin().define_semester(semestre) 
+            sm.current ="secondwindow"
+        else:
+            sm.current = "addsemesterwindow"
+            DB_admin().semester_añadido_info(semestre='1',accion='update')
 
 
     def on_save(self, instance, value, date_range):
@@ -439,7 +446,89 @@ class FourthWindow(Screen):
     def closeDialog(self,int):
         self.dialog.dismiss()
 
+class AddSemesterWindow(Screen):
+    def __init__(self,**kwargs):
+        super(AddSemesterWindow,self).__init__(**kwargs)
+    def on_pre_enter(self, *args):
+        self.ids.top_bar_w5.title = "Añade las materias que cursarás en este semestre"
+        self.data_tables = MDDataTable(
+            size_hint=(0.9, 0.9),
+            pos_hint = {"x":0.05,"y":0.05},
+            use_pagination=True,
+            column_data=[
+                ("Materia", dp(60)),
+                ("Grupo", dp(30)),
+                
+            ],
+            row_data=[]
+        )
+        self.ids.add_semester_table.add_widget(self.data_tables)
 
+
+        menu_semestre_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": f"{str(i)} ° semestre",
+                "height": dp(40),
+                "on_release": lambda x=i: self.on_select_item_menu(x),
+            } for i in range(1,9)
+        ]
+        self.menu_semestres = MDDropdownMenu(
+            caller=self.ids.semestre,
+            items=menu_semestre_items,
+            width_mult=4,
+        )
+
+
+    def go_back(self):
+        sm.current = "firstwindow"
+    def on_select_item_menu(self, text_item):
+        DB_admin().semester_añadido_info(semestre=text_item,accion='update')
+        semestre_a_seleccionar =  DB_admin().semester_añadido_info(accion='select')
+        materias = DB_admin().materias_por_semestre(carrera="Administración",semestre=semestre_a_seleccionar)
+        materias_name = [x['materia'] for x in materias]
+        '''menu de materias'''
+        menu_materias_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": materia,
+                "height": dp(40),
+                "on_release": lambda x=materia: self.on_select_item_menu_materias(x),
+            } for materia in materias_name
+        ]
+        self.menu_materias = MDDropdownMenu(
+            caller=self.ids.semestre,
+            items=menu_materias_items,
+            width_mult=4,
+        )
+        self.menu_semestres.dismiss()
+    def on_select_item_menu_materias(self, text_item):
+        materia = text_item.title()
+        grupo = self.ids.grupo.text
+        if grupo != "":
+            self.add_materia_a_tabla(materia=materia,grupo=grupo)
+            self.menu_materias.dismiss()
+
+    def add_materia_a_tabla(self,materia,grupo):
+        self.data_tables.row_data.append((materia,grupo))
+
+    def agregar_materias_DB(self):
+        materias = self.data_tables.row_data
+        lista_materias = []
+        for materia in materias:
+            dicc = {}
+            dicc['nombre'] = materia[0].upper()
+            dicc['grupo'] = materia[1]
+            dicc['clave_materia'] = DB_admin().obtener_materia_name_(modo=6,subject_name_=materia[0].upper())
+            lista_materias.append(dicc)
+        semestre = 'Semestre 23-2'
+        DB_admin().semester_añadido_info(semestre=semestre,accion='insertar')
+        DB_admin(usuario=1).semester_añadido_info(semestre=semestre,materias=lista_materias,accion='insertar_materias')
+        Planes_de_trabajo(semestre =semestre.split(' ')[1]).descargaPlanes(modalidad='d')
+
+        
+        
+            
 class ContentNavigationDrawer(MDBoxLayout): #Pertenece a la página principal
     nav_drawer = ObjectProperty()
     sm2 = ScreenManager()
@@ -497,6 +586,7 @@ class suayedApp(MDApp):
         sm.add_widget(SecondWindow(name='secondwindow'))
         sm.add_widget(ThirdWindow(name='thirdwindow'))
         sm.add_widget(FourthWindow(name='fourthwindow'))
+        sm.add_widget(AddSemesterWindow(name='addsemesterwindow'))
         return sm
 
     def go_back(self,pantalla):
