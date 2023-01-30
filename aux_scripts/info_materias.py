@@ -6,7 +6,7 @@ import xlwings as xw
 from openpyxl import load_workbook
 import calendar
 import mysql.connector
-
+import re
 
 class DB_admin():
 
@@ -50,16 +50,16 @@ class DB_admin():
             
     def materias_por_semestre(self,semestre,usuario=None,carrera=None):
         if usuario == None:
-            self.cur.execute("SELECT*FROM materias_fca_ WHERE semestre = {} and {} = 1;".format(semestre,carrera))
+            self.cur.execute("SELECT*FROM materias_fca WHERE semestre = {} and {} = 1;".format(semestre,carrera))
             materias = self.cur.fetchall()
             materias = [dict(zip(['clave','materia','semestre','Administración'],materia)) for materia in materias]
         else:
             semestre = 'Semestre ' + semestre
             self.cur.execute(f'''
-                            select materia,clave_materia,grupo from materias_usuario
-                            left join materias_fca 
-                            ON materias_usuario.clave_materia = materias_fca.clave
-                            where materias_usuario.semestre_id= (select id from semestres where name = '{semestre}');
+                            select mf.materia,mu.clave_materia,mu.grupo from materias_usuario as mu
+                            left join materias_fca as mf 
+                            ON mu.clave_materia = mf.clave_materia
+                            where mu.semestre_id= (select id from semestres where name = '{semestre}');
             ''')
             materias = self.cur.fetchall()
             materias = [dict(zip(['materia','clave_materia','grupo'],materia)) for materia in materias]
@@ -68,13 +68,13 @@ class DB_admin():
     def load_data(self,archivo = None,semestre=None):
         semestre_id = self.cur.execute("SELECT id FROM semestres WHERE name = '{}'".format(f"Semestre {semestre}"))
         semestre_id = self.cur.fetchone()[0]
-        df_actividades = pd.read_excel(archivo)
+        df_actividades = pd.read_csv(archivo,encoding='latin1')
         for row in df_actividades.itertuples():
-            fecha_entrega = row.Fecha.split('/')
+            fecha_entrega = row.fecha_entrega.split('/')
             fecha_entrega = fecha_entrega[2] + '-' + fecha_entrega[1] + '-' + fecha_entrega[0]
-            ponderacion = row.Ponderación[0:1]
-            self.cur.execute('''INSERT INTO actividades (name,semestre,clave_materia,grupo,usuario,fecha_entrega,valor) 
-                                VALUES ('{}',{},{},{},{},'{}',{})'''.format(row.Actividad,semestre_id,row.Clave,row.Grupo,self.usuario,fecha_entrega,ponderacion))
+            ponderacion = row.valor
+            self.cur.execute('''REPLACE INTO actividades (name,semestre,clave_materia,usuario,fecha_entrega,valor) 
+                                VALUES ('{}',{},{},{},'{}',{})'''.format(row.name,semestre_id,row.clave_materia,self.usuario,fecha_entrega,ponderacion))
             self.conn.commit()
 
     def lista_semester(self):  # Devuelve una lista con los semestres disponibles
@@ -157,8 +157,8 @@ class DB_admin():
                 actividades.append(acti_name)
                 materia_nombre = '''SELECT materia FROM materias_fca  
                                     JOIN actividades 
-                                    ON materias_fca.clave = actividades.clave_materia
-                                    where materias_fca.clave =''' + str(clave) + ''' LIMIT 1'''
+                                    ON materias_fca.clave_materia = actividades.clave_materia
+                                    where materias_fca.clave_materia =''' + str(clave) + ''' LIMIT 1'''
                 self.cur.execute(materia_nombre)
                 status_ = self.cur.fetchone()
                 status.append(status_[0])
@@ -184,13 +184,13 @@ class DB_admin():
         if modo ==1: ## Se presionó el butón
 
 
-            if remember_status == 1:
+            if remember_status == 0:
                 self.cur.execute('''
-                    UPDATE user_settings SET recordar_inicio_sesion=0 WHERE user_id = 1
+                    UPDATE user_settings SET recordar_inicio_sesion=1 WHERE user_id = 1
                 ''')
             else:
                 self.cur.execute('''
-                    UPDATE user_settings SET recordar_inicio_sesion=1 WHERE user_id = 1
+                    UPDATE user_settings SET recordar_inicio_sesion=0 WHERE user_id = 1
                 ''')
 
             self.conn.commit()
@@ -205,7 +205,7 @@ class DB_admin():
         semestre = self.cur.fetchone()[0]
 
 
-        materias = "SELECT DISTINCT materia FROM materias_fca JOIN actividades ON materias_fca.clave = actividades.clave_materia WHERE actividades.semestre ='" + semestre + "'"
+        materias = "SELECT DISTINCT materia FROM materias_fca JOIN actividades ON materias_fca.clave_materia = actividades.clave_materia WHERE actividades.semestre ='" + semestre + "'"
         self.cur.execute(materias)
         materias = self.cur.fetchall()
         materias_ = list()
@@ -296,12 +296,12 @@ class DB_admin():
         '''Estblece en la tabla user_settings el valor de la act seleccionada en la pantalla 2'''
         if "Act_compl" in actividad:
             actividad = actividad.replace("U", "Unidad ").replace(
-                "Act_compl", "Actividad complementaria").replace("_", " / ") + "/"
+                "Act_compl", "Actividad complementaria").replace("_", " / ") + "//"
         else:
             actividad = actividad.replace("U", "Unidad ").replace(
                 "Act_compl", "Actividad complementaria"). \
-                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "/"
-            actividad = actividad.replace('Examen/','Examen')
+                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "//"
+            actividad = actividad.replace('Examen//','Examen')
         self.cur.execute('''
             UPDATE user_settings SET act_sel = "''' + actividad + '''" WHERE user_id = 1
         ''')
@@ -310,12 +310,15 @@ class DB_admin():
     def estado_actividad(self, clave, actividad):
         if "Act_compl" in actividad:
             actividad = actividad.replace("U", "Unidad ").replace(
-                "Act_compl", "Actividad complementaria").replace("_", " / ") + "/"
+                "Act_compl", "Actividad complementaria").replace("_", " / ") + "//"
         else:
             actividad = actividad.replace("U", "Unidad ").replace(
                 "Act_compl", "Actividad complementaria"). \
-                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "/"
-            actividad = actividad.replace('Examen/', 'Examen')
+                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "//"
+            actividad = actividad.replace('Examen//', 'Examen')
+        if "Examen" not in actividad:
+            c = re.split(r'(Unidad \d+)', actividad)
+            actividad = c[1] + " // " + c[2].lstrip()
         '''Busca los valores del feedback de la actividad seleccionada en la p2 y los muestra en la pantalla de feedback'''
         self.cur.execute(
             "SELECT date_format(entregada_el,'%d-%m-%Y'),valor,status,calificacion,calificada_en,comentarios FROM actividades WHERE clave_materia= '" + str(clave) + "' AND name = '" + actividad + "'")
@@ -344,16 +347,16 @@ class DB_admin():
         elif modo ==2: ## Seleccionad el primer nombre de la materia que encuentre de acuerdo al semestre
             self.cur.execute( '''SELECT DISTINCT materia FROM materias_fca
                                 JOIN actividades  
-                                ON materias_fca.clave = actividades.clave_materia   
-                                WHERE semestre = {}
+                                ON materias_fca.clave_materia = actividades.clave_materia   
+                                WHERE actividades.semestre = {}
                                 LIMIT 1'''.format(semestre_))
             subject_name = self.cur.fetchone()
             return subject_name
         elif modo ==3:   ## Busca la clave de la materia
             self.cur.execute( '''
-            SELECT DISTINCT clave FROM materias_fca
-            JOIN actividades
-            ON materias_fca.clave = actividades.clave_materia
+            SELECT DISTINCT mf.clave_materia FROM materias_fca as mf
+            JOIN actividades as act
+            ON mf.clave_materia = act.clave_materia
             WHERE materia = "''' + subject_name_ + '''"''')
             clave = self.cur.fetchone()
             return clave
@@ -367,12 +370,12 @@ class DB_admin():
                 replace("Cuestionario de reforzamiento", "Cuest_refor").replace("Actividad", "Act")
             return acti_name
         elif modo == 5:
-            self.cur.execute("SELECT materia FROM materias_fca_ WHERE clave={} ".format(clave_materia))
+            self.cur.execute("SELECT materia FROM materias_fca WHERE clave_materia={} ".format(clave_materia))
             subject_name = self.cur.fetchone()[0]
             return subject_name
         elif modo == 6:
-            print("SELECT clave FROM materias_fca WHERE materia={} ".format(subject_name_))
-            self.cur.execute("SELECT clave_materia FROM materias_fca_ WHERE materia='{}' ".format(subject_name_))
+            print("SELECT clave_materia FROM materias_fca WHERE materia={} ".format(subject_name_))
+            self.cur.execute("SELECT clave_materia FROM materias_fca WHERE materia='{}' ".format(subject_name_))
             clave_materia = self.cur.fetchone()[0]
             return clave_materia
 
@@ -392,8 +395,8 @@ class DB_admin():
         actividad = actividad.replace("U", "Unidad ").replace(
             "Act_compl", "Actividad complementaria"). \
             replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace('Act_int','Actividad integradora'). \
-                replace("_", " / ") + "/"
-        actividad = actividad.replace('Examen/','Examen')
+                replace("_", " / ") + "//"
+        actividad = actividad.replace('Examen//','Examen')
         self.cur.execute("SELECT date_format(fecha_entrega,'%d-%m-%Y') FROM actividades WHERE clave_materia= '" + str(
             materia) + "' AND name = '" + actividad + "'")
         datos_act = self.cur.fetchone()
@@ -417,7 +420,7 @@ class DB_admin():
         materia_act = self.cur.fetchone()
         materia = materia_act[0]
         actividad = materia_act[1]
-        clave_materia = self.cur.execute("SELECT clave FROM materias_fca WHERE materia = '{}'".format(materia))
+        clave_materia = self.cur.execute("SELECT clave_materia FROM materias_fca WHERE materia = '{}'".format(materia))
         clave_materia = self.cur.fetchone()[0]
         self.cur.execute("UPDATE actividades SET entregada_el = date_format('{}','%Y-%m-%d') WHERE clave_materia= '{}' AND name = '{}'".format(fecha_entregada,clave_materia,actividad))
         self.conn.commit()
@@ -458,6 +461,7 @@ class DB_admin():
     def user_info(self,columnas):
         columnas = ",".join(columnas)
         user_info = self.cur.execute("SELECT {} FROM users WHERE id = 1".format(columnas))
+        print("SELECT {} FROM users WHERE id = 1".format(columnas))
         datos_usuario = self.cur.fetchall()
         #convertir datos_usuario a diccionario
         datos_usuario = dict(zip(columnas.split(","),datos_usuario[0]))
@@ -593,9 +597,10 @@ class goal_file():
         return resultados
 
 
-#materias = DB_admin().materias_por_semestre(semestre='23-1')
+#materias = DB_admin().materias_por_semestre(semestre='23-2',usuario='1')
+#print(materias)
 
-#DB_admin(usuario=1).load_data(semestre='23-2',archivo="assests/files/actividades_load.csv")
+DB_admin(usuario=1).load_data(semestre='23-2',archivo="assests/files/actividades_por_materia/actividades_load.csv")
 
 
 #archiv = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'

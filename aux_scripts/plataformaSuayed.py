@@ -99,7 +99,7 @@ class Feedback():
                 except:
                     try:
                         actividad = self.driver.find_element(By.XPATH,
-                                                            './/span[contains(text(),"' + activity.replace('/','//') + '")]').click()
+                                                            './/span[contains(text(),"' + activity.replace('//','/') + '")]').click()
                     except:
                         print(activity)
                         continue

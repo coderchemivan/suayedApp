@@ -1,11 +1,11 @@
 import pdfplumber
+import xlwings as xw
 import pandas as pd
 import re
 import datetime
 from time import sleep
-#from aux_scripts.info_materias import DB_admin
-from info_materias import DB_admin
-
+from aux_scripts.info_materias import DB_admin
+#from info_materias import DB_admin
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -19,6 +19,10 @@ import requests
 class Planes_de_trabajo():
   def __init__(self,semestre=None):
     self.semestre = semestre
+    self.semestre_info = self.semestre.split('-')
+    self.resta = 0 if self.semestre_info[1] == '2' else 1
+    self.año = '20' + (str(int(self.semestre_info[0])-self.resta))
+    self.semestre_num = self.semestre_info[1]
 
   def define_driver_opts(self):
     opts = Options()
@@ -63,14 +67,14 @@ class Planes_de_trabajo():
     #guardar el df en un csv
     df.to_csv('assests/files/materias_fca.csv',index=True)
 
-  def descargaPlanes(self,modalidad=None):
+  def descargaPlanes(self,modalidad=None,materias=None):
     driver = self.define_driver_opts()
     if modalidad =="d":
-        materias = DB_admin().materias_por_semestre(self.semestre,usuario='1')
+        materias = DB_admin().materias_por_semestre(self.semestre,usuario='1') if materias == None else materias
         for materia in materias:
             materia_name = materia['materia']
             grupo = materia['grupo']
-            semestre_num = grupo[1:2]
+            semestre_num = str(grupo)[1:2]
             clave_materia = materia['clave_materia']
             url = f'https://planes-trabajo.fca.unam.mx/distancia/2012/{semestre_num}'
             driver.get(url)
@@ -103,40 +107,41 @@ class Planes_de_trabajo():
                     else:
                         print('no se encontro el plan de trabajo de la materia {} en el semestre {}'.format(materia_name,self.semestre))
             self.parse(local_filename)
+        self.call_macro()
 
   def mes_digit(self,mes,monthNameEnSp):
       if mes == 'enero':
-          if monthNameEnSp == int(3):
+          if monthNameEnSp == 1:
               return "01"
           else:
               return "January"
       elif mes == 'febrero':
-          if monthNameEnSp == int(3):
+          if monthNameEnSp == 1:
               return "02"
           else:
               return "February"
       elif mes == 'marzo':
-          if monthNameEnSp == int(3):
+          if monthNameEnSp == 1:
               return "03"
           else:
               return "March"
       elif mes == 'abril':
-          if monthNameEnSp == int(3):
+          if monthNameEnSp == 1:
               return "04"
           else:
               return "April"
       elif mes == 'mayo':
-          if monthNameEnSp == int(3):
+          if monthNameEnSp == 1:
               return "05"
           else:
               return "May"
       elif mes == 'junio':
-          if monthNameEnSp == int(3):
+          if monthNameEnSp == 1:
               return "06"
           else:
               return "June"
       elif mes == 'julio':
-          if monthNameEnSp == int(3):
+          if monthNameEnSp == 1:
               return "07"
           else:
               return "July"
@@ -183,12 +188,12 @@ class Planes_de_trabajo():
         fechas2 = list()
         text = self.pdf_text(archivo=archivo)
         text_extracion = re.findall('(CALENDARIO DE ACTIVIDADES.+VII.+Sistema.+FACTORES)', text)
-        fechas = re.findall('(\d{2}\sde\s(agosto|septiembre|octubre|noviembre|diciembre))', text_extracion[0])
+        fechas = re.findall('(\d{2}\sde\s(agosto|septiembre|octubre|noviembre|diciembre))', text_extracion[0]) if self.semestre_num== '1' else re.findall('(\d{2}\sde\s(enero|febrero|marzo|abril|mayo|junio|julio))', text_extracion[0])
         fechas = [fecha[0] for fecha in fechas if fecha[0] != '']
         fechas = fechas
 
         for bb in range(0, len(fechas)):
-            fecha = fechas[bb].replace(' ', '').replace('de', " ") + ' 2022'
+            fecha = fechas[bb].replace(' ', '').replace('de', " ") + ' ' + self.año
             fechas[bb] = fecha
 
 
@@ -215,7 +220,8 @@ class Planes_de_trabajo():
                     pass
             else:
 
-                fech = fechas[bb].replace(" ", "/")
+                fech = fechas[bb].replace(" ", "/").replace(fechas[bb].split(' ')[1],
+                                                    self.mes_digit(fechas[bb].split(' ')[1], 1))
                 fechas2.append(fech)
     except Exception as e:
         pass
@@ -238,12 +244,15 @@ class Planes_de_trabajo():
     clave_materia = re.findall('Grupo (\d{4})', text_datos_materia[0])
     return clave_materia[0]
 
+  def call_macro(self,archivo=None):
+    app = xw.App(visible=False)
+    wb = xw.Book('assests/files/actividades_por_materia/1.juntar_act.xlsm')
+    macro1 = wb.macro('Juntar_materias.create_sheets')
+    macro1()
+
   def parse(self,archivo=None):
     pdf = pdfplumber.open(archivo)
-    semestre_info = self.semestre.split('-')
-    año = '20' + (str(int(semestre_info[0])-1))
-    semestre = semestre_info[1]
-    meses = {'agosto':'08','septiembre':'09','octubre':'10','noviembre':'11','diciembre':'12'} if semestre == '1' else {'enero':'01','febrero':'02','marzo':'03','abril':'04','mayo':'05','junio':'06'} 
+    meses = {'agosto':'08','septiembre':'09','octubre':'10','noviembre':'11','diciembre':'12'} if self.semestre_num == '1' else {'febrero':'02','marzo':'03','abril':'04','mayo':'05','junio':'06'} 
     paginas = pdf.pages
     inicio = False
     final = False
@@ -288,26 +297,37 @@ class Planes_de_trabajo():
             table.iloc[i,1] = unidad[0]
             table.iloc[i,4] = ponderacion[0]
     df2 = self.Dates_dataFrame(archivo=archivo)
-    table = pd.concat([table,df2],axis=0)
-    table = self.df_formating(table,año,semestre,meses)
-    table = table.drop_duplicates(subset=['Fecha'], keep='first')
+    table = self.df_formating(table,self.año,self.semestre,meses)
+    table = pd.merge(table,df2,how='outer',on='Fecha')
+    #cambiar el formato de la columna fecha de dd/mm/yyyy a yyyy/mm/dd
+    table['Fecha'] = pd.to_datetime(table['Fecha'],format='%d/%m/%Y')
+    table['Fecha'] = table['Fecha'].dt.strftime('%Y/%m/%d')
+    table = table.drop(columns=['Unidad_y','Actividad_y','Ponderacion_y'])
+    table = table.rename(columns={'Unidad_x':'Unidad','Actividad_x':'Actividad','Ponderacion_x':'Ponderacion'})
+    table = table.drop_duplicates(subset=['Fecha','Actividad'],keep='first')
+    #ordenar el df por fecha
+    table = table.sort_values(by='Fecha')
     table['Semestre'] = "'"+self.semestre
     table['Clave'] = self.clave_materia(archivo=archivo)
     table['Grupo'] = self.grupo(archivo=archivo)
     self.df_to_csv(table,self.clave_materia(archivo=archivo))
     
+    
   def df_formating(self,table,año,semestre,meses):
     '''dataframe fromat prepareation '''
     table['Unidad'] = table['Unidad'].str.slice(0,8)
-    print(table)
-    table['Unidad'] = table['Unidad'].str.replace('UNIDAD ','U')
-    table['Actividad'] = table['Actividad'].str.replace('\n',' ')
+    table['Unidad'] = table['Unidad'].str.replace('UNIDAD ','')
+    replacements = {'\n':' ','Act. de aprendizaje':'apren','Cuestionario de reforzamiento':'refor','Act. complementaria':'com',
+                    'Foros':'foro','Act. lo que aprendí':'loque','Act. lo que aprendí':'loque'}
+    for k,v in replacements.items():
+        table['Actividad'] = table['Actividad'].str.replace(k,v)
     #concatenar el año a la fecha
     table['Fecha'] = table['Fecha'].str.replace('\n',' ')
     table['Ponderacion'] = table['Ponderacion'].str.replace(' %',' ')
     for mes,mes_num in meses.items():
       table['Fecha'] = table['Fecha'].str.replace(' de '+mes,'/'+ mes_num +'/'+año)
-    table['Fecha'] = table['Fecha'].str.replace(' de 2022','')
+    text_to_replace = ' de {}'.format(self.año)
+    table['Fecha'] = table['Fecha'].str.replace(text_to_replace,'')
     table = table[table['Fecha'].str.contains('\d{2}/\d{2}/\d{4}')]
     table = table.reset_index(drop=True)
     table = table.drop(columns=['Descripción'])
@@ -323,7 +343,7 @@ class Planes_de_trabajo():
 #df1.clave_materia()
 
 
-c = Planes_de_trabajo(semestre ='23-1').descargaPlanes(modalidad='d')
+#c = Planes_de_trabajo(semestre ='23-2').descargaPlanes(modalidad='d',materias = [{'materia':'PRESUPUESTOS','grupo':'8451','clave_materia':'1454'}])
 
 #c = Planes_de_trabajo().get_fca_subjects()
 

@@ -82,7 +82,7 @@ class LoginPage(Screen):
         Clock.schedule_once(self.remember_)
 
     def remember_(self,*args):
-        remember = DB_admin().remember_status(modo=2)  ##listo
+        remember = DB_admin().remember_status(modo=0)  
         user = '421157110'
         pass_ = '16091997'
         if remember == 1:
@@ -96,7 +96,7 @@ class LoginPage(Screen):
 
     def remember_me(self):
         
-        DB_admin().remember_status(modo = 1) ##listo
+        DB_admin().remember_status(modo = 1) 
 
     def login(self):
         user_info = DB_admin().user_info(columnas=['username', 'password']) 
@@ -239,7 +239,7 @@ class SecondWindow(Screen):
         ##
 
     def press_actividad(self):  # Abre la ventana donde se muestran los detalles de la actividad
-        activity_name = DB_admin().define_activity(self.text) ##listo
+        activity_name = DB_admin().define_activity(self.text) 
         sm.current = 'thirdwindow'
         sm.transition.direction = "left"
 
@@ -323,7 +323,7 @@ class SecondWindow(Screen):
         semestre_info = DB_admin().fetch_semester_selected_info()
         semestre_name = semestre_info['name']
         semestre_id = semestre_info['id']
-        carpeta = subject_name[0] + '//1. Materiales//plan_'+str(clave[0]) +'_'+ subject_grupo +'_'+'ED.pdf'
+        carpeta = subject_name[0] + '//1. Materiales//plan_'+str(clave[0]) +'_'+ str(subject_grupo) +'_'+'ED.pdf'
         path = "C://Users//ivan_//OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO//Documents//Administracion//Ivan//{}. {}//{}".format(str(int(semestre_id)+3), semestre_name, carpeta)
         path = path.replace('"',"")
         subprocess.Popen([path], shell=True)
