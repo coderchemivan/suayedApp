@@ -15,6 +15,8 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.service import Service as ChromeService
 from webdriver_manager.chrome import ChromeDriverManager
 import requests
+from urllib import request
+import os
 
 class Planes_de_trabajo():
   def __init__(self,semestre=None):
@@ -66,6 +68,16 @@ class Planes_de_trabajo():
     df = df.pivot(index=['clave_materia','materia','semestre'],columns='carrera',values='carrera').reset_index()
     #guardar el df en un csv
     df.to_csv('assests/files/materias_fca.csv',index=True)
+
+  def crear_carpetas_materias(self,carpeta=None,materias=None):
+    materias = DB_admin().materias_por_semestre(self.semestre,usuario='1') if materias == None else materias
+    for materia in materias:
+        try:
+            os.mkdir("{}//{}//".format(carpeta,materia['materia']))
+            os.mkdir("{}//{}//1. Materiales".format(carpeta,materia['materia']))
+        except Exception as e:
+            print(e)
+
 
   def descargaPlanes(self,modalidad=None,materias=None):
     driver = self.define_driver_opts()
@@ -339,6 +351,60 @@ class Planes_de_trabajo():
     df.to_csv(f'assests/files/actividades_por_materia/{nombre_materia}.csv',index=False)
      
  
+class ApuntesElectronicos(Planes_de_trabajo):
+    def __init__(self, semestre=None):
+        super().__init__(semestre)
+
+    def descargarApuntes(self,materias=None):
+        driver = self.define_driver_opts()
+        materias = DB_admin().materias_por_semestre(self.semestre,usuario='1') if materias == None else materias
+        url = 'https://administracion.suayed.fca.unam.mx/login/index.php'
+        driver.get(url)
+        # Logeo en la página
+        user_input = driver.find_element(By.ID, "username")
+        password_input = driver.find_element(By.ID, "password")
+        sleep(2.0)
+        user_input.send_keys("421157110")
+        password_input.send_keys("16091997")
+        password_input.send_keys(Keys.ENTER)
+
+        try:
+            menu_btn = driver.find_element(By.XPATH, '//button[@aria-expanded="false"]').click()
+        except:
+            pass
+        for materia in materias:
+            encontrado = False
+            nombre_materia = materia['materia']
+            clave_materia = materia['clave_materia']
+            grupo = materia['grupo']
+
+            print("//h3[@class='coursename']/a[contains(text(),'{}')]".format(nombre_materia))
+            materia_contenedor = driver.find_element(By.XPATH,"//h3[@class='coursename']/a[contains(text(),'{}')]".format(nombre_materia)).click()
+            contenedor_links = driver.find_elements(By.XPATH,"//div[@class='activityinstance']//a[@class='aalink']")
+
+            for link in contenedor_links:
+                text = link.text
+                if 'Apunte' in text:
+                    encontrado = True
+                    link = link.get_attribute('href')
+                    break
+            if encontrado == False:
+                continue
+            driver.get(link)
+            link_descarga = driver.find_element(By.XPATH,"//div[@class='resourceworkaround']/a").click()
+            #link_buscado = link_descarga.get_attribute('href')
+            
+            #descargando el pdf
+            #local_filename = 'assests/files/apuntes/{}.pdf'.format(clave_materia)
+            #request.urlretrieve(link_buscado, local_filename)
+            #wget.download(link_buscado, local_filename)
+            driver.back()
+            driver.back()
+            sleep(2)
+
+#c = ApuntesElectronicos(semestre ='23-2').descargarApuntes()
+ApuntesElectronicos(semestre ='23-2').crear_carpetas_materias(r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Documents\Administracion\Ivan\6. Semestre 23-2")
+
 #df1 = Planes_de_trabajo(r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Documents\Administracion\Ivan\5. Semestre 23-1\COACHING\1. Materiales/plan_285_8451_ED.pdf",'23-1').parse()
 #df1.clave_materia()
 
@@ -348,3 +414,27 @@ class Planes_de_trabajo():
 #c = Planes_de_trabajo().get_fca_subjects()
 
 
+# localname = "assests/files/apuntes/1145.pdf"
+# url = "http://fcasua.contad.unam.mx/apuntes/interiores/docs/20192/administracion/1/LA_1143_051118_A_Fundamentos_de_Administracion_Plan2016.pdf"
+# headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36'}
+
+
+# '''Método 1'''
+# #request.urlretrieve(url, localname)
+
+# '''Método 2'''
+# #wget.download(url, localname)
+
+# '''Método 3'''
+# data = requests.get(url)
+# r = requests.get(url, stream=True)
+# with open(localname, 'wb')as file:
+#   file.write(data.content)
+
+#link_buscado = f'https://administracion.suayed.fca.unam.mx/pluginfile.php/97274/mod_resource/content/2/A_Administracion_Cadenas_suministro_24092021_FINAL.pdf'
+#descargar el pdf
+# r = requests.get(link_buscado, stream=True, headers=headers)
+# with open(localname, 'wb') as f:
+#     for chunk in r.iter_content(chunk_size=1024): 
+#         if chunk: # filter out keep-alive new chunks
+#             f.write(chunk)

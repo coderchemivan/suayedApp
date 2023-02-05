@@ -336,18 +336,18 @@ class SecondWindow(Screen):
 
 class ThirdWindow(Screen):
     def on_pre_enter(self, *args):
-        activity_name = DB_admin().obtener_materia_name_(modo=4) ##listo
-        subject_name = DB_admin().obtener_materia_name_(modo=1) ## listo
-        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
-        activity_status = DB_admin().estado_actividad(clave=clave[0],actividad=activity_name) ## listo
+        activity_name = DB_admin().obtener_materia_name_(modo=4) 
+        subject_name = DB_admin().obtener_materia_name_(modo=1) 
+        clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0]) 
+        activity_status = DB_admin().estado_actividad(clave=clave[0],actividad=activity_name) 
 
 
         self.ids.nombre_actividad.title = activity_name
         self.ids.enviado_el.text = f' Enviada el : {activity_status[0]}'
-        self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[1]) * 100)}'
+        self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[1]))}'
         self.ids.estatus_entrega.text = f' Status : {activity_status[2]}'
         self.ids.calificacion.text = f' Calificación :  {activity_status[3]}'
-        self.ids.calificado_el.text = f' Calificada el : {activity_status[4].strftime("%d/%m/%Y")}'
+        self.ids.calificado_el.text = f' Calificada el : {activity_status[4].strftime("%d/%m/%Y")}' if activity_status[4]!= "" else ""
         self.ids.scroll_lable.ids.comentarios.text = f' {activity_status[5]}'
 
 

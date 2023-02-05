@@ -56,10 +56,11 @@ class DB_admin():
         else:
             semestre = 'Semestre ' + semestre
             self.cur.execute(f'''
-                            select mf.materia,mu.clave_materia,mu.grupo from materias_usuario as mu
+                            select distinct(materia),clave_materia,grupo from 
+                            (select mf.materia,mu.clave_materia,mu.grupo from materias_usuario as mu
                             left join materias_fca as mf 
                             ON mu.clave_materia = mf.clave_materia
-                            where mu.semestre_id= (select id from semestres where name = '{semestre}');
+                            where mu.semestre_id= (select id from semestres where name = '{semestre}')) as tabla;
             ''')
             materias = self.cur.fetchall()
             materias = [dict(zip(['materia','clave_materia','grupo'],materia)) for materia in materias]
@@ -392,10 +393,20 @@ class DB_admin():
         return grupo
 
     def actualizar_DB(self, materia, actividad):
-        actividad = actividad.replace("U", "Unidad ").replace(
-            "Act_compl", "Actividad complementaria"). \
-            replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace('Act_int','Actividad integradora'). \
-                replace("_", " / ") + "//"
+        if "Act_compl" in actividad:
+            actividad = actividad.replace("U", "Unidad ").replace(
+                "Act_compl", "Actividad complementaria").replace("_", " / ") + "//"
+        else:
+            actividad = actividad.replace("U", "Unidad ").replace(
+                "Act_compl", "Actividad complementaria"). \
+                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "//"
+            actividad = actividad.replace('Examen//','Examen')
+        c = re.split(r'(Unidad \d+)', actividad)
+        actividad = c[1] + " // " + c[2].lstrip()
+        #agregar // después de unidad y número de unidad al nombre de la actividad
+
+
+
         actividad = actividad.replace('Examen//','Examen')
         self.cur.execute("SELECT date_format(fecha_entrega,'%d-%m-%Y') FROM actividades WHERE clave_materia= '" + str(
             materia) + "' AND name = '" + actividad + "'")
@@ -600,9 +611,9 @@ class goal_file():
 #materias = DB_admin().materias_por_semestre(semestre='23-2',usuario='1')
 #print(materias)
 
-DB_admin(usuario=1).load_data(semestre='23-2',archivo="assests/files/actividades_por_materia/actividades_load.csv")
+#DB_admin(usuario=1).load_data(semestre='23-2',archivo="assests/files/actividades_por_materia/actividades_load.csv")
 
-
+#DB_admin().materias_por_semestre('23-2',usuario='1')
 #archiv = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\materia_dashboard_material\meta.xlsm'
 #goal_file(archiv,archivo,'1343','COMPORTAMIENTO EN LAS ORGANIZACIONES').change_cell()
 
