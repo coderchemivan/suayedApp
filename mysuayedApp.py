@@ -376,7 +376,7 @@ class FourthWindow(Screen):
     def on_pre_enter(self, *args):
         subject_name = DB_admin().obtener_materia_name_(modo=1) ## listo
         subject_clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0])  ## listo
-        archivo_grafica_progreso = r'assests\materia_dashboard_material\meta.xlsm'
+        archivo_grafica_progreso = r'assets\materia_dashboard_material\meta.xlsm'
         semestre_seleccionado = DB_admin().semestre_seleccionado()
         resultados = goal_file(archivo_grafica_progreso,semestre_seleccionado,subject_clave[0],subject_name).progreso()
         self.ids.top_bar_w4.title = subject_name[0]
@@ -402,7 +402,7 @@ class FourthWindow(Screen):
     def imagen(self, *args):
         subject_name = DB_admin().obtener_materia_name_(modo=1)  ## listo
         subject_clave = DB_admin().obtener_materia_name_(modo=3,subject_name_=subject_name[0])  ## listo       self.ids.materia_progreso.clear_widgets()
-        self.ids.materia_progreso.source = f'assests\materia_dashboard_material\{subject_clave[0]}.gif'
+        self.ids.materia_progreso.source = f'assets\materia_dashboard_material\{subject_clave[0]}.gif'
 
     def go_back(self):
         sm.current = "secondwindow"

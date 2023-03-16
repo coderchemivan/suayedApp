@@ -297,7 +297,7 @@ from aux_scripts.pendientes import pendientes_list
 
 
 with open(
-    r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\aux_scripts\picker_modificado.kv'
+    r'C:\Users\ivan_\Desktop\Repositorios\suayedApp\aux_scripts\picker_modificado.kv'
 ) as kv_file:
     Builder.load_string(kv_file.read())
 
@@ -746,7 +746,7 @@ class DatePickerDaySelectableItem(
                 self.owner.max_date = self.owner._end_range_date
                 self.owner.update_calendar_for_date_range()
             self.owner.set_selected_widget_modificado(self)
-            archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
+            archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assets\BD\materias.csv'
 
             mes_trabajado = str(self.owner.sel_month).zfill(2)
             lista = DB_admin(archivo).dias_con_pendientes(modo=1, month=self.owner.sel_month, año=str(self.current_year))
@@ -1235,7 +1235,7 @@ class MDDatePickerModificado(BaseDialogPicker):
         else:
             self.year = year
             self.month = month
-            archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
+            archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assets\BD\materias.csv'
 
             mes_trabajado = str(self.month).zfill(2)
             lista = DB_admin(archivo).dias_con_pendientes(modo=1, month=self.month,año=str(self.year))
@@ -1469,7 +1469,7 @@ class MDDatePickerModificado(BaseDialogPicker):
             self._sel_day_widget.is_selected = False
 
         # #widget.is_selected = True
-        archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
+        archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assets\BD\materias.csv'
 
         mes_trabajado =str(str(self.month).zfill(2))
         lista_days = DB_admin(archivo).dias_con_pendientes(modo=1,month=self.month,año=str(self.year))
@@ -1584,7 +1584,7 @@ class MDDatePickerModificado(BaseDialogPicker):
             if self.month + operation == 13
             else self.year
         )
-        archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\BD\materias.csv'
+        archivo = r'C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assets\BD\materias.csv'
         ultimo_dia_mes = calendar.monthrange(year, month)
         mes_ = str(str(month).zfill(2))
         self.update_calendar(year, month)

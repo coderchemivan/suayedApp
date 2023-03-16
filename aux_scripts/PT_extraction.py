@@ -4,8 +4,8 @@ import pandas as pd
 import re
 import datetime
 from time import sleep
-from aux_scripts.info_materias import DB_admin
-#from info_materias import DB_admin
+#from aux_scripts.info_materias import DB_admin
+from info_materias import DB_admin
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -21,17 +21,21 @@ import os
 class Planes_de_trabajo():
   def __init__(self,semestre=None):
     self.semestre = semestre
-    self.semestre_info = self.semestre.split('-')
-    self.resta = 0 if self.semestre_info[1] == '2' else 1
-    self.año = '20' + (str(int(self.semestre_info[0])-self.resta))
-    self.semestre_num = self.semestre_info[1]
+    try:
+        self.semestre_info = self.semestre.split('-') 
+        self.resta = 0 if self.semestre_info[1] == '2' else 1
+        self.año = '20' + (str(int(self.semestre_info[0])-self.resta))
+        self.semestre_num = self.semestre_info[1]
+    except:
+        pass
+        
 
   def define_driver_opts(self):
     opts = Options()
     opts.add_argument(
                 "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36.")
     opts.add_experimental_option("prefs", {
-        "download.default_directory": r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assests\files\planes_de_trabajo",
+        "download.default_directory": r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Desktop\repositorios\suayedApp\assets\files\planes_de_trabajo",
     })
     driver = webdriver.Chrome(service=ChromeService(executable_path=ChromeDriverManager().install()),options=opts)
     return driver
@@ -67,7 +71,7 @@ class Planes_de_trabajo():
     #pasar las carreras a columnas con pivot
     df = df.pivot(index=['clave_materia','materia','semestre'],columns='carrera',values='carrera').reset_index()
     #guardar el df en un csv
-    df.to_csv('assests/files/materias_fca.csv',index=True)
+    df.to_csv('assets/files/materias_fca.csv',index=True)
 
   def crear_carpetas_materias(self,carpeta=None,materias=None):
     materias = DB_admin().materias_por_semestre(self.semestre,usuario='1') if materias == None else materias
@@ -93,7 +97,7 @@ class Planes_de_trabajo():
             links_descarga = driver.find_elements(By.XPATH,'//a[@role="button"]')
             links_descarga = [link_descarga.get_attribute('href') for link_descarga in links_descarga]
             link_buscado = f'https://planes-trabajo.fca.unam.mx/pdf/{clave_materia}/{grupo}/ED'
-            local_filename = 'assests/files/planes_de_trabajo/plan_{}_{}_ED.pdf'.format(clave_materia,grupo)
+            local_filename = 'assets/files/planes_de_trabajo/plan_{}_{}_ED.pdf'.format(clave_materia,grupo)
             if link_buscado in links_descarga:
                 #descargar el pdf
                 r = requests.get(link_buscado, stream=True)
@@ -119,7 +123,7 @@ class Planes_de_trabajo():
                     else:
                         print('no se encontro el plan de trabajo de la materia {} en el semestre {}'.format(materia_name,self.semestre))
             self.parse(local_filename)
-        self.call_macro()
+        #self.call_macro()
 
   def mes_digit(self,mes,monthNameEnSp):
       if mes == 'enero':
@@ -258,7 +262,7 @@ class Planes_de_trabajo():
 
   def call_macro(self,archivo=None):
     app = xw.App(visible=False)
-    wb = xw.Book('assests/files/actividades_por_materia/1.juntar_act.xlsm')
+    wb = xw.Book('assets/files/actividades_por_materia/1.juntar_act.xlsm')
     macro1 = wb.macro('Juntar_materias.create_sheets')
     macro1()
 
@@ -348,7 +352,7 @@ class Planes_de_trabajo():
   def df_to_csv(self,df,clave_materia):
     clave_materia = clave_materia[1:] if clave_materia[0:1] == '0' else clave_materia
     nombre_materia = DB_admin().obtener_materia_name_(modo=5,clave_materia=clave_materia)
-    df.to_csv(f'assests/files/actividades_por_materia/{nombre_materia}.csv',index=False)
+    df.to_csv(f'assets/files/actividades_por_materia/{nombre_materia}.csv',index=False)
      
  
 class ApuntesElectronicos(Planes_de_trabajo):
@@ -395,7 +399,7 @@ class ApuntesElectronicos(Planes_de_trabajo):
             #link_buscado = link_descarga.get_attribute('href')
             
             #descargando el pdf
-            #local_filename = 'assests/files/apuntes/{}.pdf'.format(clave_materia)
+            #local_filename = 'assets/files/apuntes/{}.pdf'.format(clave_materia)
             #request.urlretrieve(link_buscado, local_filename)
             #wget.download(link_buscado, local_filename)
             driver.back()
@@ -403,18 +407,24 @@ class ApuntesElectronicos(Planes_de_trabajo):
             sleep(2)
 
 #c = ApuntesElectronicos(semestre ='23-2').descargarApuntes()
-ApuntesElectronicos(semestre ='23-2').crear_carpetas_materias(r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Documents\Administracion\Ivan\6. Semestre 23-2")
+#ApuntesElectronicos(semestre ='23-2').crear_carpetas_materias(r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Documents\Administracion\Ivan\6. Semestre 23-2")
 
 #df1 = Planes_de_trabajo(r"C:\Users\ivan_\OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO\Documents\Administracion\Ivan\5. Semestre 23-1\COACHING\1. Materiales/plan_285_8451_ED.pdf",'23-1').parse()
 #df1.clave_materia()
 
 
-#c = Planes_de_trabajo(semestre ='23-2').descargaPlanes(modalidad='d',materias = [{'materia':'PRESUPUESTOS','grupo':'8451','clave_materia':'1454'}])
+c = Planes_de_trabajo(semestre ='23-2').descargaPlanes(modalidad='d',materias = [{'materia':'PRESUPUESTOS','grupo':'8451','clave_materia':'1454'},
+                                                                                 {'materia':'ADMINISTRACIÓN DE CADENAS DE SUMINISTRO','grupo':'8551','clave_materia':'1426'},
+                                                                                 {'materia':'TÉCNICAS, ENFOQUES y TEMAS ADMINISTRATIVOS CONTEMPORÁNEOS','grupo':'8552','clave_materia':'1527'},
+                                                                                 {'materia':'MATEMATICAS FINANCIERAS','grupo':'8551','clave_materia':'1154'},
+                                                                                 {'materia':'PLAN DE MERCADOTECNIA','grupo':'8551','clave_materia':'1526'},
+                                                                                 {'materia':'DESARROLLO Y CALIDAD DE VIDA PARA LOS RECURSOS HUMANOS','grupo':'8551','clave_materia':'1427'},
+                                                                                 {'materia':'HERRAMIENTAS CUALITATIVAS PARA LA MEJORA CONTINUA','grupo':'8552','clave_materia':'310'},])
 
 #c = Planes_de_trabajo().get_fca_subjects()
 
 
-# localname = "assests/files/apuntes/1145.pdf"
+# localname = "assets/files/apuntes/1145.pdf"
 # url = "http://fcasua.contad.unam.mx/apuntes/interiores/docs/20192/administracion/1/LA_1143_051118_A_Fundamentos_de_Administracion_Plan2016.pdf"
 # headers = {'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Ubuntu Chromium/71.0.3578.80 Chrome/71.0.3578.80 Safari/537.36'}
 
@@ -438,3 +448,5 @@ ApuntesElectronicos(semestre ='23-2').crear_carpetas_materias(r"C:\Users\ivan_\O
 #     for chunk in r.iter_content(chunk_size=1024): 
 #         if chunk: # filter out keep-alive new chunks
 #             f.write(chunk)
+
+
