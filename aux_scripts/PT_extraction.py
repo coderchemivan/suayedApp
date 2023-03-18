@@ -4,8 +4,8 @@ import pandas as pd
 import re
 import datetime
 from time import sleep
-#from aux_scripts.info_materias import DB_admin
-from info_materias import DB_admin
+from aux_scripts.info_materias import DB_admin
+#from info_materias import DB_admin
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
@@ -333,7 +333,7 @@ class Planes_de_trabajo():
     '''dataframe fromat prepareation '''
     table['Unidad'] = table['Unidad'].str.slice(0,8)
     table['Unidad'] = table['Unidad'].str.replace('UNIDAD ','')
-    replacements = {'\n':' ','Act. de aprendizaje':'apren','Cuestionario de reforzamiento':'refor','Act. complementaria':'com',
+    replacements = {'\n':' ','Act. de aprendizaje':'apren','Cuestionario de reforzamiento':'refor','Act. complementaria':'com','Act.complementaria':'com',
                     'Foros':'foro','Act. lo que aprendí':'loque','Act. lo que aprendí':'loque'}
     for k,v in replacements.items():
         table['Actividad'] = table['Actividad'].str.replace(k,v)
@@ -413,13 +413,13 @@ class ApuntesElectronicos(Planes_de_trabajo):
 #df1.clave_materia()
 
 
-c = Planes_de_trabajo(semestre ='23-2').descargaPlanes(modalidad='d',materias = [{'materia':'PRESUPUESTOS','grupo':'8451','clave_materia':'1454'},
-                                                                                 {'materia':'ADMINISTRACIÓN DE CADENAS DE SUMINISTRO','grupo':'8551','clave_materia':'1426'},
-                                                                                 {'materia':'TÉCNICAS, ENFOQUES y TEMAS ADMINISTRATIVOS CONTEMPORÁNEOS','grupo':'8552','clave_materia':'1527'},
-                                                                                 {'materia':'MATEMATICAS FINANCIERAS','grupo':'8551','clave_materia':'1154'},
-                                                                                 {'materia':'PLAN DE MERCADOTECNIA','grupo':'8551','clave_materia':'1526'},
-                                                                                 {'materia':'DESARROLLO Y CALIDAD DE VIDA PARA LOS RECURSOS HUMANOS','grupo':'8551','clave_materia':'1427'},
-                                                                                 {'materia':'HERRAMIENTAS CUALITATIVAS PARA LA MEJORA CONTINUA','grupo':'8552','clave_materia':'310'},])
+# c = Planes_de_trabajo(semestre ='23-2').descargaPlanes(modalidad='d',materias = [{'materia':'PRESUPUESTOS','grupo':'8451','clave_materia':'1454'},
+#                                                                                  {'materia':'ADMINISTRACIÓN DE CADENAS DE SUMINISTRO','grupo':'8551','clave_materia':'1426'},
+#                                                                                  {'materia':'TÉCNICAS, ENFOQUES y TEMAS ADMINISTRATIVOS CONTEMPORÁNEOS','grupo':'8552','clave_materia':'1527'},
+#                                                                                  {'materia':'MATEMATICAS FINANCIERAS','grupo':'8551','clave_materia':'1154'},
+#                                                                                  {'materia':'PLAN DE MERCADOTECNIA','grupo':'8551','clave_materia':'1526'},
+#                                                                                  {'materia':'DESARROLLO Y CALIDAD DE VIDA PARA LOS RECURSOS HUMANOS','grupo':'8551','clave_materia':'1427'},
+#                                                                                  {'materia':'HERRAMIENTAS CUALITATIVAS PARA LA MEJORA CONTINUA','grupo':'8552','clave_materia':'310'},])
 
 #c = Planes_de_trabajo().get_fca_subjects()
 

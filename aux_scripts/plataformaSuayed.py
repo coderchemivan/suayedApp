@@ -10,6 +10,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.keys import Keys
 import mysql.connector
 import datetime
+from aux_scripts.info_materias import DB_admin
 
 
 
@@ -82,7 +83,7 @@ class Feedback():
 
 
                 status_calificacion =  "SELECT cal_status FROM actividades " \
-                                       "WHERE clave_materia ="+materia+" AND name = '" + activity + "'"
+                                       "WHERE clave_materia ="+materia+" AND name = '" + str(activity) + "'"
 
                 cur.execute(status_calificacion)
                 status_calificacion = cur.fetchall()
@@ -94,14 +95,15 @@ class Feedback():
 
                 # Abriendo la actividad
                 try:
+                    actividad = DB_admin().decode_activity(activity,abbrv=False)
                     actividad = self.driver.find_element(By.XPATH,
-                                                         './/span[contains(text(),"' + activity + '")]').click()
+                                                         './/span[contains(text(),"' + actividad + '")]').click()
                 except:
                     try:
                         actividad = self.driver.find_element(By.XPATH,
-                                                            './/span[contains(text(),"' + activity.replace('//','/') + '")]').click()
+                                                            './/span[contains(text(),"' + actividad.replace('//','/') + '")]').click()
                     except:
-                        print(activity)
+                        print(actividad)
                         continue
 
 
@@ -116,22 +118,23 @@ class Feedback():
                             break
                         index += 1
                     fecha_entregada = tranformData.transform_date(fecha_entregada)         
-                    fecha_entrega = cur.execute("SELECT fecha_entrega FROM actividades WHERE clave_materia ="+materia+" AND name = '" + activity + "'")
+                    fecha_entrega = cur.execute("SELECT fecha_entrega FROM actividades WHERE clave_materia ="+materia+" AND name = '" + str(activity) + "'")
                     fecha_entrega = cur.fetchall()
                     fecha_entrega, = list(zip(*fecha_entrega))
                     fecha_entrega = fecha_entrega[0]
                     
                     if fecha_entregada != None:
                         update_fecha_entregada = "UPDATE actividades SET entregada_el = '" + fecha_entregada + \
-                                                    "' WHERE clave_materia = " + materia + " AND name = '" + activity + "'" 
+                                                    "' WHERE clave_materia = " + materia + " AND name = '" + str(activity) + "'" 
                         #transformando fecha_entregada de str a datetime
                         fecha_entregada = datetime.datetime.strptime(fecha_entregada, '%Y-%m-%d')
-                    if fecha_entregada!= None and fecha_entregada.date() > fecha_entrega:
+                        fecha_entrega = datetime.datetime.strptime(fecha_entrega, '%Y-%m-%d')
+                    if fecha_entregada!= None and fecha_entregada > fecha_entrega:
                         update_status = 'Entregada con atraso'
-                        update_act_status = "UPDATE actividades SET status =" + '"'+update_status+ '"'+ "WHERE clave_materia = " + materia + " AND name = '" + activity + "'"    
-                    elif fecha_entregada!= None and fecha_entregada.date() <= fecha_entrega:
+                        update_act_status = "UPDATE actividades SET status =" + '"'+update_status+ '"'+ "WHERE clave_materia = " + materia + " AND name = '" + str(activity) + "'"    
+                    elif fecha_entregada!= None and fecha_entregada <= fecha_entrega:
                         update_status = 'Entregada a tiempo'
-                        update_act_status = "UPDATE actividades SET status =" + '"'+update_status+ '"'+ "WHERE clave_materia = " + materia + " AND name = '" + activity + "'"  
+                        update_act_status = "UPDATE actividades SET status =" + '"'+update_status+ '"'+ "WHERE clave_materia = " + materia + " AND name = '" + str(activity) + "'"  
                         cur.execute(update_act_status)  
                     
 
@@ -145,13 +148,13 @@ class Feedback():
                         calificado_en =tranformData.transform_date(calificado_en)
                     
                         update_fecha_calificacion = "UPDATE actividades SET calificada_en = '" + calificado_en + \
-                                                    "' WHERE clave_materia ="+materia+" AND name = '" + activity + "'"
+                                                    "' WHERE clave_materia ="+materia+" AND name = '" + str(activity) + "'"
 
                         update_calificacion = "UPDATE actividades SET calificacion =" + calificacion +  \
-                                                " WHERE clave_materia ="+materia+" AND name = '" + activity + "'"
+                                                " WHERE clave_materia ="+materia+" AND name = '" + str(activity) + "'"
 
                         update_calificacion_status = "UPDATE actividades SET cal_status = 1 " \
-                                                        "WHERE clave_materia =" + materia + " AND name = '" + activity + "'"
+                                                        "WHERE clave_materia =" + materia + " AND name = '" + str(activity) + "'"
                         cur.execute(update_calificacion_status)
                         cur.execute(update_fecha_calificacion)
                         cur.execute(update_calificacion)
@@ -181,7 +184,7 @@ class Feedback():
                     if feedback =="":
                         feedback = 'Sin comentarios'
                     update_comentarios = "UPDATE actividades SET comentarios ='" + feedback + \
-                                        "' WHERE clave_materia =" + materia + " AND name = '" + activity + "'"
+                                        "' WHERE clave_materia =" + materia + " AND name = '" + str(activity) + "'"
 
                     cur.execute(update_comentarios)
                     conn.commit()

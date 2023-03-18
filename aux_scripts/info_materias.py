@@ -28,8 +28,8 @@ class DB_admin():
             try:
                 self.cur.execute("INSERT INTO semestres (name) VALUES ('{}')".format(semestre))
                 self.conn.commit()
-            except:
-                pass
+            except  Exception as e:
+                print(e)
         elif accion == 'update':
             self.cur.execute("UPDATE user_settings SET semestre_a_seleccionar = {} WHERE user_id = 1".format(semestre))
             self.conn.commit()
@@ -206,7 +206,7 @@ class DB_admin():
         semestre = self.cur.fetchone()[0]
 
 
-        materias = "SELECT DISTINCT materia FROM materias_fca JOIN actividades ON materias_fca.clave_materia = actividades.clave_materia WHERE actividades.semestre ='" + semestre + "'"
+        materias = "SELECT DISTINCT materia FROM materias_fca JOIN actividades ON materias_fca.clave_materia = actividades.clave_materia WHERE actividades.semestre ='" + str(semestre) + "'"
         self.cur.execute(materias)
         materias = self.cur.fetchall()
         materias_ = list()
@@ -242,9 +242,7 @@ class DB_admin():
             act_status = [list(i) for i in self.cur.fetchall()]
             activity_date = dict()
             for act in act_status:
-                act[0] = act[0].replace(" / ", "_").replace("Unidad ", "U").replace("/", "").replace("Actividad complementaria","Act_compl"). \
-                replace("Cuestionario de reforzamiento","Cuest_refor").replace("Actividad","Act")
-                actividad = act[0]
+                actividad = self.decode_activity(act[0])
                 fecha_entrega = act[1]
                 entregada_el = act[2]
                 fecha_entrega = datetime.datetime.strptime(fecha_entrega, '%d-%m-%Y')
@@ -291,7 +289,18 @@ class DB_admin():
 
             actividades = [i[0] for i in self.cur.fetchall()]
             return actividades
-
+    def decode_activity(self,act,abbrv=True):
+        act = str(act)
+        tipos_actividades = {'1': 'Actividad', '2': 'Act.complementaria','3': 'Cuestionario_refor','4': 'Act. lo que aprendí', '5': 'Foro','6': 'Act. integradora','7': 'Examen'} if abbrv == True else {'1': 'Actividad', '2': 'Actividad complementaria','3': 'Cuestionario de reforzamiento','4': 'Lo que aprendí', '5': 'Foro','6': 'Actividad integradora','7': 'Examen'}
+        unidad = act[0:2] if len(act) == 4 and act[0:2] != '22' else act[0]
+        activity_code = act[2] if len(act) == 4 else act[1]
+        activity_num = act[-1]
+        activity_num = "" if activity_num == "0" else activity_num
+        if  abbrv == True:
+            act = f'U{unidad} {tipos_actividades[activity_code]} {activity_num}' if act[0:2] != '22' else f'{tipos_actividades[activity_code]}'
+        else:
+            act = f'Unidad {unidad} / {tipos_actividades[activity_code]} {activity_num} / ' if activity_num != "" else f'Unidad {unidad} / {tipos_actividades[activity_code]} / '     
+        return act
 
     def define_activity(self, actividad):
         '''Estblece en la tabla user_settings el valor de la act seleccionada en la pantalla 2'''

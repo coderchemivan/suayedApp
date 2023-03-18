@@ -23,6 +23,7 @@ WindowManager:
     username: User
     password: Pass
     login_cb: login_cb2
+
     MDTextField:
         id: User
         hint_text: "Username"
@@ -69,7 +70,7 @@ WindowManager:
 
             MDTopAppBar:
                 title: 'HOME'
-                elevation: 10
+                elevation: 0
                 left_action_items: [["menu", lambda x: nav_drawer.set_state("open")]]
                 pos_hint:{'x':0,'top':1}
                 size_hint_y: 0.1
@@ -96,7 +97,7 @@ WindowManager:
                 #     source: r"assests\multimedia\calendar.png"    
 
             MDFloatingActionButton:
-                elevation: 8
+                elevation: 0
                 icon: 'plus'
                 pos_hint: {'center_x': .5}
                 on_press:
@@ -170,7 +171,7 @@ WindowManager:
                 title: 'ACTIVIDADES'
                 right_action_items: [["menu", lambda x: root.abrir_menu(x)]]
                 left_action_items: [["keyboard-backspace", lambda x: app.go_back(1)]]
-                elevation:10
+                elevation:0
 
 
 
@@ -184,7 +185,7 @@ WindowManager:
                 id: Por_entregar
                 icon: "bookmark-check-outline"
                 opposite_colors: True
-                elevation: 8
+                elevation: 3.5
                 md_bg_color: 0, 0.1, 0, .5
                 pos_hint: {"x":0.10,"y":0.40}
                 on_press: root.por_entregar()
@@ -201,7 +202,7 @@ WindowManager:
                 id: Entregas_a_tiempo
                 icon: "bookmark-check-outline"
                 opposite_colors: True
-                elevation: 8
+                elevation: 3.5
                 md_bg_color: 0, 1, 0, .5
                 pos_hint: {"x":0.32,"y":0.40}
 
@@ -219,7 +220,7 @@ WindowManager:
                 id: Entregas_con_retraso
                 icon: "bookmark-check-outline"
                 opposite_colors: True
-                elevation: 8
+                elevation: 3.5
                 md_bg_color: 0, 0, 1, 1
                 pos_hint: {"x":0.54,"y":0.40}
                 on_press: root.entregas_con_atraso()
@@ -234,7 +235,7 @@ WindowManager:
             MDFloatingActionButton:
                 icon: "backspace-reverse"
                 opposite_colors: True
-                elevation: 8
+                elevation: 3.5
                 md_bg_color: 1, 0, 0, .5
                 pos_hint: {"x":0.76,"y":0.40}
                 on_press: root.atrasadas()
@@ -318,7 +319,7 @@ WindowManager:
             title : ""
             size_hint: 1,0.1
             pos_hint:{"top":1}
-            elevation: 10
+            elevation: 0
             left_action_items: [["keyboard-backspace", lambda x: app.go_back(2)]]
 
 
@@ -410,7 +411,7 @@ WindowManager:
                 title : ""
                 size_hint: 1,0.1
                 pos_hint:{"top":1}
-                elevation: 10
+                elevation: 0
                 left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]
 
         BoxLayout:
@@ -528,7 +529,7 @@ WindowManager:
                 title : ""
                 size_hint: 1,0.1
                 pos_hint:{"top":1}
-                elevation: 10
+                elevation: 0
                 left_action_items: [["keyboard-backspace", lambda x: root.go_back()]]
 
         FloatLayout:
