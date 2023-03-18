@@ -758,7 +758,7 @@ class DatePickerDaySelectableItem(
                     day = day.strip('0')
                 lista_days.append(day)
             if self.text in lista_days:
-                fecha = f'{str(self.current_year)}/{mes_trabajado}/{str(self.text).zfill(2)}'
+                fecha = f'{str(self.current_year)}-{mes_trabajado}-{str(self.text).zfill(2)}'
                 pendientes_fecha = DB_admin(archivo).dias_con_pendientes(modo=2,fecha=fecha)
 
         if self.is_selected == True:

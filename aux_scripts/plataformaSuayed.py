@@ -94,8 +94,9 @@ class Feedback():
                     continue
 
                 # Abriendo la actividad
+                actividad = ""
                 try:
-                    actividad = DB_admin().decode_activity(activity,abbrv=False)
+                    actividad = DB_admin().encode_decode_activity(activity,abbrv=False,decode=True)
                     actividad = self.driver.find_element(By.XPATH,
                                                          './/span[contains(text(),"' + actividad + '")]').click()
                 except:
@@ -110,18 +111,21 @@ class Feedback():
                 try:
                     #status de la entrega
                     fecha_entregada = None
-                    entrega_status_contendor = self.driver.find_elements(By.XPATH, "//*[@class='submissionstatustable']//*[@class='cell c1 lastcol']")
-                    index = 0
-                    for status in entrega_status_contendor:
-                        if entrega_status_contendor[index].text.startswith("Monday") or entrega_status_contendor[index].text.startswith("Tuesday") or entrega_status_contendor[index].text.startswith("Wednesday") or entrega_status_contendor[index].text.startswith("Thursday") or entrega_status_contendor[index].text.startswith("Friday") or entrega_status_contendor[index].text.startswith("Saturday") or entrega_status_contendor[index].text.startswith("Sunday"):
-                            fecha_entregada = entrega_status_contendor[index].text
-                            break
-                        index += 1
-                    fecha_entregada = tranformData.transform_date(fecha_entregada)         
-                    fecha_entrega = cur.execute("SELECT fecha_entrega FROM actividades WHERE clave_materia ="+materia+" AND name = '" + str(activity) + "'")
-                    fecha_entrega = cur.fetchall()
-                    fecha_entrega, = list(zip(*fecha_entrega))
-                    fecha_entrega = fecha_entrega[0]
+                    entregada = cur.execute("SELECT entregada_el FROM actividades WHERE clave_materia ="+materia+" AND name = '" + str(activity) + "'")
+                    entregada = cur.fetchall()[0][0]
+                    if entregada == None:
+                        entrega_status_contendor = self.driver.find_elements(By.XPATH, "//*[@class='submissionstatustable']//*[@class='cell c1 lastcol']")
+                        index = 0
+                        for status in entrega_status_contendor:
+                            if entrega_status_contendor[index].text.startswith("Monday") or entrega_status_contendor[index].text.startswith("Tuesday") or entrega_status_contendor[index].text.startswith("Wednesday") or entrega_status_contendor[index].text.startswith("Thursday") or entrega_status_contendor[index].text.startswith("Friday") or entrega_status_contendor[index].text.startswith("Saturday") or entrega_status_contendor[index].text.startswith("Sunday"):
+                                fecha_entregada = entrega_status_contendor[index].text
+                                break
+                            index += 1
+                        fecha_entregada = tranformData.transform_date(fecha_entregada)         
+                        fecha_entrega = cur.execute("SELECT fecha_entrega FROM actividades WHERE clave_materia ="+materia+" AND name = '" + str(activity) + "'")
+                        fecha_entrega = cur.fetchall()
+                        fecha_entrega, = list(zip(*fecha_entrega))
+                        fecha_entrega = fecha_entrega[0]
                     
                     if fecha_entregada != None:
                         update_fecha_entregada = "UPDATE actividades SET entregada_el = '" + fecha_entregada + \

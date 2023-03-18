@@ -157,7 +157,6 @@ class FirstWindow(Screen):
 
 
     def show_date_picker(self):
-        archivo = r''
         #current_month = date.today().month
         #DB_admin(archivo).dias_con_pendientes(modo=3, month=current_month,año='2022')
         date_dialog = MDDatePickerModificado()
@@ -245,7 +244,6 @@ class SecondWindow(Screen):
 
 
     def activity_check(self,*args):  # Se indica que se entregó una actividad
-        archivo = ''
         activity_name = self.text
         materia = DB_admin().obtener_materia_name_(modo=1)
         clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=materia[0])
@@ -337,6 +335,7 @@ class SecondWindow(Screen):
 class ThirdWindow(Screen):
     def on_pre_enter(self, *args):
         activity_name = DB_admin().obtener_materia_name_(modo=4) 
+        activity_name = DB_admin().encode_decode_activity(activity_name, decode=True)
         subject_name = DB_admin().obtener_materia_name_(modo=1) 
         clave = DB_admin().obtener_materia_name_(modo=3, subject_name_=subject_name[0]) 
         activity_status = DB_admin().estado_actividad(clave=clave[0],actividad=activity_name) 
@@ -347,7 +346,12 @@ class ThirdWindow(Screen):
         self.ids.ponderacion.text = f' Valor : {"{0:.0f}%".format(float(activity_status[1]))}'
         self.ids.estatus_entrega.text = f' Status : {activity_status[2]}'
         self.ids.calificacion.text = f' Calificación :  {activity_status[3]}'
-        self.ids.calificado_el.text = f' Calificada el : {activity_status[4].strftime("%d/%m/%Y")}' if activity_status[4]!= "" else ""
+        if activity_status[4]!= "":
+            date = activity_status[4].split('-')
+            date = date[2]+'-'+date[1]+'-'+date[0]
+            self.ids.calificado_el.text = f' Calificada el : {date}' 
+        else:
+            self.ids.calificado_el.text = ""
         self.ids.scroll_lable.ids.comentarios.text = f' {activity_status[5]}'
 
 

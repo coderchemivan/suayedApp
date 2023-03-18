@@ -38,7 +38,6 @@ class DB_admin():
             semestre = self.cur.fetchone()[0]
             return semestre
         elif accion == 'insertar_materias':
-            print("SELECT id FROM semestres WHERE name = '{}')".format(semestre))
             semestre_id = self.cur.execute("SELECT id FROM semestres WHERE name = '{}'".format(semestre))
             semestre_id = self.cur.fetchone()[0]
             for materia in materias:
@@ -134,7 +133,7 @@ class DB_admin():
             if len(fechas_)!=0:
                 fechas,= list(zip(*fechas_))
                 for fecha in fechas:
-                    fecha = fecha.strftime("%Y-%m-%d").split("-")[2]
+                    fecha = fecha.split("-")[2]
                     lista_dias.append(fecha)
 
             return lista_dias
@@ -142,7 +141,6 @@ class DB_admin():
         elif modo ==2:  ## Regresa una lista con el nomnbre de las materias, act y status
             dia = "SELECT name,clave_materia FROM actividades " \
                                   "WHERE fecha_entrega = '" + fecha + "'"
-
             self.cur.execute(dia)
             registros = self.cur.fetchall()
             materias = list()
@@ -152,23 +150,24 @@ class DB_admin():
             for registro in registros:
                 clave = registro[1]
                 acti_name = registro[0]
-                acti_name = acti_name.replace(" / ", "_").replace("Unidad ", "U").replace("/", "").replace(
-                    "Actividad complementaria", "Act_compl"). \
-                    replace("Cuestionario de reforzamiento", "Cuest_refor").replace("Actividad", "Act")
+                acti_name = self.encode_decode_activity(acti_name)
                 actividades.append(acti_name)
                 materia_nombre = '''SELECT materia FROM materias_fca  
                                     JOIN actividades 
                                     ON materias_fca.clave_materia = actividades.clave_materia
                                     where materias_fca.clave_materia =''' + str(clave) + ''' LIMIT 1'''
+                print(materia_nombre)
                 self.cur.execute(materia_nombre)
-                status_ = self.cur.fetchone()
-                status.append(status_[0])
-
-
-                self.cur.execute("SELECT status FROM actividades where clave_materia ='" + str(clave) + "' AND name= '" + registro[0] + "'")
-                materia_nombre = self.cur.fetchone()
-                materias.append(materia_nombre[0])
-
+                status_ = self.cur.fetchall()
+                status_,= list(zip(*status_))
+                for stat in status_:
+                    status.append(stat)
+                
+                self.cur.execute("SELECT status FROM actividades where clave_materia ='" + str(clave) + "' AND name= '" + str(registro[0]) + "'")
+                materia_nombre = self.cur.fetchall()
+                for materia in materia_nombre:
+                    materias.append(materia[0])
+                
             materia_actividad.append(materias)
             materia_actividad.append(actividades)
             materia_actividad.append(status)
@@ -242,7 +241,7 @@ class DB_admin():
             act_status = [list(i) for i in self.cur.fetchall()]
             activity_date = dict()
             for act in act_status:
-                actividad = self.decode_activity(act[0])
+                actividad = self.encode_decode_activity(act[0])
                 fecha_entrega = act[1]
                 entregada_el = act[2]
                 fecha_entrega = datetime.datetime.strptime(fecha_entrega, '%d-%m-%Y')
@@ -289,46 +288,34 @@ class DB_admin():
 
             actividades = [i[0] for i in self.cur.fetchall()]
             return actividades
-    def decode_activity(self,act,abbrv=True):
-        act = str(act)
-        tipos_actividades = {'1': 'Actividad', '2': 'Act.complementaria','3': 'Cuestionario_refor','4': 'Act. lo que aprendí', '5': 'Foro','6': 'Act. integradora','7': 'Examen'} if abbrv == True else {'1': 'Actividad', '2': 'Actividad complementaria','3': 'Cuestionario de reforzamiento','4': 'Lo que aprendí', '5': 'Foro','6': 'Actividad integradora','7': 'Examen'}
-        unidad = act[0:2] if len(act) == 4 and act[0:2] != '22' else act[0]
-        activity_code = act[2] if len(act) == 4 else act[1]
-        activity_num = act[-1]
-        activity_num = "" if activity_num == "0" else activity_num
-        if  abbrv == True:
-            act = f'U{unidad} {tipos_actividades[activity_code]} {activity_num}' if act[0:2] != '22' else f'{tipos_actividades[activity_code]}'
+    def encode_decode_activity(self,act,abbrv=True,decode=True):
+        if decode == True:
+            act = str(act)
+            tipos_actividades = {'1': 'Actividad', '2': 'Act.complementaria','3': 'Cuestionario_refor','4': 'Act. lo que aprendí', '5': 'Foro','6': 'Act. integradora','7': 'Examen'} if abbrv == True else {'1': 'Actividad', '2': 'Actividad complementaria','3': 'Cuestionario de reforzamiento','4': 'Lo que aprendí', '5': 'Foro','6': 'Actividad integradora','7': 'Examen'}
+            unidad = act[0:2] if len(act) == 4 and act[0:2] != '99' else act[0]
+            activity_code = act[2] if len(act) == 4 else act[1]
+            activity_num = act[-1]
+            activity_num = "" if activity_num == "0" else activity_num
+            if  abbrv == True:
+                act = f'U{unidad} {tipos_actividades[activity_code]} {activity_num}' if act[0:2] != '99' else f'{tipos_actividades[activity_code]}'
+            else:
+                act = f'Unidad {unidad} / {tipos_actividades[activity_code]} {activity_num} / ' if activity_num != "" else f'Unidad {unidad} / {tipos_actividades[activity_code]} / '
         else:
-            act = f'Unidad {unidad} / {tipos_actividades[activity_code]} {activity_num} / ' if activity_num != "" else f'Unidad {unidad} / {tipos_actividades[activity_code]} / '     
+            act = act.replace('U','').replace('Actividad','1').replace('Act.complementaria','2').replace('Cuestionario_refor','3').replace('Act. lo que aprendí','4').replace('Foro','5').replace('Act. integradora','6').replace('Examen','7') 
+            act = act.replace(' ','')
+            act = act + '0' if len(act) == 2 else act
         return act
 
     def define_activity(self, actividad):
         '''Estblece en la tabla user_settings el valor de la act seleccionada en la pantalla 2'''
-        if "Act_compl" in actividad:
-            actividad = actividad.replace("U", "Unidad ").replace(
-                "Act_compl", "Actividad complementaria").replace("_", " / ") + "//"
-        else:
-            actividad = actividad.replace("U", "Unidad ").replace(
-                "Act_compl", "Actividad complementaria"). \
-                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "//"
-            actividad = actividad.replace('Examen//','Examen')
+        actividad = self.encode_decode_activity(actividad,abbrv=False,decode=False)
         self.cur.execute('''
             UPDATE user_settings SET act_sel = "''' + actividad + '''" WHERE user_id = 1
         ''')
         self.conn.commit()
 
     def estado_actividad(self, clave, actividad):
-        if "Act_compl" in actividad:
-            actividad = actividad.replace("U", "Unidad ").replace(
-                "Act_compl", "Actividad complementaria").replace("_", " / ") + "//"
-        else:
-            actividad = actividad.replace("U", "Unidad ").replace(
-                "Act_compl", "Actividad complementaria"). \
-                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "//"
-            actividad = actividad.replace('Examen//', 'Examen')
-        if "Examen" not in actividad:
-            c = re.split(r'(Unidad \d+)', actividad)
-            actividad = c[1] + " // " + c[2].lstrip()
+        actividad = self.encode_decode_activity(actividad,abbrv=False,decode=False)
         '''Busca los valores del feedback de la actividad seleccionada en la p2 y los muestra en la pantalla de feedback'''
         self.cur.execute(
             "SELECT date_format(entregada_el,'%d-%m-%Y'),valor,status,calificacion,calificada_en,comentarios FROM actividades WHERE clave_materia= '" + str(clave) + "' AND name = '" + actividad + "'")
@@ -384,7 +371,6 @@ class DB_admin():
             subject_name = self.cur.fetchone()[0]
             return subject_name
         elif modo == 6:
-            print("SELECT clave_materia FROM materias_fca WHERE materia={} ".format(subject_name_))
             self.cur.execute("SELECT clave_materia FROM materias_fca WHERE materia='{}' ".format(subject_name_))
             clave_materia = self.cur.fetchone()[0]
             return clave_materia
@@ -402,30 +388,16 @@ class DB_admin():
         return grupo
 
     def actualizar_DB(self, materia, actividad):
-        if "Act_compl" in actividad:
-            actividad = actividad.replace("U", "Unidad ").replace(
-                "Act_compl", "Actividad complementaria").replace("_", " / ") + "//"
-        else:
-            actividad = actividad.replace("U", "Unidad ").replace(
-                "Act_compl", "Actividad complementaria"). \
-                replace("Cuest_refor", "Cuestionario de reforzamiento").replace("Act", "Actividad").replace("_", " / ") + "//"
-            actividad = actividad.replace('Examen//','Examen')
-        c = re.split(r'(Unidad \d+)', actividad)
-        actividad = c[1] + " // " + c[2].lstrip()
-        #agregar // después de unidad y número de unidad al nombre de la actividad
-
-
-
-        actividad = actividad.replace('Examen//','Examen')
+        actividad = self.encode_decode_activity(actividad,decode=False)
         self.cur.execute("SELECT date_format(fecha_entrega,'%d-%m-%Y') FROM actividades WHERE clave_materia= '" + str(
             materia) + "' AND name = '" + actividad + "'")
-        datos_act = self.cur.fetchone()
+        datos_act = self.cur.fetchall()
 
         hoy = datetime.datetime.today()
         self.cur.execute("UPDATE actividades SET entregada_el = '" + datetime.datetime.strftime(hoy,"%Y-%m-%d") + "' WHERE clave_materia= '" + str(
             materia) + "' AND name = '" + actividad + "'")
 
-        fecha_entrega = datos_act[0]
+        fecha_entrega = datos_act[0][0]
         fecha_entrega = datetime.datetime.strptime(fecha_entrega,"%d-%m-%Y")
         if hoy > fecha_entrega:
             estado = "Entregada con atraso"
@@ -437,11 +409,13 @@ class DB_admin():
     
     def update_fecha_entregada(self, fecha_entregada):
         materia_act = self.cur.execute("SELECT materia_sel,act_sel FROM user_settings WHERE user_id = 1")
-        materia_act = self.cur.fetchone()
-        materia = materia_act[0]
-        actividad = materia_act[1]
+        materia_act = self.cur.fetchall()
+        
+        materia = materia_act[0][0]
+        actividad = materia_act[0][1]
         clave_materia = self.cur.execute("SELECT clave_materia FROM materias_fca WHERE materia = '{}'".format(materia))
-        clave_materia = self.cur.fetchone()[0]
+        clave_materia = self.cur.fetchall()
+        clave_materia = clave_materia[0][0]
         self.cur.execute("UPDATE actividades SET entregada_el = date_format('{}','%Y-%m-%d') WHERE clave_materia= '{}' AND name = '{}'".format(fecha_entregada,clave_materia,actividad))
         self.conn.commit()
 
@@ -481,7 +455,6 @@ class DB_admin():
     def user_info(self,columnas):
         columnas = ",".join(columnas)
         user_info = self.cur.execute("SELECT {} FROM users WHERE id = 1".format(columnas))
-        print("SELECT {} FROM users WHERE id = 1".format(columnas))
         datos_usuario = self.cur.fetchall()
         #convertir datos_usuario a diccionario
         datos_usuario = dict(zip(columnas.split(","),datos_usuario[0]))
