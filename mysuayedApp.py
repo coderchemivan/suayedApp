@@ -1,6 +1,7 @@
 # # https://github.com/vipinjangra/KivyMD
 
 # ## VERSION 5
+import os
 
 import pandas as pd
 from kivy.lang import Builder
@@ -321,9 +322,9 @@ class SecondWindow(Screen):
         semestre_info = DB_admin().fetch_semester_selected_info()
         semestre_name = semestre_info['name']
         semestre_id = semestre_info['id']
-        carpeta = subject_name[0] + '//1. Materiales//plan_'+str(clave[0]) +'_'+ str(subject_grupo) +'_'+'ED.pdf'
-        path = "C://Users//ivan_//OneDrive - UNIVERSIDAD NACIONAL AUTÓNOMA DE MÉXICO//Documents//Administracion//Ivan//{}. {}//{}".format(str(int(semestre_id)+3), semestre_name, carpeta)
-        path = path.replace('"',"")
+        pdf_file = subject_name[0] + '//1. Materiales//plan_'+str(clave[0]) +'_'+ str(subject_grupo) +'_'+'ED.pdf'
+        archivo_categorias = os.path.realpath(os.path.join(os.path.dirname(__file__), '..', 'files', pdf_file))
+        path = "C://Users//ivan_//Documents//UNAM//Semestres//{}. {}//{}".format(str(int(semestre_id)+5), semestre_name, pdf_file)
         subprocess.Popen([path], shell=True)
 
 
