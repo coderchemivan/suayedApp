@@ -291,7 +291,7 @@ class DB_admin():
     def encode_decode_activity(self,act,abbrv=True,decode=True):
         if decode == True:
             act = str(act)
-            tipos_actividades = {'1': 'Actividad', '2': 'Act.complementaria','3': 'Cuestionario_refor','4': 'Act. lo que aprendí', '5': 'Foro','6': 'Act. integradora','7': 'Examen'} if abbrv == True else {'1': 'Actividad', '2': 'Actividad complementaria','3': 'Cuestionario de reforzamiento','4': 'Lo que aprendí', '5': 'Foro','6': 'Actividad integradora','7': 'Examen'}
+            tipos_actividades = {'1': 'Act', '2': 'Act_compl','3': 'Cuest_refor','4': 'Act. lo que aprendí', '5': 'Foro','6': 'Act. integradora','7': 'Examen'} if abbrv == True else {'1': 'Actividad', '2': 'Actividad complementaria','3': 'Cuestionario de reforzamiento','4': 'Lo que aprendí', '5': 'Foro','6': 'Actividad integradora','7': 'Examen'}
             unidad = act[0:2] if len(act) == 4 and act[0:2] != '99' else act[0]
             activity_code = act[2] if len(act) == 4 else act[1]
             activity_num = act[-1]
@@ -301,7 +301,7 @@ class DB_admin():
             else:
                 act = f'Unidad {unidad} / {tipos_actividades[activity_code]} {activity_num} / ' if activity_num != "" else f'Unidad {unidad} / {tipos_actividades[activity_code]} / '
         else:
-            act = act.replace('U','').replace('Actividad','1').replace('Act.complementaria','2').replace('Cuestionario_refor','3').replace('Act. lo que aprendí','4').replace('Foro','5').replace('Act. integradora','6').replace('Examen','7') 
+            act = act.replace('U','').replace('Act','1').replace('Act_compl','2').replace('Cuest_refor','3').replace('Act. lo que aprendí','4').replace('Foro','5').replace('Act. integradora','6').replace('Examen','7') 
             act = act.replace(' ','')
             act = act + '0' if len(act) == 2 else act
         return act
@@ -427,16 +427,17 @@ class DB_admin():
         table_rows = self.cur.fetchall()
         df = pd.read_sql(d,con = self.conn)
 
-        char_to_replace = {" / ":"_",
-                           "Unidad ": "U",
-                           "Actividad complementaria": "Act_compl",
-                           "Cuestionario de reforzamiento": "Cuest_refor",
-                            "Actividad": "Act",
-                            "Actividad integradora": "Act_integradora",
-                            "/": ""}
-        for key,value in char_to_replace.items():
-            df['name'] = df['name'].str.replace(key,value)
-        df['valor'] = df['valor'].apply(lambda x: float(x)*100)
+        # char_to_replace = {" / ":"_",
+        #                    "Unidad ": "U",
+        #                    "Actividad complementaria": "Act_compl",
+        #                    "Cuestionario de reforzamiento": "Cuest_refor",
+        #                     "Actividad": "Act",
+        #                     "Actividad integradora": "Act_integradora",
+        #                     "/": ""}
+        # for key,value in char_to_replace.items():
+        #    df['name'] = df['name'].str.replace(key,value)
+        df['name'] = df['name'].apply(self.encode_decode_activity)
+        df['valor'] = df['valor'].apply(lambda x: float(x))
         df['valor'] = df['valor'].apply(lambda x: round(x,1))
         df['valor'] = df['valor'].apply(lambda x: str(x) + "%")
         
@@ -548,19 +549,22 @@ class goal_file():
 
     def progreso(self):
         self.cur.execute("SELECT valor,calificacion,status FROM actividades WHERE usuario = '1' and clave_materia= '" + str(self.clave) +
-                         "' AND semestre = '" + self.semestre + "'")
+                         "' AND semestre = '" + str(self.semestre) + "'")
 
         cal_valor = self.cur.fetchall()
         self.cur.execute("SELECT meta FROM materias_usuario WHERE user_id = '1' and clave_materia= '" + str(self.clave) +
-                         "' AND semestre_id = '" + self.semestre + "'")
-        meta = self.cur.fetchone()[0]
+                         "' AND semestre_id = '" + str(self.semestre) + "'")
+        meta = self.cur.fetchall()[0][0]
 
         resultados = dict()
         acumulado = 0
         max_posible = 0
         for registro in cal_valor:
             valor = registro[0]
-            calificacion = registro[1]
+            try:
+                calificacion = float(registro[1])
+            except:
+                calificacion = None
             status = registro[2]
             if calificacion != None and status != "Atrasada":
                 ponderacion = (calificacion*valor)/10
@@ -570,22 +574,22 @@ class goal_file():
                 max_posible += 0
             elif status == "Por entregar":
                 max_posible += valor
-        resultados['acumulado'] = float("{:.2f}".format(acumulado*10))
-        resultados['max_posible'] = float("{:.2f}".format(max_posible*10))
+        resultados['acumulado'] = float("{:.2f}".format(acumulado))
+        resultados['max_posible'] = float("{:.2f}".format(max_posible))
         resultados['meta'] = meta
         ## Enviando la suma de calificaciones al libro de excel
-        wb = load_workbook(filename=self.archivo_excel,read_only=False,keep_vba=True)
-        ws = wb['Hoja1']
-        ws['a2'] = self.subject_name[0]
-        ws['b2'] = int(self.clave)
-        ws['d2'] = acumulado*10
-        wb.save(self.archivo_excel)
-        app = xw.App(visible=False)
-        wb = xw.Book('assets/materia_dashboard_material/meta.xlsm')
-        macro1 = wb.macro('modulo.progress')
-        macro1()
-        wb.save()
-        wb.app.quit()
+        # wb = load_workbook(filename=self.archivo_excel,read_only=False,keep_vba=True)
+        # ws = wb['Hoja1']
+        # ws['a2'] = self.subject_name[0]
+        # ws['b2'] = int(self.clave)
+        # ws['d2'] = acumulado*10
+        # wb.save(self.archivo_excel)
+        # app = xw.App(visible=False)
+        # wb = xw.Book('assets/materia_dashboard_material/meta.xlsm')
+        # macro1 = wb.macro('modulo.progress')
+        # macro1()
+        # wb.save()
+        # wb.app.quit()
 
         return resultados
 

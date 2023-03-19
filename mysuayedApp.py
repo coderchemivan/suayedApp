@@ -387,7 +387,7 @@ class FourthWindow(Screen):
         self.ids.acumulado.text = "Acumulado \n" + str(resultados['acumulado'])
         self.ids.meta.text = "Mi meta: \n" + str(resultados['meta'])
         self.ids.max_cal.text = "Calificación \n máxima\n" + str(resultados['max_posible'])
-        Clock.schedule_once(self.imagen)
+        #Clock.schedule_once(self.imagen)
         df = DB_admin().condensado_tareas(subject_clave[0])
         df = df.iloc[:, 0:]
         cols = df.columns.values
